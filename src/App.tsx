@@ -31,6 +31,8 @@ import InscriptionPage from './pages/InscriptionPage'
 import MonComptePage from './pages/MonComptePage'
 import CgvPage from './pages/CgvPage'
 import ConfidentialitePage from './pages/ConfidentialitePage'
+import LivraisonPage from './pages/LivraisonPage'
+import MentionsLegalesPage from './pages/MentionsLegalesPage'
 import CookieBanner from './components/CookieBanner'
 import CartDrawer from './components/CartDrawer'
 
@@ -60,6 +62,8 @@ function StoreFront() {
             <Route path="/mon-compte" element={<MonComptePage />} />
             <Route path="/cgv" element={<CgvPage />} />
             <Route path="/confidentialite" element={<ConfidentialitePage />} />
+            <Route path="/livraison" element={<LivraisonPage />} />
+            <Route path="/mentions-legales" element={<MentionsLegalesPage />} />
           </Routes>
         </div>
       </main>

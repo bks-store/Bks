@@ -70,7 +70,7 @@ export default function Footer() {
 
         <div className="site-footer__bottom">
           <p>© 2026 BKS — Beau Kiosque de Soulier · Dinan · {t.footer.rights}</p>
-          <p>{t.footer.authentic}</p>
+          <p style={{ opacity: 0.45, fontSize: '0.75rem' }}>Développé par Opportis</p>
         </div>
       </div>
     </footer>

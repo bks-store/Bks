@@ -4,7 +4,7 @@ import { useTranslation } from '../i18n/useTranslation'
 // ── Configuration SEO globale ─────────────────────────────────────────────────
 export const SITE_URL = 'https://www.bks-dinan.fr'  // ← mettre à jour avec votre domaine
 export const SITE_NAME = 'BKS'
-export const SITE_NAME_FULL = 'BKS — Sneakers & Streetwear Dinan'
+export const SITE_NAME_FULL = 'BKS — Sneakers & Streetwear'
 
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/brand/logo-bks-3d-clean.png`
 
@@ -134,12 +134,18 @@ export const LOCAL_BUSINESS_SCHEMA = {
       '@type': 'OpeningHoursSpecification',
       dayOfWeek: ['Monday'],
       opens: '14:00',
-      closes: '19:00',
+      closes: '18:30',
     },
     {
       '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-      opens: '10:00',
+      dayOfWeek: ['Tuesday', 'Thursday'],
+      opens: '11:00',
+      closes: '18:30',
+    },
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Wednesday', 'Friday', 'Saturday'],
+      opens: '11:00',
       closes: '19:00',
     },
   ],
@@ -185,7 +191,7 @@ export const FAQ_SCHEMA = {
       name: 'Quels sont les horaires de la boutique BKS à Dinan ?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'BKS est ouverte le lundi de 14h à 19h, et du mardi au samedi de 10h à 19h. La boutique est fermée le dimanche.',
+        text: 'BKS est ouverte le lundi de 14h à 18h30, le mardi et jeudi de 11h à 18h30, et le mercredi, vendredi et samedi de 11h à 19h. La boutique est fermée le dimanche.',
       },
     },
     {

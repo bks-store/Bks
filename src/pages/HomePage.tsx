@@ -113,6 +113,47 @@ function Hero() {
   )
 }
 
+const BRANDS = [
+  'Nike', 'Jordan', 'Adidas', 'New Balance', 'Saucony', 'UGG', 'Timberland', 'ASICS',
+]
+
+function BrandsStrip() {
+  return (
+    <div style={{
+      borderTop: '1px solid var(--line)',
+      borderBottom: '1px solid var(--line)',
+      padding: '1.25rem 0',
+      overflow: 'hidden',
+    }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        gap: '0 2.5rem',
+        paddingInline: 'var(--gutter)',
+        maxWidth: 'var(--container)',
+        margin: '0 auto',
+      }}>
+        {BRANDS.map((brand, i) => (
+          <span key={brand} style={{
+            fontFamily: 'var(--ff-body)',
+            fontSize: '0.6875rem',
+            fontWeight: 600,
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            color: 'var(--ink-soft)',
+            opacity: 0.5 + (i % 2) * 0.2,
+            whiteSpace: 'nowrap',
+          }}>
+            {brand}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function Collections() {
   const { t } = useTranslation()
   const c = t.home.collections
@@ -286,7 +327,7 @@ export default function HomePage() {
         schema={[LOCAL_BUSINESS_SCHEMA, FAQ_SCHEMA]}
       />
       <Hero />
-      <Collections />
+      <BrandsStrip />
       <ProductRow
         eyebrow={t.home.newEyebrow}
         title={t.sections.nouveautes}

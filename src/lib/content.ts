@@ -38,13 +38,13 @@ export const MEDIA_SLOTS = [
 export type MediaKey = typeof MEDIA_SLOTS[number]
 
 export const MEDIA_DEFAULTS: Record<MediaKey, string> = {
-  hero: IMAGES.hero,
-  'hero-2': IMAGES.instagram[0],
-  'hero-3': IMAGES.instagram[1],
-  'hero-4': IMAGES.instagram[2],
+  hero: '/images/store/selection-jordan1.jpg',
+  'hero-2': '/images/store/selection-jordan4.jpg',
+  'hero-3': '/images/store/selection-saucony.jpg',
+  'hero-4': '/images/store/selection-ugg.jpg',
   brand: IMAGES.brand,
-  store: IMAGES.store,
-  about: IMAGES.store,
+  store: '/images/store/boutique-interieur.webp',
+  about: '/images/store/boutique-interieur.webp',
   'instagram-1': IMAGES.instagram[0],
   'instagram-2': IMAGES.instagram[1],
   'instagram-3': IMAGES.instagram[2],

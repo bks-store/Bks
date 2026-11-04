@@ -250,7 +250,15 @@ export default function AdminProductEdit() {
             </Field>
             <Field label={t.admin.productEdit.priceBuy}>
               <input type="number" step="0.01" min="0" value={priceBuy}
-                onChange={e => setPriceBuy(e.target.value)}
+                onChange={e => {
+                  const buy = parseFloat(e.target.value)
+                  setPriceBuy(e.target.value)
+                  if (!isNaN(buy) && buy > 0) {
+                    // Marge 65% TTC : PV TTC = PA HT / (1 - 0.65) * 1.20
+                    const pvTTC = (buy / 0.35) * 1.20
+                    setPriceSale(Math.ceil(pvTTC * 100 - 1) / 100 + '')
+                  }
+                }}
                 placeholder="Confidentiel"
                 className="w-full px-4 py-3 rounded-[4px] text-sm outline-none" style={inputStyle} />
             </Field>

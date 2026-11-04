@@ -5,6 +5,7 @@ import { useUserAuth } from '../context/UserAuthContext'
 import { supabase, isConfigured } from '../lib/supabase'
 import { useToast } from '../context/ToastContext'
 import SEOHead from '../components/SEOHead'
+import { Package, User, LogOut, ChevronRight } from 'lucide-react'
 
 interface Order {
   id: string
@@ -48,15 +49,12 @@ const COUNTRIES: { code: string; label: string }[] = [
   { code: 'SG', label: 'Singapour' },
 ]
 
-function statusLabel(s: string, locale: string) {
-  const map: Record<string, { fr: string; en: string }> = {
-    pending:   { fr: 'En attente', en: 'Pending' },
-    confirmed: { fr: 'Confirmée',  en: 'Confirmed' },
-    shipped:   { fr: 'Expédiée',   en: 'Shipped' },
-    delivered: { fr: 'Livrée',     en: 'Delivered' },
-    cancelled: { fr: 'Annulée',    en: 'Cancelled' },
-  }
-  return (map[s]?.[locale as 'fr' | 'en']) ?? s
+const STATUS_MAP: Record<string, { fr: string; color: string }> = {
+  pending:   { fr: 'En attente',  color: '#92714a' },
+  confirmed: { fr: 'Confirmée',   color: '#2d7a3a' },
+  shipped:   { fr: 'Expédiée',    color: '#1a5fa8' },
+  delivered: { fr: 'Livrée',      color: '#2d7a3a' },
+  cancelled: { fr: 'Annulée',     color: '#dc2626' },
 }
 
 export default function MonComptePage() {
@@ -66,7 +64,7 @@ export default function MonComptePage() {
   const navigate = useNavigate()
   const { addToast } = useToast()
   const [orders, setOrders] = useState<Order[]>([])
-  const [tab, setTab] = useState<'orders' | 'info' | 'address'>('orders')
+  const [tab, setTab] = useState<'orders' | 'info'>('orders')
   const [profile, setProfile] = useState<Profile>(EMPTY_PROFILE)
   const [saving, setSaving] = useState(false)
 
@@ -91,10 +89,16 @@ export default function MonComptePage() {
       .select('full_name, phone, address, address2, city, zip, country')
       .eq('id', user.id)
       .maybeSingle()
-      .then(({ data }) => { if (data) setProfile({ ...EMPTY_PROFILE, ...data }) })
+      .then(({ data }) => {
+        if (data) setProfile({ ...EMPTY_PROFILE, ...data })
+        else if (user.user_metadata?.first_name) {
+          const full = [user.user_metadata.first_name, user.user_metadata.last_name].filter(Boolean).join(' ')
+          setProfile(p => ({ ...p, full_name: full }))
+        }
+      })
   }, [user])
 
-  const handleSaveAddress = useCallback(async () => {
+  const handleSave = useCallback(async () => {
     if (!user || !isConfigured || !supabase) return
     setSaving(true)
     const { error } = await supabase
@@ -102,7 +106,7 @@ export default function MonComptePage() {
       .upsert({ id: user.id, ...profile }, { onConflict: 'id' })
     setSaving(false)
     if (error) addToast('Erreur lors de la sauvegarde', 'error')
-    else addToast('Adresse sauvegardée')
+    else addToast('Informations sauvegardées')
   }, [user, profile, addToast])
 
   const setField = (key: keyof Profile) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -115,142 +119,205 @@ export default function MonComptePage() {
 
   if (loading || !user) return null
 
-  const firstName = user.user_metadata?.first_name ?? ''
-  const lastName  = user.user_metadata?.last_name ?? ''
+  const displayName = profile.full_name || user.user_metadata?.first_name || user.email?.split('@')[0] || ''
 
   return (
-    <div className="container" style={{ paddingBlock: 'var(--section)' }}>
-      <SEOHead
-        path="/mon-compte"
-        titleFr="Mon compte — BKS"
-        titleEn="My account — BKS"
-        noIndex
-      />
+    <div style={{ minHeight: '100vh', background: 'var(--surface)' }}>
+      <SEOHead path="/mon-compte" titleFr="Mon compte — BKS" titleEn="My account — BKS" noIndex />
 
-      <header className="page-head" style={{ marginBottom: '2.5rem' }}>
-        <h1 className="display h-xl">
-          {firstName ? `${a.welcomeBack}, ${firstName}` : a.welcomeBack}
-        </h1>
-        <p style={{ color: 'var(--ink-soft)', marginTop: '0.5rem' }}>{user.email}</p>
-      </header>
-
-      <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2rem', borderBottom: '1px solid var(--line)' }}>
-        {(['orders', 'info', 'address'] as const).map(tab_ => (
-          <button
-            key={tab_}
-            onClick={() => setTab(tab_)}
-            className="btn"
-            style={{
-              borderBottom: tab === tab_ ? '2px solid var(--accent)' : '2px solid transparent',
-              borderRadius: 0, paddingInline: 0, paddingBottom: '0.75rem',
-              color: tab === tab_ ? 'var(--ink)' : 'var(--ink-soft)',
-              fontWeight: tab === tab_ ? 600 : 400,
-            }}
-          >
-            {tab_ === 'orders' ? a.myOrders : tab_ === 'info' ? a.myInfo : 'Mon adresse'}
-          </button>
-        ))}
+      {/* Hero header */}
+      <div style={{
+        background: 'var(--bks-brun, #2E1B11)',
+        color: '#fff',
+        paddingBlock: 'clamp(2.5rem, 6vw, 4rem)',
+      }}>
+        <div className="container">
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.5, marginBottom: '0.5rem' }}>
+            Votre espace
+          </p>
+          <h1 className="display h-lg" style={{ color: '#fff', marginBottom: '0.5rem' }}>
+            {displayName ? `Bonjour, ${displayName.split(' ')[0]}` : 'Votre compte BKS'}
+          </h1>
+          <p style={{ opacity: 0.55, fontSize: '0.875rem' }}>{user.email}</p>
+        </div>
       </div>
 
-      {tab === 'orders' && (
-        <div>
-          {orders.length === 0 ? (
-            <p style={{ color: 'var(--ink-soft)' }}>{a.noOrders}</p>
-          ) : (
-            <div style={{ display: 'grid', gap: '1rem' }}>
-              {orders.map(o => (
-                <div key={o.id} style={{
-                  border: '1px solid var(--line)',
-                  borderRadius: 8, padding: '1.25rem',
-                  display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '0.75rem',
+      <div className="container" style={{ paddingBlock: '2.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr)', gap: '2rem' }}>
+
+          {/* Tabs */}
+          <div style={{ display: 'flex', gap: '0', borderBottom: '1px solid var(--line)' }}>
+            {([
+              { key: 'orders', label: 'Mes commandes', icon: <Package size={15} strokeWidth={1.6} /> },
+              { key: 'info',   label: 'Mes informations', icon: <User size={15} strokeWidth={1.6} /> },
+            ] as const).map(({ key, label, icon }) => (
+              <button
+                key={key}
+                onClick={() => setTab(key)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.4rem',
+                  padding: '0.75rem 1.25rem',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  borderBottom: tab === key ? '2px solid var(--bks-brun, #2E1B11)' : '2px solid transparent',
+                  marginBottom: '-1px',
+                  color: tab === key ? 'var(--ink)' : 'var(--ink-soft)',
+                  fontWeight: tab === key ? 600 : 400,
+                  fontSize: '0.875rem',
+                  transition: 'color .15s',
+                }}
+              >
+                {icon} {label}
+              </button>
+            ))}
+          </div>
+
+          {/* ── Commandes ── */}
+          {tab === 'orders' && (
+            <div>
+              {orders.length === 0 ? (
+                <div style={{
+                  padding: '3rem 2rem', textAlign: 'center',
+                  border: '1px dashed var(--line)', borderRadius: 10,
+                  color: 'var(--ink-soft)',
                 }}>
-                  <div>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--ink-soft)', marginBottom: '0.25rem' }}>{a.orderNumber}</p>
-                    <p style={{ fontFamily: 'monospace', fontSize: '0.875rem' }}>{o.id.slice(0, 8).toUpperCase()}</p>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--ink-soft)', marginBottom: '0.25rem' }}>{a.orderDate}</p>
-                    <p style={{ fontSize: '0.875rem' }}>{new Date(o.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB')}</p>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--ink-soft)', marginBottom: '0.25rem' }}>{a.orderTotal}</p>
-                    <p style={{ fontSize: '0.875rem', fontWeight: 600 }}>{o.total.toFixed(2)} €</p>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--ink-soft)', marginBottom: '0.25rem' }}>{a.orderStatus}</p>
-                    <p style={{ fontSize: '0.875rem' }}>{statusLabel(o.status, locale)}</p>
-                  </div>
+                  <Package size={36} strokeWidth={1.2} style={{ marginBottom: '1rem', opacity: 0.4 }} />
+                  <p style={{ fontWeight: 500, marginBottom: '0.5rem' }}>Aucune commande pour l'instant</p>
+                  <p style={{ fontSize: '0.8125rem' }}>Vos commandes apparaîtront ici après votre premier achat.</p>
                 </div>
-              ))}
+              ) : (
+                <div style={{ display: 'grid', gap: '0.75rem' }}>
+                  {orders.map(o => {
+                    const st = STATUS_MAP[o.status] ?? { fr: o.status, color: 'var(--ink-soft)' }
+                    return (
+                      <div key={o.id} style={{
+                        border: '1px solid var(--line)',
+                        borderRadius: 10,
+                        padding: '1.25rem 1.5rem',
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+                        gap: '1rem',
+                        alignItems: 'center',
+                        background: '#fff',
+                      }}>
+                        <div>
+                          <p style={{ fontSize: '0.6875rem', color: 'var(--ink-soft)', marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Référence</p>
+                          <p style={{ fontFamily: 'monospace', fontSize: '0.875rem', fontWeight: 600 }}>{o.id.slice(0, 8).toUpperCase()}</p>
+                        </div>
+                        <div>
+                          <p style={{ fontSize: '0.6875rem', color: 'var(--ink-soft)', marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Date</p>
+                          <p style={{ fontSize: '0.875rem' }}>{new Date(o.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB')}</p>
+                        </div>
+                        <div>
+                          <p style={{ fontSize: '0.6875rem', color: 'var(--ink-soft)', marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Total</p>
+                          <p style={{ fontSize: '0.9375rem', fontWeight: 700 }}>{o.total.toFixed(2)} €</p>
+                        </div>
+                        <div>
+                          <p style={{ fontSize: '0.6875rem', color: 'var(--ink-soft)', marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Statut</p>
+                          <span style={{
+                            display: 'inline-block',
+                            fontSize: '0.75rem', fontWeight: 600,
+                            padding: '0.2rem 0.6rem', borderRadius: 20,
+                            background: `${st.color}18`,
+                            color: st.color,
+                          }}>
+                            {st.fr}
+                          </span>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <ChevronRight size={16} strokeWidth={1.5} color="var(--ink-soft)" />
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           )}
-        </div>
-      )}
 
-      {tab === 'info' && (
-        <div style={{ display: 'grid', gap: '1rem', maxWidth: 400 }}>
-          <div className="field">
-            <label>{a.firstName}</label>
-            <input type="text" value={firstName} readOnly style={{ opacity: 0.7 }} />
-          </div>
-          <div className="field">
-            <label>{a.lastName}</label>
-            <input type="text" value={lastName} readOnly style={{ opacity: 0.7 }} />
-          </div>
-          <div className="field">
-            <label>{a.email}</label>
-            <input type="email" value={user.email ?? ''} readOnly style={{ opacity: 0.7 }} />
-          </div>
-        </div>
-      )}
+          {/* ── Informations ── */}
+          {tab === 'info' && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
 
-      {tab === 'address' && (
-        <div style={{ maxWidth: 480 }}>
-          <p style={{ color: 'var(--ink-soft)', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
-            Cette adresse sera pré-remplie automatiquement à la commande.
-          </p>
-          <div style={{ display: 'grid', gap: '1rem' }}>
-            <div className="field">
-              <label>Nom complet</label>
-              <input type="text" value={profile.full_name} onChange={setField('full_name')} placeholder="Jean Dupont" autoComplete="name" />
-            </div>
-            <div className="field">
-              <label>Téléphone</label>
-              <input type="tel" value={profile.phone} onChange={setField('phone')} placeholder="+33 6 00 00 00 00" autoComplete="tel" />
-            </div>
-            <div className="field">
-              <label>Adresse *</label>
-              <input type="text" value={profile.address} onChange={setField('address')} placeholder="12 rue de la Paix" autoComplete="address-line1" />
-            </div>
-            <div className="field">
-              <label>Complément</label>
-              <input type="text" value={profile.address2} onChange={setField('address2')} placeholder="Appt, bât…" autoComplete="address-line2" />
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div className="field">
-                <label>Code postal *</label>
-                <input type="text" value={profile.zip} onChange={setField('zip')} placeholder="75001" autoComplete="postal-code" />
+              {/* Bloc identité */}
+              <section style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 10, padding: '1.5rem', display: 'grid', gap: '1rem' }}>
+                <h2 style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: '0.25rem' }}>
+                  Identité
+                </h2>
+                <div className="field">
+                  <label>Nom complet</label>
+                  <input type="text" value={profile.full_name} onChange={setField('full_name')} placeholder="Jean Dupont" autoComplete="name" />
+                </div>
+                <div className="field">
+                  <label>Email</label>
+                  <input type="email" value={user.email ?? ''} readOnly style={{ opacity: 0.6, cursor: 'default' }} />
+                </div>
+                <div className="field">
+                  <label>Téléphone</label>
+                  <input type="tel" value={profile.phone} onChange={setField('phone')} placeholder="+33 6 00 00 00 00" autoComplete="tel" />
+                </div>
+              </section>
+
+              {/* Bloc adresse */}
+              <section style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 10, padding: '1.5rem', display: 'grid', gap: '1rem' }}>
+                <h2 style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: '0.25rem' }}>
+                  Adresse de livraison
+                </h2>
+                <div className="field">
+                  <label>Adresse</label>
+                  <input type="text" value={profile.address} onChange={setField('address')} placeholder="12 rue de la Paix" autoComplete="address-line1" />
+                </div>
+                <div className="field">
+                  <label>Complément</label>
+                  <input type="text" value={profile.address2} onChange={setField('address2')} placeholder="Appt, bât…" autoComplete="address-line2" />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '0.75rem' }}>
+                  <div className="field">
+                    <label>Code postal</label>
+                    <input type="text" value={profile.zip} onChange={setField('zip')} placeholder="75001" autoComplete="postal-code" />
+                  </div>
+                  <div className="field">
+                    <label>Ville</label>
+                    <input type="text" value={profile.city} onChange={setField('city')} placeholder="Paris" autoComplete="address-level2" />
+                  </div>
+                </div>
+                <div className="field">
+                  <label>Pays</label>
+                  <select value={profile.country} onChange={setField('country')} autoComplete="country">
+                    {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.label}</option>)}
+                  </select>
+                </div>
+              </section>
+
+              {/* Bouton save pleine largeur */}
+              <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end', gap: '1rem', alignItems: 'center' }}>
+                <button
+                  className="btn btn--solid"
+                  onClick={handleSave}
+                  disabled={saving}
+                  style={{ minWidth: 220 }}
+                >
+                  {saving ? 'Sauvegarde…' : 'Sauvegarder mes informations'}
+                </button>
               </div>
-              <div className="field">
-                <label>Ville *</label>
-                <input type="text" value={profile.city} onChange={setField('city')} placeholder="Paris" autoComplete="address-level2" />
-              </div>
             </div>
-            <div className="field">
-              <label>Pays</label>
-              <select value={profile.country} onChange={setField('country')} autoComplete="country">
-                {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.label}</option>)}
-              </select>
-            </div>
-            <button className="btn btn--solid" onClick={handleSaveAddress} disabled={saving} style={{ marginTop: '0.5rem' }}>
-              {saving ? 'Sauvegarde…' : 'Sauvegarder mon adresse'}
+          )}
+
+          {/* Déconnexion */}
+          <div style={{ paddingTop: '1.5rem', borderTop: '1px solid var(--line)' }}>
+            <button
+              onClick={handleSignOut}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                fontSize: '0.8125rem', color: 'var(--ink-soft)',
+                background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+              }}
+            >
+              <LogOut size={14} strokeWidth={1.6} />
+              {a.signOut}
             </button>
           </div>
-        </div>
-      )}
 
-      <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid var(--line)' }}>
-        <button className="btn btn--outline" onClick={handleSignOut}>{a.signOut}</button>
+        </div>
       </div>
     </div>
   )

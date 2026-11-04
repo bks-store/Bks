@@ -473,12 +473,21 @@ export default function CartPage() {
           </div>
           <div className="summary__row">
             <span>{t.cart.shipping}</span>
-            <span>{t.cart.shippingCalc}</span>
+            {total >= 150
+              ? <span style={{ color: 'var(--accent)', fontWeight: 600 }}>Offerte ✓</span>
+              : <span>{t.cart.shippingCalc}</span>
+            }
           </div>
-          <p style={{ fontSize: '0.6875rem', color: 'var(--ink-soft)', marginBottom: '1rem', lineHeight: 1.5 }}>
-            Livraison 72h en Europe · France, Belgique, Suisse et plus.<br />
-            Livraison internationale disponible (USA, Canada, Dubaï…)
-          </p>
+          {total < 150 && (
+            <p style={{ fontSize: '0.6875rem', color: 'var(--accent)', marginBottom: '1rem', lineHeight: 1.5 }}>
+              Plus que {(150 - total).toFixed(2).replace('.', ',')} € pour la livraison offerte
+            </p>
+          )}
+          {total >= 150 && (
+            <p style={{ fontSize: '0.6875rem', color: 'var(--ink-soft)', marginBottom: '1rem', lineHeight: 1.5 }}>
+              Livraison offerte en France · Colissimo suivi
+            </p>
+          )}
           <div className="summary__total">
             <span>{t.cart.total}</span>
             <span>{formatPrice(total)}</span>
