@@ -52,7 +52,7 @@ export default function AboutPage() {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-start',
-            paddingTop: '1rem',
+            paddingTop: 'clamp(2rem, 4vw, 3rem)',
             paddingBottom: 'clamp(2rem, 5vw, 3.5rem)',
             paddingRight: 'clamp(0px, 4vw, 3rem)',
           }}>
