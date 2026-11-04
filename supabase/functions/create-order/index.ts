@@ -46,16 +46,26 @@ serve(async (req) => {
 
     if (orderErr || !order) throw new Error(orderErr?.message ?? 'Erreur création commande')
 
-    // Insérer les articles
+    // Récupérer prix d'achat + gs_size_id pour chaque article
     const orderItems = await Promise.all(
       items.map(async (item: CartItem) => {
-        // Récupérer gs_size_id via product_id + size
         const { data: sizeRow } = await supabase
           .from('product_sizes')
-          .select('gs_size_id')
+          .select('gs_size_id, price_buy')
           .eq('product_id', item.productId)
           .eq('size', item.size)
           .maybeSingle()
+
+        // Fallback : prix d'achat depuis le produit si pas dans product_sizes
+        let priceBuy = sizeRow?.price_buy ?? null
+        if (!priceBuy) {
+          const { data: prod } = await supabase
+            .from('products')
+            .select('price_buy')
+            .eq('id', item.productId)
+            .maybeSingle()
+          priceBuy = prod?.price_buy ?? null
+        }
 
         return {
           order_id: order.id,
@@ -65,6 +75,7 @@ serve(async (req) => {
           size: item.size,
           quantity: item.quantity,
           unit_price: item.price,
+          unit_price_buy: priceBuy,
           stock_type: 'dropshipping',
           gs_size_id: sizeRow?.gs_size_id ?? null,
         }

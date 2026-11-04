@@ -10,6 +10,7 @@ import { useTranslation } from '../../i18n/useTranslation'
 import type { DbOrder } from '../../types/database'
 
 // Coefficient: PV TTC = PA × 1.65 → marge = 0.65/1.65
+const MARKUP = 1.65
 const MARGIN_RATE = 0.65 / 1.65
 
 interface FullStats {
@@ -114,11 +115,27 @@ export default function AdminDashboard() {
       const caPrevMonth = prevMonthOrders.reduce((s, o) => s + (o.payment_amount ?? 0), 0)
       const caToday = todayOrders.reduce((s, o) => s + (o.payment_amount ?? 0), 0)
 
+      // Marge réelle depuis order_items.unit_price_buy (si disponible)
+      const orderIds = monthOrders.map(o => o.id)
+      let margeMonth = caMonth * MARGIN_RATE // fallback coefficient
+      if (orderIds.length > 0) {
+        const { data: itemsData } = await supabase
+          .from('order_items')
+          .select('unit_price, unit_price_buy, quantity')
+          .in('order_id', orderIds)
+        if (itemsData?.some((i: any) => i.unit_price_buy != null)) {
+          margeMonth = (itemsData as any[]).reduce((s: number, i: any) => {
+            const buy = i.unit_price_buy ?? i.unit_price / MARKUP
+            return s + (i.unit_price - buy) * (i.quantity ?? 1)
+          }, 0)
+        }
+      }
+
       const lastSync = allProducts.find(p => p.last_sync_at)?.last_sync_at ?? null
 
       setStats({
         caMonth, caPrevMonth, caToday,
-        margeMonth: caMonth * MARGIN_RATE,
+        margeMonth,
         panierMoyen: monthOrders.length > 0 ? caMonth / monthOrders.length : 0,
         ordersMonth: monthOrders.length,
         ordersToday: todayOrders.length,
