@@ -154,48 +154,6 @@ function BrandsStrip() {
   )
 }
 
-function Collections() {
-  const { t } = useTranslation()
-  const c = t.home.collections
-  const { visibleRubriques } = useContent()
-  const tiles = visibleRubriques.filter(r => r.onHome).slice(0, 3).map((r, i) => ({
-    cls: ['tile--a', 'tile--b', 'tile--c'][i], to: `/rubrique/${r.slug}`, img: r.coverUrl ?? undefined, title: r.name, sub: r.description,
-  }))
-  if (tiles.length === 0) return null
-  return (
-    <section className="section bg-surface">
-      <div className="container">
-        <div className="section-head">
-          <div>
-            <p className="eyebrow">{c.eyebrow}</p>
-            <h2 className="display h-lg">{c.title}</h2>
-          </div>
-        </div>
-
-        <div className="collections">
-          {tiles.map(tile => (
-            <Link key={tile.to} to={tile.to} className={`tile ${tile.cls}`}>
-              <div className="media media--zoom tile__media">
-                <SmartImage src={tile.img} alt={tile.title} />
-              </div>
-              <div className="tile__caption">
-                <div>
-                  <h3 className="display h-sm">{tile.title}</h3>
-                  <p className="tile__sub">{tile.sub}</p>
-                </div>
-                <span className="tile__cta">{c.discover} <ArrowRight size={13} strokeWidth={1.6} /></span>
-              </div>
-            </Link>
-          ))}
-          <div className="collections__note">
-            <p>{c.note}</p>
-            <Link to="/catalogue" className="link-arrow">{c.all} <ArrowRight size={14} strokeWidth={1.6} /></Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
 
 function ProductRow({ eyebrow, title, products, link, linkLabel, tone, cols }: {
   eyebrow: string; title: string; products: Product[]; link: string; linkLabel: string

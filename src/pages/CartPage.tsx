@@ -169,7 +169,7 @@ function StripePaymentForm({
 
 // ── Main CartPage ─────────────────────────────────────────────────────────────
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, total, clearCart } = useCart()
+  const { items, removeItem, updateQuantity, total } = useCart()
   const { t } = useTranslation()
   const { user } = useUserAuth()
   const totalQty = items.reduce((s, i) => s + i.quantity, 0)
@@ -184,8 +184,9 @@ export default function CartPage() {
       .select('full_name, phone, address, address2, city, zip, country')
       .eq('id', user.id)
       .maybeSingle()
-      .then(({ data }) => {
-        if (!data) return
+      .then(({ data: d }) => {
+        if (!d) return
+        const data = d as any
         setForm(f => ({
           ...f,
           name: data.full_name || f.name,
@@ -241,6 +242,7 @@ export default function CartPage() {
       setOrderId(data.orderId)
 
       if (saveAddress && user && isConfigured && supabase) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         supabase.from('profiles').upsert({
           id: user.id,
           full_name: form.name,
@@ -250,7 +252,7 @@ export default function CartPage() {
           city: form.address.city,
           zip: form.address.zip,
           country: form.address.country,
-        }, { onConflict: 'id' })
+        } as any, { onConflict: 'id' })
       }
 
       setStep('payment')
@@ -568,7 +570,8 @@ function Field({
       }}>
         {label}
       </label>
-      {cloneElement(children, { style: { ...inputStyle, ...children.props.style } })}
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+      {cloneElement(children as React.ReactElement<any>, { style: { ...inputStyle, ...(children.props as any).style } })}
     </div>
   )
 }

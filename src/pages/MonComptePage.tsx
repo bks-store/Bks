@@ -77,9 +77,9 @@ export default function MonComptePage() {
     supabase
       .from('orders')
       .select('id, created_at, total, status, payment_status')
-      .eq('customer_email', user.email)
+      .eq('customer_email', user.email!)
       .order('created_at', { ascending: false })
-      .then(({ data }) => setOrders(data ?? []))
+      .then(({ data }) => setOrders((data ?? []) as unknown as Order[]))
   }, [user])
 
   useEffect(() => {
@@ -90,7 +90,7 @@ export default function MonComptePage() {
       .eq('id', user.id)
       .maybeSingle()
       .then(({ data }) => {
-        if (data) setProfile({ ...EMPTY_PROFILE, ...data })
+        if (data) setProfile({ ...EMPTY_PROFILE, ...(data as any) })
         else if (user.user_metadata?.first_name) {
           const full = [user.user_metadata.first_name, user.user_metadata.last_name].filter(Boolean).join(' ')
           setProfile(p => ({ ...p, full_name: full }))
@@ -103,7 +103,7 @@ export default function MonComptePage() {
     setSaving(true)
     const { error } = await supabase
       .from('profiles')
-      .upsert({ id: user.id, ...profile }, { onConflict: 'id' })
+      .upsert({ id: user.id, ...profile } as any, { onConflict: 'id' })
     setSaving(false)
     if (error) addToast('Erreur lors de la sauvegarde', 'error')
     else addToast('Informations sauvegardées')
