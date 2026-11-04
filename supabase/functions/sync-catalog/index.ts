@@ -19,11 +19,8 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     )
 
-    let markup = 40
-    try {
-      const body = await req.json()
-      if (body?.markup) markup = parseFloat(body.markup)
-    } catch { /* body vide */ }
+    // Majoration 65% TVA incluse : PV TTC = PA * 1.65
+    const MARKUP = 1.65
 
     // 1. Récupérer le catalogue une seule fois
     const gsRes = await fetch(`${GS_API_BASE}/assortment/`, {
@@ -46,7 +43,7 @@ serve(async (req) => {
         brand: item.brand_name,
         category: 'sneakers',
         stock_type: 'dropshipping',
-        price_sale: parseFloat((minBuy * (1 + markup / 100)).toFixed(2)),
+        price_sale: Math.ceil(minBuy * MARKUP * 100 - 1) / 100,
         price_buy: minBuy,
         images: item.image_full_url
           ? [item.image_full_url, ...(item.additional_images ?? [])]
