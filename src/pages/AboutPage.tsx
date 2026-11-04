@@ -52,7 +52,8 @@ export default function AboutPage() {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-start',
-            paddingBlock: 'clamp(2rem, 5vw, 3.5rem)',
+            paddingTop: '1rem',
+            paddingBottom: 'clamp(2rem, 5vw, 3.5rem)',
             paddingRight: 'clamp(0px, 4vw, 3rem)',
           }}>
             <nav className="crumbs" style={{ marginBottom: '2rem', opacity: 0.5 }} aria-label="Fil d'Ariane">
