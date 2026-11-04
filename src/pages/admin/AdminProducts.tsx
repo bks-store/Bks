@@ -127,80 +127,87 @@ export default function AdminProducts() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      {/* Page header */}
+      <div className="admin-head">
         <div>
-          <p className="eyebrow">Catalogue</p>
-          <h1 className="admin-title">
-            {t.admin.products.title}
-          </h1>
-          <p className="text-xs mt-1" style={{color:'var(--ink)', opacity:0.4}}>
+          <p className="eyebrow" style={{textTransform:'uppercase', fontSize:'0.6875rem', letterSpacing:'0.14em', color:'var(--ink-soft)', marginBottom:'0.4rem'}}>Catalogue</p>
+          <h1 className="admin-title">{t.admin.products.title}</h1>
+          <p style={{fontSize:'0.75rem', color:'var(--ink-faint)', marginTop:'0.3rem'}}>
             {filtered.length} produit{filtered.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <Link to="/admin/produits/nouveau" className="btn-primary" style={{gap:'0.5rem', display:'inline-flex', alignItems:'center'}}>
+          <Plus size={16} strokeWidth={2} />
+          {t.admin.products.add}
+        </Link>
+      </div>
+
+      {/* Sync GS banner */}
+      <div className="admin-card" style={{marginBottom:'1.5rem', padding:'1.25rem 1.5rem', display:'flex', alignItems:'center', flexWrap:'wrap', gap:'1rem', justifyContent:'space-between'}}>
+        <div style={{display:'flex', alignItems:'center', gap:'1rem', minWidth:0}}>
+          <div style={{
+            width:40, height:40, borderRadius:8, flexShrink:0,
+            background:'rgba(200,149,90,0.12)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            color:'var(--accent)',
+          }}>
+            <RefreshCw size={18} strokeWidth={1.8} />
+          </div>
+          <div style={{minWidth:0}}>
+            <p style={{fontSize:'0.875rem', fontWeight:600, color:'var(--ink)'}}>Synchronisation Golden Sneakers</p>
+            <p style={{fontSize:'0.75rem', color:'var(--ink-faint)', marginTop:'0.15rem'}}>
+              Importe les photos et les tailles depuis votre fournisseur
+            </p>
+          </div>
+        </div>
+        <div style={{display:'flex', alignItems:'center', gap:'0.75rem', flexShrink:0}}>
+          {syncResult && (
+            <div style={{
+              display:'flex', alignItems:'center', gap:'0.4rem',
+              fontSize:'0.8125rem', fontWeight:500,
+              color: syncResult.ok ? '#3D7A43' : '#A6412C',
+            }}>
+              {syncResult.ok ? <CheckCircle2 size={15} /> : <AlertCircle size={15} />}
+              {syncResult.msg}
+            </div>
+          )}
           <button
             onClick={syncCatalog}
             disabled={syncing}
-            className="px-4 py-2.5 rounded-[4px] text-sm font-semibold flex items-center gap-2"
-            style={{
-              background: 'transparent',
-              border: '1px solid var(--line)',
-              color: 'var(--ink)',
-              opacity: syncing ? 0.6 : 1,
-              cursor: syncing ? 'not-allowed' : 'pointer',
-            }}
-            title="Synchroniser le catalogue Golden Sneakers"
+            className="btn-primary"
+            style={{gap:'0.5rem', display:'inline-flex', alignItems:'center', opacity: syncing ? 0.7 : 1}}
           >
-            {syncing
-              ? <Loader2 size={15} className="animate-spin" />
-              : <RefreshCw size={15} />}
-            Sync GS
+            {syncing ? <Loader2 size={15} className="animate-spin" /> : <RefreshCw size={15} strokeWidth={2} />}
+            {syncing ? 'Sync en cours…' : 'Sync GS'}
           </button>
-          <Link to="/admin/produits/nouveau"
-            className="btn-primary px-4 py-2.5 rounded-[4px] text-sm font-semibold flex items-center gap-2">
-            <Plus size={16} />
-            {t.admin.products.add}
-          </Link>
         </div>
       </div>
 
-      {syncResult && (
-        <div
-          className="flex items-center gap-2 mb-4 px-4 py-3 rounded-[4px] text-sm"
-          style={{
-            background: syncResult.ok ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)',
-            border: `1px solid ${syncResult.ok ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)'}`,
-            color: syncResult.ok ? '#16a34a' : '#dc2626',
-          }}
-        >
-          {syncResult.ok
-            ? <CheckCircle2 size={15} />
-            : <AlertCircle size={15} />}
-          {syncResult.msg}
-        </div>
-      )}
-
       {/* Filters */}
-      <div className="flex flex-col gap-3 mb-5">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" color="var(--ink-faint)" />
+      <div style={{display:'flex', flexDirection:'column', gap:'0.75rem', marginBottom:'1.25rem'}}>
+        <div style={{display:'flex', flexWrap:'wrap', gap:'0.75rem'}}>
+          <div style={{position:'relative', flex:'1 1 220px', minWidth:0}}>
+            <Search size={15} style={{position:'absolute', left:'0.875rem', top:'50%', transform:'translateY(-50%)', color:'var(--ink-faint)', pointerEvents:'none'}} />
             <input
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={t.admin.products.search}
-              className="w-full pl-9 pr-4 py-2.5 rounded-[4px] text-sm outline-none"
-              style={{background:'var(--surface)', color:'var(--ink)', border:'1px solid var(--line)'}}
+              style={{
+                width:'100%', paddingLeft:'2.5rem', paddingRight:'1rem', paddingBlock:'0.625rem',
+                borderRadius:6, fontSize:'0.875rem', background:'var(--card)',
+                color:'var(--ink)', border:'1px solid var(--line)', outline:'none',
+              }}
             />
           </div>
-          <div className="flex rounded-[4px] overflow-hidden" style={{border:'1px solid var(--line)'}}>
+          <div style={{display:'flex', borderRadius:6, overflow:'hidden', border:'1px solid var(--line)', flexShrink:0}}>
             {(['all', 'published', 'unpublished'] as const).map(f => (
               <button key={f} onClick={() => setFilter(f)}
-                className="px-4 py-2.5 text-xs font-medium transition-colors"
                 style={{
-                  background: filter === f ? 'var(--bks-brun)' : 'transparent',
-                  color: filter === f ? 'var(--bks-creme)' : 'var(--ink-soft)',
+                  padding:'0.5rem 1rem', fontSize:'0.75rem', fontWeight:600,
+                  background: filter === f ? 'var(--a-sidebar)' : 'var(--card)',
+                  color: filter === f ? '#F4EEE5' : 'var(--ink-soft)',
+                  border:'none', cursor:'pointer', transition:'background 0.15s',
                 }}>
                 {f === 'all' ? t.admin.products.all
                   : f === 'published' ? t.admin.products.published
@@ -210,16 +217,17 @@ export default function AdminProducts() {
           </div>
         </div>
         {brands.length > 2 && (
-          <div className="flex flex-wrap gap-2">
+          <div style={{display:'flex', flexWrap:'wrap', gap:'0.4rem'}}>
             {brands.map(b => (
               <button key={b} onClick={() => setBrandFilter(b)}
-                className="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
                 style={{
-                  background: brandFilter === b ? 'var(--bks-brun)' : 'var(--surface-2)',
-                  color: brandFilter === b ? 'var(--bks-creme)' : 'var(--ink-soft)',
-                  letterSpacing: '0.05em',
+                  padding:'0.3rem 0.75rem', borderRadius:999, fontSize:'0.6875rem', fontWeight:600,
+                  background: brandFilter === b ? 'var(--a-sidebar)' : 'var(--surface-2)',
+                  color: brandFilter === b ? '#F4EEE5' : 'var(--ink-soft)',
+                  border:'none', cursor:'pointer', letterSpacing:'0.06em',
+                  transition:'background 0.15s',
                 }}>
-                {b === 'all' ? 'Toutes les marques' : b}
+                {b === 'all' ? 'Toutes' : b}
               </button>
             ))}
           </div>
@@ -228,73 +236,102 @@ export default function AdminProducts() {
 
       {/* Products list */}
       {loading ? (
-        <div className="flex justify-center py-16">
-          <Loader2 size={28} className="animate-spin" color="var(--bks-brun)" />
+        <div style={{display:'flex', justifyContent:'center', padding:'5rem 0'}}>
+          <Loader2 size={28} className="animate-spin" color="var(--accent)" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16">
-          <Package size={40} className="mx-auto mb-3" color="var(--ink-faint)" />
-          <p className="text-sm" style={{color:'var(--ink)', opacity:0.4}}>Aucun produit trouvé</p>
+        <div style={{textAlign:'center', padding:'5rem 0', color:'var(--ink-faint)'}}>
+          <Package size={40} style={{margin:'0 auto 1rem', opacity:0.3}} />
+          <p style={{fontSize:'0.875rem'}}>Aucun produit trouvé</p>
         </div>
       ) : (
-        <div className="rounded-[6px] overflow-hidden"
-          style={{background:'var(--card)', border:'1px solid var(--line)'}}>
-          <div className="divide-y" style={{borderColor:'var(--line)'}}>
-            {filtered.map(product => (
-              <div key={product.id} className="flex items-center gap-4 px-4 py-4">
-
-                {/* Image placeholder */}
-                <div className="media w-14 shrink-0 rounded-[4px]" style={{aspectRatio:'4 / 5'}}>
-                  <SmartImage src={product.images[0] ?? IMAGES.products[product.id]} alt={product.name} />
+        <div className="admin-card" style={{overflow:'hidden'}}>
+          {filtered.map((product, idx) => {
+            const imgSrc = product.images?.[0] ?? IMAGES.products[product.id]
+            return (
+              <div key={product.id} style={{
+                display:'flex', alignItems:'center', gap:'1rem',
+                padding:'0.875rem 1.25rem',
+                borderTop: idx === 0 ? 'none' : '1px solid var(--line)',
+                transition:'background 0.15s',
+              }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(138,90,48,0.025)')}
+                onMouseLeave={e => (e.currentTarget.style.background = '')}
+              >
+                {/* Product image */}
+                <div style={{
+                  width:68, height:68, flexShrink:0, borderRadius:8,
+                  overflow:'hidden', background:'var(--surface)',
+                  border:'1px solid var(--line)',
+                }}>
+                  {imgSrc ? (
+                    <img
+                      src={imgSrc}
+                      alt={product.name}
+                      style={{width:'100%', height:'100%', objectFit:'cover'}}
+                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                    />
+                  ) : (
+                    <div style={{width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                      <Package size={22} color="var(--ink-faint)" />
+                    </div>
+                  )}
                 </div>
 
                 {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                    <p className="text-sm font-medium truncate" style={{color:'var(--ink)'}}>
+                <div style={{flex:1, minWidth:0}}>
+                  <div style={{display:'flex', alignItems:'center', gap:'0.4rem', flexWrap:'wrap', marginBottom:'0.25rem'}}>
+                    <p style={{fontSize:'0.9375rem', fontWeight:500, color:'var(--ink)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>
                       {product.name}
                     </p>
                     {product.is_new && (
-                      <span className="text-xs px-1.5 py-0.5 rounded-full shrink-0"
-                        style={{background:'var(--line-strong)', color:'#8A5A30'}}>
-                        {t.admin.products.new}
+                      <span style={{fontSize:'0.5625rem', fontWeight:700, padding:'0.15rem 0.5rem', borderRadius:999, background:'rgba(200,149,90,0.14)', color:'var(--accent)', letterSpacing:'0.08em', textTransform:'uppercase', flexShrink:0}}>
+                        New
                       </span>
                     )}
                     {product.is_featured && (
-                      <span className="text-xs px-1.5 py-0.5 rounded-full shrink-0"
-                        style={{background:'rgba(74,106,134,0.14)', color:'#4A6A86'}}>
-                        {t.sections.featured}
+                      <span style={{fontSize:'0.5625rem', fontWeight:700, padding:'0.15rem 0.5rem', borderRadius:999, background:'rgba(74,106,134,0.1)', color:'#4A6A86', letterSpacing:'0.08em', textTransform:'uppercase', flexShrink:0}}>
+                        Vedette
                       </span>
                     )}
                   </div>
-                  <p className="text-xs" style={{color:'var(--ink)', opacity:0.45}}>
-                    {product.brand} · {product.price_sale.toFixed(2)} €
-                    {product.price_buy
-                      ? <span style={{opacity:0.6}}> (achat: {product.price_buy.toFixed(2)} €)</span>
-                      : null}
+                  <p style={{fontSize:'0.75rem', color:'var(--ink-faint)'}}>
+                    {product.brand}
+                    <span style={{margin:'0 0.35rem', opacity:0.4}}>·</span>
+                    <span style={{fontWeight:600, color:'var(--ink)'}}>
+                      {product.price_sale.toLocaleString('fr-FR', {style:'currency', currency:'EUR'})}
+                    </span>
+                    {product.price_buy ? (
+                      <span style={{marginLeft:'0.4rem', opacity:0.55}}>
+                        achat {product.price_buy.toFixed(0)} €
+                      </span>
+                    ) : null}
                   </p>
                 </div>
 
-                {/* Stock type */}
-                <div className="hidden sm:flex items-center gap-1.5 shrink-0">
-                  <div className={`w-1.5 h-1.5 rounded-full ${
-                    product.stock_type === 'boutique' ? 'bg-green-500' : 'bg-yellow-500'
-                  }`} />
-                  <span className="text-xs" style={{color:'var(--ink)', opacity:0.4}}>
+                {/* Stock type badge */}
+                <div style={{display:'flex', alignItems:'center', gap:'0.4rem', flexShrink:0}}>
+                  <div style={{
+                    width:6, height:6, borderRadius:'50%',
+                    background: product.stock_type === 'boutique' ? '#4E7A43' : '#C8955A',
+                  }} />
+                  <span style={{fontSize:'0.6875rem', color:'var(--ink-faint)', display:'none'}}>
                     {product.stock_type}
                   </span>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-1 shrink-0">
+                <div style={{display:'flex', alignItems:'center', gap:'4px', flexShrink:0}}>
                   <button
                     onClick={() => togglePublish(product)}
                     disabled={toggling === product.id}
-                    className="w-9 h-9 rounded-[4px] flex items-center justify-center transition-colors hover:bg-[var(--surface-2)]"
+                    style={{width:36, height:36, borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'transparent', border:'none', cursor:'pointer', transition:'background 0.15s'}}
                     title={product.is_published ? 'Masquer' : 'Publier'}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
                     {toggling === product.id
-                      ? <Loader2 size={16} className="animate-spin" color="#8A5A30" />
+                      ? <Loader2 size={16} className="animate-spin" color="var(--accent)" />
                       : product.is_published
                         ? <Eye size={16} color="#4E7A43" />
                         : <EyeOff size={16} color="var(--ink-faint)" />
@@ -302,15 +339,19 @@ export default function AdminProducts() {
                   </button>
                   <Link
                     to={`/admin/produits/${product.id}`}
-                    className="w-9 h-9 rounded-[4px] flex items-center justify-center transition-colors hover:bg-[var(--surface-2)]"
+                    style={{width:36, height:36, borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'transparent', transition:'background 0.15s', color:'var(--accent)'}}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
-                    <Edit2 size={16} color="#8A5A30" />
+                    <Edit2 size={16} strokeWidth={1.8} />
                   </Link>
                   <button
                     onClick={() => deleteProduct(product)}
                     disabled={deleting === product.id}
-                    className="w-9 h-9 rounded-[4px] flex items-center justify-center transition-colors hover:bg-red-50"
+                    style={{width:36, height:36, borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'transparent', border:'none', cursor:'pointer', transition:'background 0.15s'}}
                     title="Supprimer"
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(166,65,44,0.06)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
                     {deleting === product.id
                       ? <Loader2 size={16} className="animate-spin" color="#A6412C" />
@@ -319,8 +360,8 @@ export default function AdminProducts() {
                   </button>
                 </div>
               </div>
-            ))}
-          </div>
+            )
+          })}
         </div>
       )}
     </div>

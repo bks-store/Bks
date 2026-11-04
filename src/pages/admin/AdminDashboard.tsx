@@ -28,7 +28,8 @@ function StatCard({ icon, value, label, sub }: {
 }) {
   return (
     <div className="stat">
-      <p className="stat__label">{icon}{label}</p>
+      <div className="stat__icon">{icon}</div>
+      <p className="stat__label">{label}</p>
       <p className="stat__value">{value}</p>
       {sub && <p className="stat__sub">{sub}</p>}
     </div>
@@ -151,17 +152,19 @@ export default function AdminDashboard() {
       </div>
 
       <div className="stats">
-        <StatCard icon={<ShoppingBag size={14} strokeWidth={1.6} />} value={stats.ordersToday} label={t.admin.dashboard.ordersToday} />
-        <StatCard icon={<Clock size={14} strokeWidth={1.6} />} value={stats.pendingOrders} label={t.admin.dashboard.pendingOrders} />
-        <StatCard icon={<Package size={14} strokeWidth={1.6} />} value={stats.publishedProducts} label={t.admin.dashboard.publishedProducts}
+        <StatCard icon={<ShoppingBag size={16} strokeWidth={1.6} />} value={stats.ordersToday} label={t.admin.dashboard.ordersToday} />
+        <StatCard icon={<Clock size={16} strokeWidth={1.6} />} value={stats.pendingOrders} label={t.admin.dashboard.pendingOrders} />
+        <StatCard icon={<Package size={16} strokeWidth={1.6} />} value={stats.publishedProducts} label={t.admin.dashboard.publishedProducts}
           sub={`${stats.unpublishedProducts} non publiés`} />
-        <StatCard icon={<TrendingUp size={14} strokeWidth={1.6} />} value={money(stats.revenueMonth)} label={t.admin.dashboard.revenue} />
+        <StatCard icon={<TrendingUp size={16} strokeWidth={1.6} />} value={money(stats.revenueMonth)} label={t.admin.dashboard.revenue} />
       </div>
 
       <div className="admin-card" style={{marginBottom:'2rem'}}>
         <div className="admin-card__head">
           <h2>{t.admin.dashboard.recentOrders}</h2>
-          <Link to="/admin/commandes" className="admin-link">{t.admin.dashboard.viewAll} <ChevronRight size={12} /></Link>
+          <Link to="/admin/commandes" className="admin-link">
+            {t.admin.dashboard.viewAll} <ChevronRight size={12} strokeWidth={2} />
+          </Link>
         </div>
 
         {recentOrders.length === 0 ? (
@@ -174,14 +177,14 @@ export default function AdminDashboard() {
                 <Link key={order.id} to={`/admin/commandes/${order.id}`} className="order-row">
                   <div style={{minWidth:0}}>
                     <p style={{fontSize:'0.9375rem', fontWeight:500, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{order.customer_name}</p>
-                    <p style={{fontSize:'0.75rem', color:'var(--ink-faint)', marginTop:'0.15rem'}}>
-                      {order.created_at ? formatDate(order.created_at) : ''} · {order.id}
+                    <p style={{fontSize:'0.6875rem', color:'var(--ink-faint)', marginTop:'0.2rem', letterSpacing:'0.03em'}}>
+                      {order.created_at ? formatDate(order.created_at) : ''} · #{order.id?.slice(0,8).toUpperCase()}
                     </p>
                   </div>
                   <span className="badge" style={{background:`${color}14`, color}}>
                     {t.admin.orders.statuses[order.status as keyof typeof t.admin.orders.statuses ?? 'pending'] ?? order.status}
                   </span>
-                  <span style={{fontWeight:600, fontSize:'0.9375rem', whiteSpace:'nowrap', minWidth:'5.5rem', textAlign:'right'}}>
+                  <span style={{fontWeight:700, fontSize:'0.9375rem', whiteSpace:'nowrap', minWidth:'5.5rem', textAlign:'right'}}>
                     {order.payment_amount != null ? money(order.payment_amount) : ''}
                   </span>
                 </Link>
@@ -192,8 +195,8 @@ export default function AdminDashboard() {
       </div>
 
       <div style={{display:'flex', flexWrap:'wrap', gap:'0.75rem'}}>
-        <Link to="/admin/produits/nouveau" className="btn btn--solid">Ajouter un produit</Link>
-        <Link to="/admin/commandes" className="btn btn--outline">Voir les commandes</Link>
+        <Link to="/admin/produits/nouveau" className="btn-primary">Ajouter un produit</Link>
+        <Link to="/admin/commandes" className="btn-outline">Voir les commandes</Link>
       </div>
     </div>
   )

@@ -1,5 +1,5 @@
 import { NavLink, useNavigate, Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Package, ShoppingBag, LogOut, ExternalLink, Menu, X, LayoutGrid, Images } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingBag, LogOut, ExternalLink, Menu, X, LayoutGrid, Images, Store } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { useAdmin } from '../../context/AdminContext'
 import { useTranslation } from '../../i18n/useTranslation'
@@ -20,16 +20,17 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   const navItems = [
-    { to: '/admin', icon: <LayoutDashboard size={18} strokeWidth={1.5} />, label: t.admin.nav.dashboard, end: true },
-    { to: '/admin/produits', icon: <Package size={18} strokeWidth={1.5} />, label: t.admin.nav.products },
-    { to: '/admin/commandes', icon: <ShoppingBag size={18} strokeWidth={1.5} />, label: t.admin.nav.orders },
-    { to: '/admin/rubriques', icon: <LayoutGrid size={18} strokeWidth={1.5} />, label: t.admin.nav.rubriques },
-    { to: '/admin/photos', icon: <Images size={18} strokeWidth={1.5} />, label: t.admin.nav.photos },
+    { to: '/admin', icon: <LayoutDashboard size={17} strokeWidth={1.6} />, label: t.admin.nav.dashboard, end: true },
+    { to: '/admin/produits', icon: <Package size={17} strokeWidth={1.6} />, label: t.admin.nav.products },
+    { to: '/admin/commandes', icon: <ShoppingBag size={17} strokeWidth={1.6} />, label: t.admin.nav.orders },
+    { to: '/admin/rubriques', icon: <LayoutGrid size={17} strokeWidth={1.6} />, label: t.admin.nav.rubriques },
+    { to: '/admin/photos', icon: <Images size={17} strokeWidth={1.6} />, label: t.admin.nav.photos },
   ]
 
-  const nav = (
+  const navContent = (
     <>
       <div className="admin-nav">
+        <p className="admin-nav__section">Navigation</p>
         {navItems.map(item => (
           <NavLink key={item.to} to={item.to} end={item.end}>
             {item.icon}
@@ -37,9 +38,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </NavLink>
         ))}
       </div>
-      <div className="admin-side__foot admin-nav" style={{padding:'0.875rem'}}>
-        <Link to="/" target="_blank"><ExternalLink size={17} strokeWidth={1.5} />{t.admin.nav.site}</Link>
-        <button onClick={handleSignOut}><LogOut size={17} strokeWidth={1.5} />{t.admin.nav.signOut}</button>
+      <div className="admin-side__foot">
+        <Link to="/" target="_blank">
+          <Store size={16} strokeWidth={1.6} />
+          {t.admin.nav.site}
+        </Link>
+        <button onClick={handleSignOut}>
+          <LogOut size={16} strokeWidth={1.6} />
+          {t.admin.nav.signOut}
+        </button>
         {user && <p className="admin-side__user">{user.email}</p>}
       </div>
     </>
@@ -52,25 +59,27 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <Link to="/admin"><img src={IMAGES.logo.onDark} alt="BKS" /></Link>
           <p>Administration</p>
         </div>
-        {nav}
+        {navContent}
       </aside>
 
       <header className="admin-top">
         <div>
           <button onClick={() => setMenuOpen(o => !o)} aria-label="Menu" aria-expanded={menuOpen}>
-            {menuOpen ? <X size={22} strokeWidth={1.4} /> : <Menu size={22} strokeWidth={1.4} />}
+            {menuOpen ? <X size={22} strokeWidth={1.5} /> : <Menu size={22} strokeWidth={1.5} />}
           </button>
         </div>
         <Link to="/admin" style={{width:'auto'}}><img src={IMAGES.logo.onDark} alt="BKS" /></Link>
         <div style={{display:'flex', justifyContent:'flex-end'}}>
-          <Link to="/" target="_blank" aria-label={t.admin.nav.site}><ExternalLink size={18} strokeWidth={1.5} /></Link>
+          <Link to="/" target="_blank" aria-label={t.admin.nav.site}>
+            <ExternalLink size={18} strokeWidth={1.5} />
+          </Link>
         </div>
       </header>
 
       {menuOpen && (
         <div className="admin-drawer">
           <div className="admin-drawer__bg" onClick={() => setMenuOpen(false)} />
-          <nav style={{display:'flex', flexDirection:'column'}}>{nav}</nav>
+          <nav>{navContent}</nav>
         </div>
       )}
 
