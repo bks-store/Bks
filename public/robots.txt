@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Pages admin — jamais indexées
+Disallow: /admin/
+Disallow: /panier
+Disallow: /commande-confirmee
+Disallow: /connexion
+Disallow: /inscription
+Disallow: /mon-compte
+
+# Sitemap
+Sitemap: https://www.bks-dinan.fr/sitemap.xml
