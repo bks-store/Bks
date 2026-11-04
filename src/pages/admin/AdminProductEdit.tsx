@@ -254,8 +254,8 @@ export default function AdminProductEdit() {
                   const buy = parseFloat(e.target.value)
                   setPriceBuy(e.target.value)
                   if (!isNaN(buy) && buy > 0) {
-                    // Marge 65% TTC : PV TTC = PA HT / (1 - 0.65) * 1.20
-                    const pvTTC = (buy / 0.35) * 1.20
+                    // Majoration 65% TVA incluse : PV TTC = PA * 1.65
+                    const pvTTC = buy * 1.65
                     setPriceSale(Math.ceil(pvTTC * 100 - 1) / 100 + '')
                   }
                 }}
