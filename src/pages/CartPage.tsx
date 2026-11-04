@@ -173,6 +173,9 @@ export default function CartPage() {
   const { t } = useTranslation()
   const { user } = useUserAuth()
   const totalQty = items.reduce((s, i) => s + i.quantity, 0)
+  const SHIPPING = 5.90
+  const shippingCost = total >= 150 ? 0 : SHIPPING
+  const totalWithShipping = total + shippingCost
 
   const [step, setStep] = useState<Step>('cart')
   const [form, setForm] = useState<CustomerForm>(EMPTY_FORM)
@@ -231,7 +234,7 @@ export default function CartPage() {
       }
 
       const { data, error: fnErr } = await supabase.functions.invoke('create-payment', {
-        body: { items, total, customer: form },
+        body: { items, total: totalWithShipping, customer: form },
       })
 
       if (fnErr) throw new Error(fnErr.message)
@@ -459,7 +462,7 @@ export default function CartPage() {
             >
               <StripePaymentForm
                 orderId={orderId!}
-                total={total}
+                total={totalWithShipping}
                 onBack={() => setStep('details')}
               />
             </Elements>
@@ -477,7 +480,7 @@ export default function CartPage() {
             <span>{t.cart.shipping}</span>
             {total >= 150
               ? <span style={{ color: 'var(--accent)', fontWeight: 600 }}>Offerte ✓</span>
-              : <span>{t.cart.shippingCalc}</span>
+              : <span style={{ color: 'var(--ink)' }}>5,90 €</span>
             }
           </div>
           {total < 150 && (
@@ -492,7 +495,7 @@ export default function CartPage() {
           )}
           <div className="summary__total">
             <span>{t.cart.total}</span>
-            <span>{formatPrice(total)}</span>
+            <span>{formatPrice(totalWithShipping)}</span>
           </div>
 
           {step === 'cart' && (
