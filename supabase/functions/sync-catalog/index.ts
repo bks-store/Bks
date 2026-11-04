@@ -35,12 +35,15 @@ serve(async (req) => {
     const catalog: GsProduct[] = await gsRes.json()
     const now = new Date().toISOString()
 
-    // 2. Upsert produits (avec URL GS d'abord)
+    // 2. Upsert produits — sans écraser images ni is_published pour les existants
+    // On sépare : insert nouveaux (avec images GS) / update existants (prix + stock seulement)
+    const gsImageMap: Record<string, string[]> = {}
     const productsPayload = catalog.map((item) => {
       const minBuy = Math.min(...item.sizes.map((s) => s.offer_price))
       const gsImages = item.image_full_url
         ? [item.image_full_url, ...(item.additional_images ?? []).slice(0, 3)]
         : []
+      gsImageMap[item.sku] = gsImages
       return {
         sku: item.sku,
         gs_product_id: item.id,
@@ -50,8 +53,6 @@ serve(async (req) => {
         stock_type: 'dropshipping',
         price_sale: Math.ceil(minBuy * MARKUP * 100 - 1) / 100,
         price_buy: minBuy,
-        images: gsImages,
-        is_published: false,
         last_sync_at: now,
         sync_status: 'synced',
       }
@@ -61,6 +62,20 @@ serve(async (req) => {
       .from('products')
       .upsert(productsPayload, { onConflict: 'sku', ignoreDuplicates: false })
       .select('id, sku, images')
+
+    // Pour les produits sans images encore, initialiser avec l'URL GS
+    const noImg = (upsertedProducts ?? []).filter(p => !p.images?.length)
+    if (noImg.length > 0) {
+      await Promise.all(noImg.map(p =>
+        supabase.from('products')
+          .update({ images: gsImageMap[p.sku] ?? [] })
+          .eq('id', p.id)
+      ))
+      // Mettre à jour le tableau local pour que l'étape 5 détecte correctement
+      for (const p of noImg) {
+        p.images = gsImageMap[p.sku] ?? []
+      }
+    }
 
     if (prodErr) throw new Error(`Upsert produits: ${prodErr.message}`)
 
