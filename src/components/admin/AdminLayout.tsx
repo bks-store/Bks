@@ -1,5 +1,5 @@
 import { NavLink, useNavigate, Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Package, ShoppingBag, LogOut, ExternalLink, Menu, X, LayoutGrid, Images, Store } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingBag, LogOut, ExternalLink, Menu, X, LayoutGrid, Images, Store, BarChart2 } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { useAdmin } from '../../context/AdminContext'
 import { useTranslation } from '../../i18n/useTranslation'
@@ -25,6 +25,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     { to: '/admin/commandes', icon: <ShoppingBag size={17} strokeWidth={1.6} />, label: t.admin.nav.orders },
     { to: '/admin/rubriques', icon: <LayoutGrid size={17} strokeWidth={1.6} />, label: t.admin.nav.rubriques },
     { to: '/admin/photos', icon: <Images size={17} strokeWidth={1.6} />, label: t.admin.nav.photos },
+    { to: '/admin/rapports', icon: <BarChart2 size={17} strokeWidth={1.6} />, label: 'Rapports' },
   ]
 
   const navContent = (

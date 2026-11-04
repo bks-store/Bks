@@ -14,6 +14,7 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminProducts from './pages/admin/AdminProducts'
 import AdminProductEdit from './pages/admin/AdminProductEdit'
 import AdminOrders from './pages/admin/AdminOrders'
+import AdminReports from './pages/admin/AdminReports'
 import AdminOrderDetail from './pages/admin/AdminOrderDetail'
 import AdminRubriques from './pages/admin/AdminRubriques'
 import AdminRubriqueEdit from './pages/admin/AdminRubriqueEdit'
@@ -85,6 +86,7 @@ function AdminArea() {
           <Route path="rubriques" element={<AdminRubriques />} />
           <Route path="rubriques/:id" element={<AdminRubriqueEdit />} />
           <Route path="photos" element={<AdminMedia />} />
+          <Route path="rapports" element={<AdminReports />} />
         </Routes>
       </AdminLayout>
     </ProtectedRoute>
