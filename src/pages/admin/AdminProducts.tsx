@@ -109,6 +109,15 @@ export default function AdminProducts() {
     setToggling(null)
   }
 
+  // Convertit une URL Supabase Storage en miniature optimisée (120px, qualité 70)
+  const thumb = (url: string | undefined) => {
+    if (!url) return url
+    if (url.includes('/storage/v1/object/public/')) {
+      return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + '?width=120&quality=70'
+    }
+    return url
+  }
+
   const brands = ['all', ...[...new Set(products.map(p => p.brand))].sort()]
 
   const filtered = products.filter(p => {
@@ -246,7 +255,7 @@ export default function AdminProducts() {
       ) : (
         <div className="admin-card" style={{overflow:'hidden'}}>
           {filtered.map((product, idx) => {
-            const imgSrc = product.images?.[0] ?? IMAGES.products[product.id]
+            const imgSrc = product.images?.[0]
             return (
               <div key={product.id} style={{
                 display:'flex', alignItems:'center', gap:'1rem',
@@ -265,8 +274,10 @@ export default function AdminProducts() {
                 }}>
                   {imgSrc ? (
                     <img
-                      src={imgSrc}
+                      src={thumb(imgSrc)}
                       alt={product.name}
+                      loading="lazy"
+                      decoding="async"
                       style={{width:'100%', height:'100%', objectFit:'cover'}}
                       onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
                     />
