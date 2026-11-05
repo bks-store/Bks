@@ -94,15 +94,16 @@ export default function CataloguePage() {
         descEn="Full BKS selection: exclusive sneakers and limited editions, worldwide shipping from Dinan, France."
       />
       <header className={`page-head ${rubrique?.coverUrl ? 'rubrique-head' : ''}`}>
-        <div>
+        <div className={rubrique?.coverUrl ? 'rubrique-head__text' : ''}>
           <nav className="crumbs" aria-label="Fil d'Ariane">
             <Link to="/">Accueil</Link><span>/</span><span aria-current="page">{pageTitle}</span>
           </nav>
           <h1 className="display h-lg">{pageTitle}</h1>
-          {rubrique?.description && <p className="lead" style={{marginTop:'1.25rem'}}>{rubrique.description}</p>}
+          {rubrique?.coverUrl && <span className="rubrique-head__accent" aria-hidden="true" />}
+          {rubrique?.description && <p className="lead">{rubrique.description}</p>}
         </div>
         {rubrique?.coverUrl && (
-          <div className="media rubrique-head__media"><SmartImage src={rubrique.coverUrl} alt={rubrique.name} loading="eager" /></div>
+          <div className="rubrique-head__media"><SmartImage src={rubrique.coverUrl} alt={rubrique.name} loading="eager" /></div>
         )}
       </header>
 

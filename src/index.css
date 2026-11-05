@@ -631,6 +631,7 @@ a:hover .media--zoom > img { transform: scale(1.03); }
    PAGES
 ═══════════════════════════════════════════ */
 .page-head { padding-block: clamp(2.5rem, 5vw, 4.5rem) clamp(2rem, 3vw, 3rem); }
+.rubrique-head.page-head { padding-block: clamp(3rem, 6vw, 5.5rem) clamp(3rem, 5vw, 5rem); }
 .crumbs { display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.75rem; color: var(--ink-soft); margin-bottom: 1.5rem; }
 .crumbs a:hover { color: var(--ink); }
 .crumbs span[aria-current] { color: var(--ink); }
@@ -966,11 +967,24 @@ a:hover .media--zoom > img { transform: scale(1.03); }
 .admin-title { font-family: var(--ff-display); font-weight: 500 !important; font-size: clamp(1.875rem, 2.8vw, 2.5rem); line-height: 1.05; color: var(--ink); margin-top: 0.6rem; }
 
 /* Rubrique page head with cover */
-.rubrique-head { display: grid; gap: 2rem; align-items: end; }
-.rubrique-head__media { aspect-ratio: 16 / 9; }
+.rubrique-head { display: grid; gap: 2rem; align-items: start; }
+.rubrique-head__media { aspect-ratio: 4 / 3; border-radius: 2px; overflow: hidden; }
+.rubrique-head__media .media { aspect-ratio: 4 / 3; border-radius: 2px; overflow: hidden; }
+.rubrique-head__text { display: flex; flex-direction: column; justify-content: flex-start; padding-top: 0.5rem; }
+.rubrique-head__text .crumbs { margin-bottom: 1rem; }
+.rubrique-head__text h1 { margin-bottom: 0; }
+.rubrique-head__accent { display: block; width: 2.5rem; height: 2px; background: var(--accent); margin-top: 1.25rem; margin-bottom: 1.25rem; }
+.rubrique-head__text .lead { color: var(--ink-soft); max-width: 32rem; }
+@media (min-width: 768px) {
+  .rubrique-head { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; align-items: start; }
+  .rubrique-head__media { aspect-ratio: 1 / 1; }
+  .rubrique-head__media .media { aspect-ratio: 1 / 1; }
+}
 @media (min-width: 1024px) {
-  .rubrique-head { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 4rem; }
-  .rubrique-head__media { aspect-ratio: 3 / 2; }
+  .rubrique-head { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 5rem; }
+  .rubrique-head__media { aspect-ratio: 4 / 5; }
+  .rubrique-head__media .media { aspect-ratio: 4 / 5; }
+  .rubrique-head__text { padding-top: 1rem; }
 }
 
 /* Store gallery */
