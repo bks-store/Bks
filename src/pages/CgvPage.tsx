@@ -32,7 +32,7 @@ export default function CgvPage() {
         <h2>Article 2 — Objet</h2>
         <p>
           Les présentes conditions générales de vente (CGV) régissent les relations contractuelles entre BKS et tout acheteur
-          effectuant un achat sur le site bks-dinan.fr. Tout achat implique l'acceptation pleine et entière des présentes CGV.
+          effectuant un achat sur le site bks-store.com. Tout achat implique l'acceptation pleine et entière des présentes CGV.
         </p>
 
         <h2>Article 3 — Produits</h2>

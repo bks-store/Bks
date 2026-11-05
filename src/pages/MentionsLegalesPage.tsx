@@ -30,7 +30,7 @@ export default function MentionsLegalesPage() {
 
         <h2>Hébergement</h2>
         <p>
-          Le site bks-dinan.fr est hébergé par :<br />
+          Le site bks-store.com est hébergé par :<br />
           Vercel Inc.<br />
           440 N Barranca Ave #4133, Covina, CA 91723, États-Unis<br />
           <a href="https://vercel.com" target="_blank" rel="noopener noreferrer">vercel.com</a>

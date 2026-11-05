@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async'
 import { useTranslation } from '../i18n/useTranslation'
 
 // ── Configuration SEO globale ─────────────────────────────────────────────────
-export const SITE_URL = 'https://www.bks-dinan.fr'  // ← mettre à jour avec votre domaine
+export const SITE_URL = 'https://www.bks-store.com'  // ← mettre à jour avec votre domaine
 export const SITE_NAME = 'BKS'
 export const SITE_NAME_FULL = 'BKS — Sneakers & Streetwear'
 

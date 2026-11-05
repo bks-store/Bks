@@ -10,4 +10,4 @@ Disallow: /inscription
 Disallow: /mon-compte
 
 # Sitemap
-Sitemap: https://www.bks-dinan.fr/sitemap.xml
+Sitemap: https://www.bks-store.com/sitemap.xml
