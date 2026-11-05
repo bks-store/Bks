@@ -5,7 +5,6 @@ import { supabase, isConfigured } from '../../lib/supabase'
 import { useTranslation } from '../../i18n/useTranslation'
 import type { DbProduct } from '../../types/database'
 import { PRODUCTS } from '../../data/products'
-import { IMAGES } from '../../config/images'
 
 // Conversion données locales -> DbProduct pour la démo
 const DEMO_PRODUCTS: DbProduct[] = PRODUCTS.map(p => ({
