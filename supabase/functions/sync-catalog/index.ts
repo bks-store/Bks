@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { Image } from 'https://deno.land/x/imagescript@1.2.15/mod.ts'
 
 const GS_API_BASE = 'https://www.goldensneakers.net/api'
 const CORS = {
@@ -15,6 +16,9 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
   try {
+    const url = new URL(req.url)
+    const forceReimport = url.searchParams.get('force_reimport') === 'true'
+
     const gsToken = Deno.env.get('GOLDEN_SNEAKERS_TOKEN')
     if (!gsToken) throw new Error('GOLDEN_SNEAKERS_TOKEN manquant dans les secrets Supabase')
 
@@ -136,7 +140,7 @@ serve(async (req) => {
 
     const withoutStorage = (allGsProducts ?? []).filter((p: { sku: string; images: string[] }) => {
       const img = p.images?.[0] ?? ''
-      if (img.includes('supabase.co')) return false  // déjà en Storage
+      if (!forceReimport && img.includes('supabase.co')) return false  // déjà en Storage
       // Trouver une source d'image valide : URL existante OU catalogue GS
       const hasValidExisting = img.startsWith('http')
       const catalogUrl = catalogBySkuUrl.get(p.sku) ?? ''
@@ -175,9 +179,19 @@ serve(async (req) => {
         const buf = await res.arrayBuffer()
         const path = `gs/${product.sku}/0.jpg`
 
+        // Resize to max 600px wide to reduce file size (~300KB → ~40KB)
+        let uploadBuf: ArrayBuffer
+        try {
+          const img = await Image.decode(new Uint8Array(buf))
+          if (img.width > 600) img.resize(600, Image.RESIZE_AUTO)
+          uploadBuf = (await img.encodeJPEG(82)).buffer as ArrayBuffer
+        } catch {
+          uploadBuf = buf // fallback: upload original if decode fails
+        }
+
         const { error: upErr } = await supabase.storage
           .from('product-images')
-          .upload(path, buf, { upsert: true, contentType: 'image/jpeg' })
+          .upload(path, uploadBuf, { upsert: true, contentType: 'image/jpeg' })
 
         if (upErr) { errors.push(`upload: ${product.sku}: ${upErr.message}`); continue }
 
