@@ -53,7 +53,7 @@ serve(async (req) => {
         brand: item.brand_name,
         category: 'sneakers',
         stock_type: 'dropshipping',
-        price_sale: Math.ceil(minBuy * MARKUP * 100 - 1) / 100,
+        price_sale: Math.round((minBuy * MARKUP + 0.01) / 10) * 10 - 0.01,
         price_buy: minBuy,
         last_sync_at: now,
         sync_status: 'synced',
@@ -190,6 +190,18 @@ serve(async (req) => {
       }
     }
 
+    // Normaliser les prix de tous les produits vers le format X9.99
+    const { data: allProducts } = await supabase.from('products').select('id, price_sale')
+    const roundTo999 = (p: number) => Math.round((p + 0.01) / 10) * 10 - 0.01
+    const toRound = (allProducts ?? []).filter((p: { price_sale: number }) =>
+      Math.abs(roundTo999(p.price_sale) - p.price_sale) > 0.001
+    )
+    if (toRound.length > 0) {
+      await Promise.all(toRound.map((p: { id: string; price_sale: number }) =>
+        supabase.from('products').update({ price_sale: roundTo999(p.price_sale) }).eq('id', p.id)
+      ))
+    }
+
     return new Response(
       JSON.stringify({
         ok: true,
@@ -197,6 +209,7 @@ serve(async (req) => {
         sizes_synced: sizesPayload.length,
         images_cached: imagesDownloaded,
         images_pending: Math.max(0, totalNeedsImg - imagesDownloaded),
+        prices_normalized: toRound.length,
         errors,
       }),
       { headers: { ...CORS, 'Content-Type': 'application/json' } },
