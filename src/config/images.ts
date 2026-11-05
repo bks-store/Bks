@@ -51,14 +51,7 @@ function optimizeUrl(url: string, width = 600): string {
   return url
 }
 
-const CATEGORY_FALLBACK: Record<string, string> = {
-  sneakers: IMAGES.categories.sneakers,
-  streetwear: IMAGES.categories.streetwear,
-  accessoires: IMAGES.categories.nouveautes,
-}
-
-export function productImage(product: Pick<Product, 'id' | 'images' | 'category'>, width = 600): string | undefined {
+export function productImage(product: Pick<Product, 'id' | 'images'>, width = 600): string | undefined {
   const raw = product.images[0] ?? IMAGES.products[product.id]
-    ?? CATEGORY_FALLBACK[product.category] ?? IMAGES.categories.sneakers
   return raw ? optimizeUrl(raw, width) : undefined
 }
