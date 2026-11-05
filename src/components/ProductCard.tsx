@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { Product } from '../data/products'
-import { productImage, optimizeStorageUrl } from '../config/images'
+import { productImage } from '../config/images'
 import { useTranslation } from '../i18n/useTranslation'
 import SmartImage from './SmartImage'
 import { formatPrice } from '../lib/format'
@@ -8,7 +8,7 @@ import { formatPrice } from '../lib/format'
 export default function ProductCard({ product, priority }: { product: Product; priority?: boolean }) {
   const { t } = useTranslation()
   const img1 = productImage(product)
-  const img2 = product.images[1] ? optimizeStorageUrl(product.images[1]) : null
+  const img2 = product.images[1] ?? null
 
   return (
     <Link to={`/produit/${product.id}`} className="pcard">
