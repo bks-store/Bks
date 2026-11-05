@@ -57,8 +57,8 @@ export default function InscriptionPage() {
     <div className="container" style={{ maxWidth: 480, paddingBlock: 'var(--section)' }}>
       <SEOHead
         path="/inscription"
-        titleFr="Créer un compte — BKS"
-        titleEn="Create account — BKS"
+        titleFr="Créer un compte"
+        titleEn="Create account"
         noIndex
       />
       <h1 className="display h-lg" style={{ marginBottom: '2rem' }}>{a.createAccount}</h1>

@@ -51,15 +51,18 @@ export default function ProductPage() {
   const similar = products.filter(p => p.id !== product.id && (p.brand === product.brand || p.category === product.category)).slice(0, 4)
 
   const ogImage = productImage(product, 1200)
-  const descFr = `${product.brand} ${product.name} — ${product.description || 'Sneakers disponibles chez BKS Dinan. Livraison France et international.'}`
-  const descEn = `${product.brand} ${product.name} — ${product.description || 'Sneakers available at BKS Dinan. Shipping France and worldwide.'}`
+  const productTitle = product.name.toLowerCase().startsWith(product.brand.toLowerCase())
+    ? product.name
+    : `${product.brand} ${product.name}`
+  const descFr = `${productTitle} — ${product.description || 'Sneakers disponibles chez BKS Dinan. Livraison France et international.'}`
+  const descEn = `${productTitle} — ${product.description || 'Sneakers available at BKS Dinan. Shipping France and worldwide.'}`
 
   return (
     <>
       <SEOHead
         path={`/produit/${product.id}`}
-        titleFr={`${product.brand} ${product.name}`}
-        titleEn={`${product.brand} ${product.name}`}
+        titleFr={productTitle}
+        titleEn={productTitle}
         descFr={descFr}
         descEn={descEn}
         image={ogImage?.startsWith('http') ? ogImage : ogImage ? `${SITE_URL}${ogImage}` : undefined}

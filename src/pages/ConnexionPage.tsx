@@ -38,8 +38,8 @@ export default function ConnexionPage() {
     <div className="container" style={{ maxWidth: 480, paddingBlock: 'var(--section)' }}>
       <SEOHead
         path="/connexion"
-        titleFr="Connexion — BKS"
-        titleEn="Sign in — BKS"
+        titleFr="Connexion"
+        titleEn="Sign in"
         noIndex
       />
       <h1 className="display h-lg" style={{ marginBottom: '2rem' }}>{a.signIn}</h1>

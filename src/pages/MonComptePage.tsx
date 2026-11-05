@@ -123,7 +123,7 @@ export default function MonComptePage() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--surface)' }}>
-      <SEOHead path="/mon-compte" titleFr="Mon compte — BKS" titleEn="My account — BKS" noIndex />
+      <SEOHead path="/mon-compte" titleFr="Mon compte" titleEn="My account" noIndex />
 
       {/* Hero header */}
       <div style={{

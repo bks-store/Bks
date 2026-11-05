@@ -6,8 +6,8 @@ export default function CgvPage() {
     <div className="container">
       <SEOHead
         path="/cgv"
-        titleFr="Conditions Générales de Vente — BKS"
-        titleEn="Terms & Conditions — BKS"
+        titleFr="Conditions Générales de Vente"
+        titleEn="Terms & Conditions"
         noIndex
       />
       <header className="page-head">

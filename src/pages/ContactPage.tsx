@@ -9,8 +9,8 @@ export default function ContactPage() {
     <div className="container">
       <SEOHead
         path="/contact"
-        titleFr="Contact — BKS Dinan"
-        titleEn="Contact — BKS Dinan"
+        titleFr="Contact"
+        titleEn="Contact"
         descFr="Contactez la boutique BKS à Dinan — 3 rue de la Chaux, 22100. Instagram, horaires et informations pratiques."
         descEn="Contact BKS shop in Dinan — 3 rue de la Chaux, 22100 Dinan, France. Instagram, opening hours and practical information."
       />

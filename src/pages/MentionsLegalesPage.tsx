@@ -6,8 +6,8 @@ export default function MentionsLegalesPage() {
     <div className="container">
       <SEOHead
         path="/mentions-legales"
-        titleFr="Mentions légales — BKS"
-        titleEn="Legal notices — BKS"
+        titleFr="Mentions légales"
+        titleEn="Legal notices"
         noIndex
       />
       <header className="page-head">

@@ -11,8 +11,8 @@ export default function LivraisonPage() {
     <>
       <SEOHead
         path="/livraison"
-        titleFr="Livraison & retours — BKS"
-        titleEn="Delivery & returns — BKS"
+        titleFr="Livraison & retours"
+        titleEn="Delivery & returns"
         descFr="Livraison Colissimo en France et en Europe. Retours sous 14 jours. Livraison offerte dès 150 € en France."
         descEn="Colissimo delivery in France and Europe. 14-day returns. Free delivery from €150 in France."
       />

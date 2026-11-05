@@ -6,8 +6,8 @@ export default function ConfidentialitePage() {
     <div className="container">
       <SEOHead
         path="/confidentialite"
-        titleFr="Politique de confidentialité — BKS"
-        titleEn="Privacy Policy — BKS"
+        titleFr="Politique de confidentialité"
+        titleEn="Privacy Policy"
         noIndex
       />
       <header className="page-head">
