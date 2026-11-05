@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, Link } from 'react-router-dom'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
@@ -37,6 +37,19 @@ import MentionsLegalesPage from './pages/MentionsLegalesPage'
 import CookieBanner from './components/CookieBanner'
 import CartDrawer from './components/CartDrawer'
 
+function NotFoundPage() {
+  return (
+    <div className="container">
+      <div className="empty" style={{paddingBlock:'8rem', textAlign:'center'}}>
+        <p className="eyebrow" style={{marginBottom:'1rem'}}>404</p>
+        <h1 className="display h-lg" style={{marginBottom:'1.5rem'}}>Page introuvable</h1>
+        <p className="lead" style={{marginBottom:'2.5rem', color:'var(--ink-soft)'}}>Cette page n'existe pas ou a été déplacée.</p>
+        <Link to="/" className="btn btn--solid">Retour à l'accueil</Link>
+      </div>
+    </div>
+  )
+}
+
 function StoreFront() {
   const { pathname } = useLocation()
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
@@ -65,6 +78,7 @@ function StoreFront() {
             <Route path="/confidentialite" element={<ConfidentialitePage />} />
             <Route path="/livraison" element={<LivraisonPage />} />
             <Route path="/mentions-legales" element={<MentionsLegalesPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </div>
       </main>
