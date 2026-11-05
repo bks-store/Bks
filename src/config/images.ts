@@ -44,6 +44,13 @@ export const IMAGES = {
   } as Record<string, string>,
 }
 
+// Transforme les URLs Supabase Storage vers l'API de rendu optimisé (resize + WebP)
+export function optimizeStorageUrl(url: string, width = 600): string {
+  if (!url?.includes('/storage/v1/object/public/')) return url
+  return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + `?width=${width}&quality=80`
+}
+
 export function productImage(product: Pick<Product, 'id' | 'images'>): string | undefined {
-  return product.images[0] ?? IMAGES.products[product.id]
+  const url = product.images[0] ?? IMAGES.products[product.id]
+  return url ? optimizeStorageUrl(url) : undefined
 }

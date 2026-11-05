@@ -1,19 +1,24 @@
 import { Link } from 'react-router-dom'
 import type { Product } from '../data/products'
-import { productImage } from '../config/images'
+import { productImage, optimizeStorageUrl } from '../config/images'
 import { useTranslation } from '../i18n/useTranslation'
 import SmartImage from './SmartImage'
 import { formatPrice } from '../lib/format'
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, priority }: { product: Product; priority?: boolean }) {
   const { t } = useTranslation()
   const img1 = productImage(product)
-  const img2 = product.images[1] ?? null
+  const img2 = product.images[1] ? optimizeStorageUrl(product.images[1]) : null
 
   return (
     <Link to={`/produit/${product.id}`} className="pcard">
       <div className="media media--zoom pcard__media">
-        <SmartImage src={img1} alt={`${product.brand} ${product.name}`} />
+        <SmartImage
+          src={img1}
+          alt={`${product.brand} ${product.name}`}
+          loading={priority ? 'eager' : 'lazy'}
+          fetchpriority={priority ? 'high' : 'auto'}
+        />
         {img2 && (
           <SmartImage
             src={img2}

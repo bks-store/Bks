@@ -6,11 +6,12 @@ interface Props {
   alt: string
   className?: string
   loading?: 'eager' | 'lazy'
+  fetchpriority?: 'high' | 'low' | 'auto'
   style?: CSSProperties
 }
 
 // Image with a branded fallback: never a broken icon or an empty box.
-export default function SmartImage({ src, alt, className = '', loading = 'lazy', style }: Props) {
+export default function SmartImage({ src, alt, className = '', loading = 'lazy', fetchpriority, style }: Props) {
   const [failed, setFailed] = useState(false)
 
   if (!src || failed) {
@@ -28,6 +29,7 @@ export default function SmartImage({ src, alt, className = '', loading = 'lazy',
       className={className}
       loading={loading}
       decoding="async"
+      fetchPriority={fetchpriority ?? 'auto'}
       style={style}
       onError={() => setFailed(true)}
     />

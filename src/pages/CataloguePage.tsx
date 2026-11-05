@@ -189,7 +189,7 @@ export default function CataloguePage() {
             </div>
           ) : (
             <div className="pgrid">
-              {filtered.map(p => <ProductCard key={p.id} product={p} />)}
+              {filtered.map((p, i) => <ProductCard key={p.id} product={p} priority={i < 6} />)}
             </div>
           )}
         </div>

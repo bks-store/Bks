@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { supabase, isConfigured } from '../lib/supabase'
 import { PRODUCTS, type Product } from '../data/products'
-import type { DbProduct, DbProductSize } from '../types/database'
+import type { ProductWithSizes } from '../types/database'
 
-// Convert a Supabase row (+ its sizes) to the local Product shape
-function toProduct(db: DbProduct, sizes: DbProductSize[]): Product {
+// Convert a Supabase row (with embedded sizes) to the local Product shape
+function toProduct(db: ProductWithSizes): Product {
   return {
     id: db.id,
     name: db.name,
@@ -13,7 +13,7 @@ function toProduct(db: DbProduct, sizes: DbProductSize[]): Product {
     originalPrice: db.price_original ?? undefined,
     category: db.category,
     subcategory: db.subcategory ?? '',
-    sizes: sizes.map(s => ({ size: s.size, available: s.available })),
+    sizes: (db.product_sizes ?? []).map(s => ({ size: s.size, available: s.available })),
     images: db.images,
     description: db.description ?? '',
     isNew: db.is_new,
@@ -48,39 +48,25 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
     setLoading(true)
     const { data: rows } = await supabase
       .from('products')
-      .select('*')
+      .select('id,name,brand,price_sale,price_original,category,subcategory,images,description,is_new,is_featured,stock_type,tags,product_sizes(size,available)')
       .eq('is_published', true)
       .order('created_at', { ascending: false })
 
     if (!rows || rows.length === 0) {
-      // Fallback : montrer uniquement les produits dropshipping (commandes en ligne)
       setProducts(PRODUCTS.filter(p => p.stockType === 'dropshipping'))
       setLoading(false)
       return
     }
 
-    const ids = rows.map((r: DbProduct) => r.id)
-    const { data: sizeRows } = await supabase
-      .from('product_sizes')
-      .select('*')
-      .in('product_id', ids)
-
-    const sizesByProduct = new Map<string, DbProductSize[]>()
-    for (const s of (sizeRows ?? []) as DbProductSize[]) {
-      const arr = sizesByProduct.get(s.product_id) ?? []
-      arr.push(s)
-      sizesByProduct.set(s.product_id, arr)
-    }
-
     // Products with images first (Supabase storage), then by featured, then newest
-    const sorted = [...rows].sort((a: DbProduct, b: DbProduct) => {
+    const sorted = [...rows].sort((a, b) => {
       const aImg = a.images?.[0]?.includes('supabase.co') ? 1 : 0
       const bImg = b.images?.[0]?.includes('supabase.co') ? 1 : 0
       if (bImg !== aImg) return bImg - aImg
       if (b.is_featured !== a.is_featured) return (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0)
       return 0
     })
-    setProducts(sorted.map((r: DbProduct) => toProduct(r, sizesByProduct.get(r.id) ?? [])))
+    setProducts(sorted.map(r => toProduct(r as unknown as ProductWithSizes)))
     setLoading(false)
   }
 
