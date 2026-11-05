@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Loader2, Check } from 'lucide-react'
+import { ArrowLeft, Loader2, Check, Send } from 'lucide-react'
 import { supabase, isConfigured } from '../../lib/supabase'
 import { useTranslation } from '../../i18n/useTranslation'
 import type { DbOrder, OrderStatus } from '../../types/database'
@@ -29,6 +29,8 @@ export default function AdminOrderDetail() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [sendingEmail, setSendingEmail] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
   const [status, setStatus] = useState<OrderStatus>('pending')
   const [tracking, setTracking] = useState('')
   const [notes, setNotes] = useState('')
@@ -69,6 +71,22 @@ export default function AdminOrderDetail() {
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
     setSaving(false)
+  }
+
+  const handleSendShippingEmail = async () => {
+    if (!tracking || !isConfigured) return
+    setSendingEmail(true)
+    try {
+      const { error } = await supabase.functions.invoke('send-shipping-email', {
+        body: { order_id: id },
+      })
+      if (!error) {
+        setEmailSent(true)
+        setTimeout(() => setEmailSent(false), 3000)
+      }
+    } finally {
+      setSendingEmail(false)
+    }
   }
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 size={28} className="animate-spin" color="var(--bks-brun)" /></div>
@@ -184,6 +202,14 @@ export default function AdminOrderDetail() {
             <input value={tracking} onChange={e => setTracking(e.target.value)}
               placeholder="Numéro de suivi Colissimo…"
               className="w-full px-4 py-3 rounded-[4px] text-sm outline-none" style={inputStyle} />
+            {tracking && (
+              <button type="button" onClick={handleSendShippingEmail} disabled={sendingEmail}
+                className="mt-2 w-full py-2.5 rounded-[4px] text-sm font-semibold tracking-wider flex items-center justify-center gap-2 disabled:opacity-60 transition-colors"
+                style={{background: emailSent ? 'rgba(78,122,67,0.14)' : 'rgba(200,149,90,0.14)', color: emailSent ? '#4E7A43' : '#8A5A30', border: `1px solid ${emailSent ? '#4E7A43' : '#C8955A'}`}}>
+                {sendingEmail ? <Loader2 size={14} className="animate-spin" /> : emailSent ? <Check size={14} /> : <Send size={14} />}
+                {emailSent ? 'Email envoyé !' : 'Envoyer email d\'expédition au client'}
+              </button>
+            )}
           </div>
 
           <div>
