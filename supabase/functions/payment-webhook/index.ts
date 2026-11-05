@@ -85,83 +85,107 @@ async function sendConfirmationEmail(order: Record<string, unknown>) {
 
   const itemsHtml = items.map(i => `
     <tr>
-      <td style="padding:10px 0;border-bottom:1px solid #e8e0d5;">
-        <strong style="color:#28170E;">${i.product_brand} ${i.product_name}</strong><br>
-        <span style="color:#888;font-size:13px;">Pointure ${i.size} · Qté ${i.quantity}</span>
+      <td style="padding:14px 0;border-bottom:1px solid #EDE8E1;vertical-align:top;">
+        <span style="font-size:10px;color:#C8955A;text-transform:uppercase;letter-spacing:0.12em;font-family:-apple-system,sans-serif;">${i.product_brand}</span><br>
+        <strong style="color:#28170E;font-size:14px;font-weight:500;font-family:-apple-system,sans-serif;">${i.product_name}</strong><br>
+        <span style="color:#9E8E84;font-size:12px;font-family:-apple-system,sans-serif;">Pointure ${i.size} · Qté ${i.quantity}</span>
       </td>
-      <td style="padding:10px 0;border-bottom:1px solid #e8e0d5;text-align:right;font-weight:600;color:#28170E;white-space:nowrap;">
-        ${(i.unit_price * i.quantity).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+      <td style="padding:14px 0;border-bottom:1px solid #EDE8E1;text-align:right;vertical-align:top;white-space:nowrap;">
+        <span style="font-size:14px;font-weight:600;color:#28170E;font-family:-apple-system,sans-serif;">${(i.unit_price * i.quantity).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
       </td>
     </tr>`).join('')
 
   const html = `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f0ebe4;font-family:-apple-system,Georgia,serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0ebe4;padding:40px 16px;">
+<body style="margin:0;padding:0;background:#EDE8E1;font-family:Georgia,serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#EDE8E1;padding:48px 16px;">
     <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
 
         <!-- Header -->
-        <tr><td style="background:#28170E;padding:32px 40px;text-align:center;">
-          <img src="https://bks-puce.vercel.app/images/brand/logo-bks-monogram.png" alt="BKS" height="52" style="height:52px;">
-          <p style="color:#C8955A;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;margin:12px 0 0;font-family:Georgia,serif;">Beau Kiosque de Soulier</p>
+        <tr><td style="background:#28170E;padding:44px 48px 36px;text-align:center;border-radius:4px 4px 0 0;">
+          <img src="https://bks-store.com/images/brand/logo-bks-monogram.png" alt="BKS" height="60" style="height:60px;display:block;margin:0 auto;">
+          <p style="color:#C8955A;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;margin:16px 0 0;font-family:Georgia,serif;">Beau Kiosque de Soulier</p>
+        </td></tr>
+
+        <!-- Bandeau confirmation -->
+        <tr><td style="background:#C8955A;padding:14px 48px;text-align:center;">
+          <p style="color:#28170E;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;margin:0;font-family:-apple-system,sans-serif;font-weight:600;">Commande confirmée</p>
         </td></tr>
 
         <!-- Corps -->
-        <tr><td style="padding:40px 40px 24px;">
-          <h1 style="color:#28170E;font-size:24px;font-weight:700;margin:0 0 8px;">Merci pour votre commande !</h1>
-          <p style="color:#666;font-size:15px;margin:0 0 24px;line-height:1.6;">
-            Votre paiement a bien été accepté. Nous préparons votre commande et vous enverrons un email dès l'expédition.
+        <tr><td style="background:#ffffff;padding:48px 48px 40px;">
+
+          <!-- Intro -->
+          <h1 style="color:#28170E;font-size:28px;font-weight:400;margin:0 0 12px;line-height:1.3;font-family:Georgia,serif;">Merci pour votre confiance.</h1>
+          <p style="color:#6B5D54;font-size:15px;margin:0 0 36px;line-height:1.75;font-family:-apple-system,sans-serif;">
+            Votre paiement a bien été reçu. Nous préparons votre commande avec soin et vous contacterons dès l'expédition.
           </p>
 
           <!-- Référence -->
-          <div style="background:#F4EFE6;border-radius:8px;padding:16px 20px;margin-bottom:28px;">
-            <span style="font-size:12px;color:#888;text-transform:uppercase;letter-spacing:0.08em;">Référence commande</span><br>
-            <strong style="color:#28170E;font-size:18px;letter-spacing:0.04em;">#${ref}</strong>
-          </div>
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:36px;">
+            <tr>
+              <td style="border:1px solid #DDD5CB;border-radius:4px;padding:20px 24px;">
+                <p style="font-size:10px;color:#9E8E84;text-transform:uppercase;letter-spacing:0.14em;margin:0 0 6px;font-family:-apple-system,sans-serif;">Référence commande</p>
+                <p style="font-size:22px;color:#28170E;font-weight:400;margin:0;letter-spacing:0.08em;font-family:Georgia,serif;">#${ref}</p>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Séparateur -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+            <tr><td style="border-top:1px solid #EDE8E1;"></td></tr>
+          </table>
 
           <!-- Articles -->
-          <h2 style="color:#28170E;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 12px;">Votre commande</h2>
-          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+          <p style="font-size:10px;color:#9E8E84;text-transform:uppercase;letter-spacing:0.14em;margin:0 0 16px;font-family:-apple-system,sans-serif;">Détail de la commande</p>
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
             ${itemsHtml}
           </table>
 
           <!-- Totaux -->
-          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:36px;border-top:1px solid #EDE8E1;">
             <tr>
-              <td style="padding:6px 0;color:#888;font-size:14px;">Sous-total</td>
-              <td style="padding:6px 0;text-align:right;font-size:14px;">${subtotal.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</td>
+              <td style="padding:10px 0 4px;color:#9E8E84;font-size:13px;font-family:-apple-system,sans-serif;">Sous-total</td>
+              <td style="padding:10px 0 4px;text-align:right;font-size:13px;color:#28170E;font-family:-apple-system,sans-serif;">${subtotal.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</td>
             </tr>
             <tr>
-              <td style="padding:6px 0;color:#888;font-size:14px;">Livraison</td>
-              <td style="padding:6px 0;text-align:right;font-size:14px;">${shipping === 0 ? '<span style="color:#4E7A43;font-weight:600;">Offerte</span>' : shipping.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</td>
+              <td style="padding:4px 0;color:#9E8E84;font-size:13px;font-family:-apple-system,sans-serif;">Livraison</td>
+              <td style="padding:4px 0;text-align:right;font-size:13px;font-family:-apple-system,sans-serif;">${shipping === 0 ? '<span style="color:#5A8C4E;">Offerte</span>' : shipping.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</td>
             </tr>
             <tr>
-              <td style="padding:12px 0 6px;color:#28170E;font-size:16px;font-weight:700;border-top:2px solid #e8e0d5;">Total</td>
-              <td style="padding:12px 0 6px;text-align:right;font-size:16px;font-weight:700;color:#28170E;border-top:2px solid #e8e0d5;">${total.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</td>
+              <td style="padding:16px 0 6px;color:#28170E;font-size:16px;font-weight:600;border-top:1px solid #DDD5CB;font-family:-apple-system,sans-serif;">Total</td>
+              <td style="padding:16px 0 6px;text-align:right;font-size:16px;font-weight:600;color:#28170E;border-top:1px solid #DDD5CB;font-family:-apple-system,sans-serif;">${total.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</td>
             </tr>
           </table>
 
           <!-- Adresse -->
           ${order.shipping_address ? `
-          <div style="background:#faf8f5;border-radius:8px;padding:16px 20px;margin-bottom:28px;">
-            <span style="font-size:12px;color:#888;text-transform:uppercase;letter-spacing:0.08em;">Livraison</span><br>
-            <span style="color:#28170E;font-size:14px;line-height:1.7;">
-              ${(order.shipping_address as Record<string,string>).line1 ?? ''}<br>
-              ${(order.shipping_address as Record<string,string>).zip ?? ''} ${(order.shipping_address as Record<string,string>).city ?? ''}, ${(order.shipping_address as Record<string,string>).country ?? 'FR'}
-            </span>
-          </div>` : ''}
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:36px;">
+            <tr>
+              <td style="background:#F9F6F2;border-radius:4px;padding:20px 24px;">
+                <p style="font-size:10px;color:#9E8E84;text-transform:uppercase;letter-spacing:0.14em;margin:0 0 10px;font-family:-apple-system,sans-serif;">Adresse de livraison</p>
+                <p style="color:#28170E;font-size:14px;line-height:1.75;margin:0;font-family:-apple-system,sans-serif;">
+                  ${(order.shipping_address as Record<string,string>).line1 ?? ''}<br>
+                  ${(order.shipping_address as Record<string,string>).zip ?? ''} ${(order.shipping_address as Record<string,string>).city ?? ''}<br>
+                  ${(order.shipping_address as Record<string,string>).country ?? 'France'}
+                </p>
+              </td>
+            </tr>
+          </table>` : ''}
 
-          <p style="color:#888;font-size:13px;line-height:1.6;margin:0;">
-            Des questions ? Répondez à cet email ou contactez-nous à <a href="mailto:bks@bks-store.com" style="color:#C8955A;">bks@bks-store.com</a>
+          <!-- Contact -->
+          <p style="color:#9E8E84;font-size:13px;line-height:1.75;margin:0;font-family:-apple-system,sans-serif;">
+            Une question sur votre commande ?<br>
+            Répondez à cet email ou écrivez-nous à <a href="mailto:bks@bks-store.com" style="color:#C8955A;text-decoration:none;">bks@bks-store.com</a>
           </p>
         </td></tr>
 
         <!-- Footer -->
-        <tr><td style="background:#28170E;padding:24px 40px;text-align:center;">
-          <p style="color:#C8955A;font-size:12px;margin:0 0 4px;letter-spacing:0.08em;text-transform:uppercase;">BKS — Beau Kiosque de Soulier</p>
-          <p style="color:rgba(244,239,230,0.5);font-size:12px;margin:0;">3 Rue de la Chaux · Dinan · bks-store.com</p>
+        <tr><td style="background:#28170E;padding:32px 48px;text-align:center;border-radius:0 0 4px 4px;">
+          <p style="color:#C8955A;font-size:10px;margin:0 0 8px;letter-spacing:0.18em;text-transform:uppercase;font-family:Georgia,serif;">BKS — Beau Kiosque de Soulier</p>
+          <p style="color:rgba(244,239,230,0.4);font-size:11px;margin:0;font-family:-apple-system,sans-serif;letter-spacing:0.04em;">3 Rue de la Chaux · Dinan, Bretagne · bks-store.com</p>
         </td></tr>
 
       </table>

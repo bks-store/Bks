@@ -38,15 +38,15 @@ serve(async (req) => {
   }
 
   const productsHtml = products?.length ? `
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin:32px 0;">
       <tr>
         ${products.slice(0, 3).map((p: { name: string; brand: string; price: number; image?: string; url?: string }) => `
-        <td width="33%" style="padding:0 8px;vertical-align:top;text-align:center;">
-          ${p.image ? `<img src="${p.image}" alt="${p.name}" width="160" style="width:100%;max-width:160px;border-radius:8px;margin-bottom:10px;">` : ''}
-          <div style="font-size:11px;color:#C8955A;text-transform:uppercase;letter-spacing:0.08em;">${p.brand}</div>
-          <div style="font-size:14px;color:#28170E;font-weight:600;margin:4px 0;">${p.name}</div>
-          <div style="font-size:14px;color:#28170E;">${p.price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</div>
-          ${p.url ? `<a href="${p.url}" style="display:inline-block;margin-top:10px;font-size:12px;color:#C8955A;text-decoration:none;border:1px solid #C8955A;padding:5px 14px;border-radius:4px;">Voir</a>` : ''}
+        <td width="33%" style="padding:0 10px;vertical-align:top;text-align:center;">
+          ${p.image ? `<img src="${p.image}" alt="${p.name}" width="160" style="width:100%;max-width:160px;display:block;margin:0 auto 14px;">` : ''}
+          <div style="font-size:9px;color:#C8955A;text-transform:uppercase;letter-spacing:0.16em;font-family:-apple-system,sans-serif;">${p.brand}</div>
+          <div style="font-size:13px;color:#28170E;font-weight:500;margin:5px 0 4px;line-height:1.4;font-family:-apple-system,sans-serif;">${p.name}</div>
+          <div style="font-size:13px;color:#6B5D54;font-family:Georgia,serif;">${p.price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</div>
+          ${p.url ? `<a href="${p.url}" style="display:inline-block;margin-top:12px;font-size:10px;color:#28170E;text-decoration:none;border-bottom:1px solid #C8955A;padding-bottom:2px;letter-spacing:0.08em;text-transform:uppercase;font-family:-apple-system,sans-serif;">Découvrir</a>` : ''}
         </td>`).join('')}
       </tr>
     </table>` : ''
@@ -54,42 +54,47 @@ serve(async (req) => {
   const buildHtml = (recipientName: string) => `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-${previewText ? `<div style="display:none;max-height:0;overflow:hidden;">${previewText}</div>` : ''}
+${previewText ? `<span style="display:none;max-height:0;overflow:hidden;mso-hide:all;">${previewText}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</span>` : ''}
 </head>
-<body style="margin:0;padding:0;background:#f0ebe4;font-family:-apple-system,Georgia,serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0ebe4;padding:40px 16px;">
+<body style="margin:0;padding:0;background:#EDE8E1;font-family:Georgia,serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#EDE8E1;padding:48px 16px;">
     <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
 
         <!-- Header -->
-        <tr><td style="background:#28170E;padding:32px 40px;text-align:center;">
-          <img src="https://bks-puce.vercel.app/images/brand/logo-bks-monogram.png" alt="BKS" height="52" style="height:52px;">
-          <p style="color:#C8955A;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;margin:12px 0 0;font-family:Georgia,serif;">Beau Kiosque de Soulier</p>
+        <tr><td style="background:#28170E;padding:44px 48px 36px;text-align:center;border-radius:4px 4px 0 0;">
+          <img src="https://bks-store.com/images/brand/logo-bks-monogram.png" alt="BKS" height="60" style="height:60px;display:block;margin:0 auto;">
+          <p style="color:#C8955A;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;margin:16px 0 0;font-family:Georgia,serif;">Beau Kiosque de Soulier</p>
         </td></tr>
 
         <!-- Corps -->
-        <tr><td style="padding:40px 40px 32px;">
-          ${recipientName ? `<p style="color:#888;font-size:14px;margin:0 0 16px;">Bonjour ${recipientName},</p>` : ''}
-          <h1 style="color:#28170E;font-size:26px;font-weight:700;margin:0 0 16px;line-height:1.3;">${headline}</h1>
-          ${body ? `<div style="color:#555;font-size:15px;line-height:1.7;margin-bottom:24px;">${body}</div>` : ''}
+        <tr><td style="background:#ffffff;padding:48px 48px 40px;">
+          ${recipientName ? `<p style="color:#9E8E84;font-size:13px;margin:0 0 20px;font-family:-apple-system,sans-serif;">Bonjour ${recipientName},</p>` : ''}
+          <h1 style="color:#28170E;font-size:30px;font-weight:400;margin:0 0 20px;line-height:1.3;font-family:Georgia,serif;">${headline}</h1>
+          ${body ? `<div style="color:#6B5D54;font-size:15px;line-height:1.8;margin-bottom:32px;font-family:-apple-system,sans-serif;">${body}</div>` : ''}
 
           ${productsHtml}
 
           ${ctaText && ctaUrl ? `
-          <div style="text-align:center;margin:28px 0;">
-            <a href="${ctaUrl}" style="display:inline-block;background:#28170E;color:#F4EFE6;text-decoration:none;padding:14px 32px;border-radius:6px;font-size:15px;font-weight:600;letter-spacing:0.03em;">${ctaText}</a>
+          <div style="text-align:center;margin:36px 0 32px;">
+            <a href="${ctaUrl}" style="display:inline-block;background:#28170E;color:#F4EFE6;text-decoration:none;padding:16px 40px;font-size:13px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;font-family:-apple-system,sans-serif;">${ctaText}</a>
           </div>` : ''}
 
-          <p style="color:#aaa;font-size:12px;margin:28px 0 0;line-height:1.6;">
+          <!-- Séparateur -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:32px 0 24px;">
+            <tr><td style="border-top:1px solid #EDE8E1;"></td></tr>
+          </table>
+
+          <p style="color:#BFB5AE;font-size:11px;margin:0;line-height:1.75;font-family:-apple-system,sans-serif;">
             Vous recevez cet email car vous êtes abonné aux actualités BKS.<br>
-            <a href="https://bks-store.com/desinscription" style="color:#C8955A;">Se désabonner</a>
+            <a href="https://bks-store.com/desinscription" style="color:#C8955A;text-decoration:none;">Se désabonner</a>
           </p>
         </td></tr>
 
         <!-- Footer -->
-        <tr><td style="background:#28170E;padding:24px 40px;text-align:center;">
-          <p style="color:#C8955A;font-size:12px;margin:0 0 4px;letter-spacing:0.08em;text-transform:uppercase;">BKS — Beau Kiosque de Soulier</p>
-          <p style="color:rgba(244,239,230,0.5);font-size:12px;margin:0;">3 Rue de la Chaux · Dinan · bks-store.com</p>
+        <tr><td style="background:#28170E;padding:32px 48px;text-align:center;border-radius:0 0 4px 4px;">
+          <p style="color:#C8955A;font-size:10px;margin:0 0 8px;letter-spacing:0.18em;text-transform:uppercase;font-family:Georgia,serif;">BKS — Beau Kiosque de Soulier</p>
+          <p style="color:rgba(244,239,230,0.4);font-size:11px;margin:0;font-family:-apple-system,sans-serif;letter-spacing:0.04em;">3 Rue de la Chaux · Dinan, Bretagne · bks-store.com</p>
         </td></tr>
 
       </table>
