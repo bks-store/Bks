@@ -108,9 +108,18 @@ serve(async (req) => {
       }
     }
 
+    // Dédupliquer par (product_id, size) pour éviter la contrainte unique
+    const sizesSeen = new Set<string>()
+    const dedupedSizes = sizesPayload.filter(s => {
+      const key = `${s.product_id}:${s.size}`
+      if (sizesSeen.has(key)) return false
+      sizesSeen.add(key)
+      return true
+    })
+
     const { error: sizeErr } = await supabase
       .from('product_sizes')
-      .upsert(sizesPayload, { onConflict: 'gs_size_id', ignoreDuplicates: false })
+      .upsert(dedupedSizes, { onConflict: 'gs_size_id', ignoreDuplicates: false })
 
     if (sizeErr) throw new Error(`Upsert tailles: ${sizeErr.message}`)
 
