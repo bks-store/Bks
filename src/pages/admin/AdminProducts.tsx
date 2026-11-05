@@ -37,7 +37,7 @@ export default function AdminProducts() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'all' | 'published' | 'unpublished'>('all')
-  const [brandFilter, setBrandFilter] = useState<string>('all')
+  const [brandFilter, setBrandFilter] = useState<string>('')
   const [toggling, setToggling] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [syncing, setSyncing] = useState(false)
@@ -116,20 +116,22 @@ export default function AdminProducts() {
     return url
   }
 
-  const brands = ['all', ...[...new Set(products.map(p => p.brand))].sort()]
+  const brands = [...new Set(products.map(p => p.brand))].sort()
+
+  // Auto-sélectionner la première marque après chargement
+  useEffect(() => {
+    if (brands.length && !brandFilter) setBrandFilter(brands[0])
+  }, [brands.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = products.filter(p => {
+    if (!brandFilter || p.brand !== brandFilter) return false
     const matchSearch = search === '' ||
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.brand.toLowerCase().includes(search.toLowerCase())
     const matchFilter = filter === 'all' ? true :
       filter === 'published' ? p.is_published : !p.is_published
-    const matchBrand = brandFilter === 'all' || p.brand === brandFilter
-    return matchSearch && matchFilter && matchBrand
-  }).sort((a, b) => {
-    if (brandFilter !== 'all') return a.name.localeCompare(b.name)
-    return a.brand.localeCompare(b.brand) || a.name.localeCompare(b.name)
-  })
+    return matchSearch && matchFilter
+  }).sort((a, b) => a.name.localeCompare(b.name))
 
   return (
     <div>
@@ -140,6 +142,7 @@ export default function AdminProducts() {
           <h1 className="admin-title">{t.admin.products.title}</h1>
           <p style={{fontSize:'0.75rem', color:'var(--ink-faint)', marginTop:'0.3rem'}}>
             {filtered.length} produit{filtered.length !== 1 ? 's' : ''}
+            {brandFilter && <span style={{marginLeft:'0.4rem', opacity:0.6}}>— {brandFilter}</span>}
           </p>
         </div>
         <Link to="/admin/produits/nouveau" className="btn-primary" style={{gap:'0.5rem', display:'inline-flex', alignItems:'center'}}>
@@ -222,22 +225,20 @@ export default function AdminProducts() {
             ))}
           </div>
         </div>
-        {brands.length > 2 && (
-          <div style={{display:'flex', flexWrap:'wrap', gap:'0.4rem'}}>
-            {brands.map(b => (
-              <button key={b} onClick={() => setBrandFilter(b)}
-                style={{
-                  padding:'0.3rem 0.75rem', borderRadius:999, fontSize:'0.6875rem', fontWeight:600,
-                  background: brandFilter === b ? 'var(--a-sidebar)' : 'var(--surface-2)',
-                  color: brandFilter === b ? '#F4EEE5' : 'var(--ink-soft)',
-                  border:'none', cursor:'pointer', letterSpacing:'0.06em',
-                  transition:'background 0.15s',
-                }}>
-                {b === 'all' ? 'Toutes' : b}
-              </button>
-            ))}
-          </div>
-        )}
+        <div style={{display:'flex', flexWrap:'wrap', gap:'0.4rem'}}>
+          {brands.map(b => (
+            <button key={b} onClick={() => setBrandFilter(b)}
+              style={{
+                padding:'0.3rem 0.75rem', borderRadius:999, fontSize:'0.6875rem', fontWeight:600,
+                background: brandFilter === b ? 'var(--a-sidebar)' : 'var(--surface-2)',
+                color: brandFilter === b ? '#F4EEE5' : 'var(--ink-soft)',
+                border:'none', cursor:'pointer', letterSpacing:'0.06em',
+                transition:'background 0.15s',
+              }}>
+              {b}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Products list */}
