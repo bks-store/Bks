@@ -308,6 +308,8 @@ a:hover .media--zoom > img { transform: scale(1.03); }
 .lang-toggle:hover { color: var(--ink); }
 .lang-toggle .is-active { color: var(--accent); }
 .lang-toggle__sep { opacity: 0.3; font-weight: 400; }
+.lang-toggle--desktop { display: none; }
+.lang-toggle--mobile { display: flex; }
 .icon-btn {
   position: relative;
   width: 44px; height: 44px;
@@ -330,6 +332,8 @@ a:hover .media--zoom > img { transform: scale(1.03); }
   .site-header__logo--desktop { display: flex; }
   .site-header__logo img { height: 50px; }
   .site-header__nav { display: flex; gap: 2.75rem; }
+  .lang-toggle--mobile { display: none; }
+  .lang-toggle--desktop { display: flex; }
 }
 @media (min-width: 1280px) { .site-header__wordmark { display: block; } }
 

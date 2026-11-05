@@ -70,6 +70,15 @@ export default function Header() {
             <button className="icon-btn burger" onClick={() => setMenuOpen(true)} aria-label="Menu">
               <Menu size={22} strokeWidth={1.4} />
             </button>
+            <button
+              className="lang-toggle lang-toggle--mobile"
+              onClick={() => setLocale(locale === 'fr' ? 'en' : 'fr')}
+              aria-label={locale === 'fr' ? 'Switch to English' : 'Passer en français'}
+            >
+              <span className={locale === 'fr' ? 'is-active' : ''}>FR</span>
+              <span className="lang-toggle__sep">|</span>
+              <span className={locale === 'en' ? 'is-active' : ''}>EN</span>
+            </button>
             <Link to="/" className="site-header__logo site-header__logo--desktop">
               {logo}
               <span className="site-header__wordmark">Beau Kiosque<br />de Soulier</span>
@@ -88,7 +97,7 @@ export default function Header() {
 
           <div className="site-header__actions">
             <button
-              className="lang-toggle"
+              className="lang-toggle lang-toggle--desktop"
               onClick={() => setLocale(locale === 'fr' ? 'en' : 'fr')}
               aria-label={locale === 'fr' ? 'Switch to English' : 'Passer en français'}
             >
