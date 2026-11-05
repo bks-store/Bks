@@ -9,7 +9,7 @@ const CORS = {
 // Majoration 65% TVA incluse : PV TTC = PA * 1.65
 const MARKUP = 1.65
 // Max images à télécharger par sync (séquentiel pour éviter les crashes mémoire)
-const MAX_IMG_DOWNLOAD = 5
+const MAX_IMG_DOWNLOAD = 20
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })

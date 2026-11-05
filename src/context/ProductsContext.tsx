@@ -72,7 +72,15 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
       sizesByProduct.set(s.product_id, arr)
     }
 
-    setProducts(rows.map((r: DbProduct) => toProduct(r, sizesByProduct.get(r.id) ?? [])))
+    // Products with images first (Supabase storage), then by featured, then newest
+    const sorted = [...rows].sort((a: DbProduct, b: DbProduct) => {
+      const aImg = a.images?.[0]?.includes('supabase.co') ? 1 : 0
+      const bImg = b.images?.[0]?.includes('supabase.co') ? 1 : 0
+      if (bImg !== aImg) return bImg - aImg
+      if (b.is_featured !== a.is_featured) return (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0)
+      return 0
+    })
+    setProducts(sorted.map((r: DbProduct) => toProduct(r, sizesByProduct.get(r.id) ?? [])))
     setLoading(false)
   }
 
