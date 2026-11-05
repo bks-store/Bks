@@ -8,8 +8,8 @@ const CORS = {
 }
 // Majoration 65% TVA incluse : PV TTC = PA * 1.65
 const MARKUP = 1.65
-// Max images à télécharger par sync (évite le timeout)
-const MAX_IMG_DOWNLOAD = 25
+// Max images à télécharger par sync (séquentiel pour éviter les crashes mémoire)
+const MAX_IMG_DOWNLOAD = 5
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
@@ -40,8 +40,10 @@ serve(async (req) => {
     const gsImageMap: Record<string, string[]> = {}
     const productsPayload = catalog.map((item) => {
       const minBuy = Math.min(...item.sizes.map((s) => s.offer_price))
-      const gsImages = item.image_full_url
-        ? [item.image_full_url, ...(item.additional_images ?? []).slice(0, 3)]
+      // Ne garder que les URLs absolues (ignorer les chemins relatifs /images/.../main/)
+      const validUrl = (u: string | undefined | null) => typeof u === 'string' && u.startsWith('http')
+      const gsImages = validUrl(item.image_full_url)
+        ? [item.image_full_url, ...(item.additional_images ?? []).filter(validUrl).slice(0, 3)]
         : []
       gsImageMap[item.sku] = gsImages
       return {
@@ -109,40 +111,84 @@ serve(async (req) => {
     if (sizeErr) throw new Error(`Upsert tailles: ${sizeErr.message}`)
 
     // 5. Télécharger les images GS → Supabase Storage
-    // Seulement pour les produits qui n'ont pas encore d'URL Storage
+    // On interroge directement la DB pour trouver TOUS les produits avec URLs GS ou sans image
     const storageBase = `${supabaseUrl}/storage/v1/object/public/product-images`
 
-    const needsImg = (upsertedProducts ?? []).filter(p => {
+    // Récupérer tous les produits GS (avec sku) pour trouver ceux sans Storage URL
+    const { data: allGsProducts } = await supabase
+      .from('products')
+      .select('id, sku, images, is_published')
+      .not('sku', 'is', null)
+
+    // Nettoyer les chemins relatifs cassés (/images/{sku}/main/) → vider pour reprendre depuis GS
+    const brokenPaths = (allGsProducts ?? []).filter((p: { images: string[] }) =>
+      p.images?.[0]?.startsWith('/images/')
+    )
+    if (brokenPaths.length > 0) {
+      await Promise.all(brokenPaths.map((p: { id: string }) =>
+        supabase.from('products').update({ images: [] }).eq('id', p.id)
+      ))
+      // Mettre à jour en mémoire
+      for (const p of brokenPaths as Array<{ images: string[] }>) p.images = []
+    }
+
+    const catalogBySkuUrl = new Map(catalog.map((c: GsProduct) => [c.sku, c.image_full_url]))
+
+    const withoutStorage = (allGsProducts ?? []).filter((p: { sku: string; images: string[] }) => {
       const img = p.images?.[0] ?? ''
-      return img.includes('goldensneakers') || img === ''
-    }).slice(0, MAX_IMG_DOWNLOAD)
+      if (img.includes('supabase.co')) return false  // déjà en Storage
+      // Trouver une source d'image valide : URL existante OU catalogue GS
+      const hasValidExisting = img.startsWith('http')
+      const catalogUrl = catalogBySkuUrl.get(p.sku) ?? ''
+      const hasValidCatalog = catalogUrl.startsWith('http')
+      // Si aucune source valide → exclure (produit sans image, on ne peut rien faire)
+      return hasValidExisting || hasValidCatalog
+    })
+
+    // Publiés en premier
+    const totalNeedsImg = withoutStorage.length
+    const sortedForImg = [...withoutStorage].sort((a: { is_published: boolean }, b: { is_published: boolean }) =>
+      Number(b.is_published) - Number(a.is_published)
+    )
+    const needsImg = sortedForImg.slice(0, MAX_IMG_DOWNLOAD)
 
     let imagesDownloaded = 0
 
-    await Promise.allSettled(needsImg.map(async (product) => {
-      const item = catalog.find(c => skuToId[c.sku] === product.id)
-      if (!item?.image_full_url) return
+    const errors: string[] = []
+
+    const validUrl = (u: string | undefined | null) => typeof u === 'string' && u.startsWith('http')
+
+    // Téléchargement séquentiel pour éviter les crashes mémoire (images ~3MB chacune)
+    for (const product of needsImg as Array<{ id: string; sku: string; images: string[] }>) {
+      const item = catalog.find(c => c.sku === product.sku)
+
+      // URL à télécharger : depuis le catalogue GS, ou depuis l'URL déjà en DB (produit discontinué)
+      const imageUrl = validUrl(item?.image_full_url)
+        ? item!.image_full_url
+        : validUrl(product.images?.[0]) ? product.images[0] : null
+
+      if (!imageUrl) { errors.push(`no valid url: ${product.sku}`); continue }
 
       try {
-        const res = await fetch(item.image_full_url)
-        if (!res.ok) return
+        const res = await fetch(imageUrl)
+        if (!res.ok) { errors.push(`fetch ${res.status}: ${product.sku}`); continue }
         const buf = await res.arrayBuffer()
-        const path = `gs/${item.sku}/0.jpg`
+        const path = `gs/${product.sku}/0.jpg`
 
         const { error: upErr } = await supabase.storage
           .from('product-images')
           .upload(path, buf, { upsert: true, contentType: 'image/jpeg' })
 
-        if (upErr) return
+        if (upErr) { errors.push(`upload: ${product.sku}: ${upErr.message}`); continue }
 
-        // Remplacer la première image par l'URL Storage
-        const newImages = [`${storageBase}/${path}`, ...(item.additional_images ?? []).slice(0, 3)]
+        const additional = item?.additional_images?.filter(validUrl).slice(0, 3) ?? []
+        const newImages = [`${storageBase}/${path}`, ...additional]
         await supabase.from('products').update({ images: newImages }).eq('id', product.id)
         imagesDownloaded++
-      } catch {
-        // Image indisponible — on garde l'URL GS
+      } catch (e) {
+        errors.push(`exception: ${product.sku}: ${(e as Error).message}`)
       }
-    }))
+    }
 
     return new Response(
       JSON.stringify({
@@ -150,7 +196,8 @@ serve(async (req) => {
         products_synced: catalog.length,
         sizes_synced: sizesPayload.length,
         images_cached: imagesDownloaded,
-        images_pending: Math.max(0, needsImg.length - imagesDownloaded),
+        images_pending: Math.max(0, totalNeedsImg - imagesDownloaded),
+        errors,
       }),
       { headers: { ...CORS, 'Content-Type': 'application/json' } },
     )
