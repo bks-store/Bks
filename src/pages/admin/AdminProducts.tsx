@@ -42,6 +42,8 @@ export default function AdminProducts() {
   const [deleting, setDeleting] = useState<string | null>(null)
   const [syncing, setSyncing] = useState(false)
   const [syncResult, setSyncResult] = useState<{ ok: boolean; msg: string } | null>(null)
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 35
 
   const load = async () => {
     setLoading(true)
@@ -123,6 +125,9 @@ export default function AdminProducts() {
     if (brands.length && !brandFilter) setBrandFilter(brands[0])
   }, [brands.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Reset page quand filtre/marque/recherche change
+  useEffect(() => { setPage(1) }, [brandFilter, filter, search])
+
   const filtered = products.filter(p => {
     if (!brandFilter || p.brand !== brandFilter) return false
     const matchSearch = search === '' ||
@@ -143,6 +148,7 @@ export default function AdminProducts() {
           <p style={{fontSize:'0.75rem', color:'var(--ink-faint)', marginTop:'0.3rem'}}>
             {filtered.length} produit{filtered.length !== 1 ? 's' : ''}
             {brandFilter && <span style={{marginLeft:'0.4rem', opacity:0.6}}>— {brandFilter}</span>}
+            {Math.ceil(filtered.length / PAGE_SIZE) > 1 && <span style={{marginLeft:'0.4rem', opacity:0.5}}>· p.{page}/{Math.ceil(filtered.length / PAGE_SIZE)}</span>}
           </p>
         </div>
         <Link to="/admin/produits/nouveau" className="btn-primary" style={{gap:'0.5rem', display:'inline-flex', alignItems:'center'}}>
@@ -242,6 +248,8 @@ export default function AdminProducts() {
       </div>
 
       {/* Products list */}
+      {(() => { const totalPages = Math.ceil(filtered.length / PAGE_SIZE); const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE); return (
+      <>
       {loading ? (
         <div style={{display:'flex', justifyContent:'center', padding:'5rem 0'}}>
           <Loader2 size={28} className="animate-spin" color="var(--accent)" />
@@ -253,7 +261,7 @@ export default function AdminProducts() {
         </div>
       ) : (
         <div className="admin-card" style={{overflow:'hidden'}}>
-          {filtered.map((product, idx) => {
+          {paginated.map((product, idx) => {
             const imgSrc = product.images?.[0]
             return (
               <div key={product.id} style={{
@@ -373,6 +381,26 @@ export default function AdminProducts() {
           })}
         </div>
       )}
+      {totalPages > 1 && (
+        <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:'0.3rem', padding:'1.5rem 0'}}>
+          <button
+            onClick={() => setPage(p => p - 1)}
+            disabled={page === 1}
+            style={{minWidth:'2rem', height:'2rem', borderRadius:4, border:'1px solid var(--line)', background:'transparent', color:'var(--ink-soft)', fontSize:'0.8125rem', cursor:'pointer', opacity: page === 1 ? 0.3 : 1}}
+          >←</button>
+          {Array.from({length: totalPages}, (_, i) => i + 1).map(n => (
+            <button key={n} onClick={() => setPage(n)}
+              style={{minWidth:'2rem', height:'2rem', borderRadius:4, border:'1px solid var(--line)', background: n === page ? 'var(--a-sidebar)' : 'transparent', color: n === page ? '#F4EEE5' : 'var(--ink-soft)', fontSize:'0.8125rem', fontWeight: n === page ? 600 : 400, cursor:'pointer'}}
+            >{n}</button>
+          ))}
+          <button
+            onClick={() => setPage(p => p + 1)}
+            disabled={page === totalPages}
+            style={{minWidth:'2rem', height:'2rem', borderRadius:4, border:'1px solid var(--line)', background:'transparent', color:'var(--ink-soft)', fontSize:'0.8125rem', cursor:'pointer', opacity: page === totalPages ? 0.3 : 1}}
+          >→</button>
+        </div>
+      )}
+      </> )})()}
     </div>
   )
 }
