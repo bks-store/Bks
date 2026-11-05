@@ -50,7 +50,7 @@ export default function ProductPage() {
 
   const similar = products.filter(p => p.id !== product.id && (p.brand === product.brand || p.category === product.category)).slice(0, 4)
 
-  const ogImage = productImage(product)
+  const ogImage = productImage(product, 1200)
   const descFr = `${product.brand} ${product.name} — ${product.description || 'Sneakers disponibles chez BKS Dinan. Livraison France et international.'}`
   const descEn = `${product.brand} ${product.name} — ${product.description || 'Sneakers available at BKS Dinan. Shipping France and worldwide.'}`
 
@@ -75,7 +75,7 @@ export default function ProductPage() {
 
         <div className="product">
           <div className="product__media media">
-            <SmartImage src={productImage(product)} alt={`${product.brand} ${product.name}`} loading="eager" />
+            <SmartImage src={productImage(product, 1200)} alt={`${product.brand} ${product.name}`} loading="eager" />
           </div>
 
           <div className="product__panel">

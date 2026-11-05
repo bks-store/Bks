@@ -1,6 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { Image } from 'https://deno.land/x/imagescript@1.2.15/mod.ts'
 
 const GS_API_BASE = 'https://www.goldensneakers.net/api'
 const CORS = {
@@ -188,19 +187,9 @@ serve(async (req) => {
         const buf = await res.arrayBuffer()
         const path = `gs/${product.sku}/0.jpg`
 
-        // Resize to max 600px wide to reduce file size (~300KB → ~40KB)
-        let uploadBuf: ArrayBuffer
-        try {
-          const img = await Image.decode(new Uint8Array(buf))
-          if (img.width > 600) img.resize(600, Image.RESIZE_AUTO)
-          uploadBuf = (await img.encodeJPEG(82)).buffer as ArrayBuffer
-        } catch {
-          uploadBuf = buf // fallback: upload original if decode fails
-        }
-
         const { error: upErr } = await supabase.storage
           .from('product-images')
-          .upload(path, uploadBuf, { upsert: true, contentType: 'image/jpeg' })
+          .upload(path, buf, { upsert: true, contentType: 'image/jpeg' })
 
         if (upErr) { errors.push(`upload: ${product.sku}: ${upErr.message}`); continue }
 

@@ -44,6 +44,14 @@ export const IMAGES = {
   } as Record<string, string>,
 }
 
-export function productImage(product: Pick<Product, 'id' | 'images'>): string | undefined {
-  return product.images[0] ?? IMAGES.products[product.id]
+function optimizeUrl(url: string, width = 600): string {
+  if (url.includes('supabase.co/storage')) {
+    return `/api/img?url=${encodeURIComponent(url)}&w=${width}`
+  }
+  return url
+}
+
+export function productImage(product: Pick<Product, 'id' | 'images'>, width = 600): string | undefined {
+  const raw = product.images[0] ?? IMAGES.products[product.id]
+  return raw ? optimizeUrl(raw, width) : undefined
 }
