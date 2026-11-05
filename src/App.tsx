@@ -17,6 +17,7 @@ import CookieBanner from './components/CookieBanner'
 import CartDrawer from './components/CartDrawer'
 
 // Pages secondaires — chargées en différé
+const BrandsPage = lazy(() => import('./pages/BrandsPage'))
 const AboutPage = lazy(() => import('./pages/AboutPage'))
 const ContactPage = lazy(() => import('./pages/ContactPage'))
 const CartPage = lazy(() => import('./pages/CartPage'))
@@ -68,6 +69,7 @@ function StoreFront() {
           <Suspense fallback={null}>
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/marques" element={<BrandsPage />} />
               <Route path="/catalogue" element={<CataloguePage />} />
               <Route path="/catalogue/:category" element={<CataloguePage />} />
               <Route path="/rubrique/:slug" element={<CataloguePage />} />

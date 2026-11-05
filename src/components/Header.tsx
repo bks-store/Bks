@@ -40,7 +40,11 @@ export default function Header() {
 
   const navLinks = [
     { to: '/', label: t.nav.home, end: true },
-    ...visibleRubriques.filter(r => r.inMenu).map(r => ({ to: `/rubrique/${r.slug}`, label: r.name, end: false })),
+    ...visibleRubriques.filter(r => r.inMenu).map(r => ({
+      to: r.slug === 'sneakers' ? '/marques' : `/rubrique/${r.slug}`,
+      label: r.name,
+      end: false,
+    })),
     { to: '/a-propos', label: t.nav.boutique, end: false },
   ]
 

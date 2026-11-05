@@ -25,7 +25,8 @@ export default function CataloguePage() {
   const query = rawQuery.toLowerCase()
   const { t } = useTranslation()
 
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([])
+  const brandParam = searchParams.get('brand')
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(brandParam ? [brandParam] : [])
   const [selectedSizes, setSelectedSizes] = useState<string[]>([])
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null)
   const [sortBy, setSortBy] = useState<'nouveautes' | 'prix-asc' | 'prix-desc'>('nouveautes')
