@@ -155,9 +155,9 @@ function BrandsStrip() {
 }
 
 
-function ProductRow({ eyebrow, title, products, link, linkLabel, tone, cols }: {
+function ProductRow({ eyebrow, title, products, link, linkLabel, tone, cols, priority }: {
   eyebrow: string; title: string; products: Product[]; link: string; linkLabel: string
-  tone: 'surface' | 'surface-2'; cols: 3 | 4
+  tone: 'surface' | 'surface-2'; cols: 3 | 4; priority?: boolean
 }) {
   return (
     <section className={`section bg-${tone}`}>
@@ -170,7 +170,7 @@ function ProductRow({ eyebrow, title, products, link, linkLabel, tone, cols }: {
           <Link to={link} className="link-arrow">{linkLabel} <ArrowRight size={14} strokeWidth={1.6} /></Link>
         </div>
         <div className={`pgrid pgrid--rail ${cols === 4 ? 'pgrid--4' : ''}`}>
-          {products.map(p => <ProductCard key={p.id} product={p} />)}
+          {products.map(p => <ProductCard key={p.id} product={p} priority={priority} />)}
         </div>
       </div>
     </section>
@@ -294,6 +294,7 @@ export default function HomePage() {
         linkLabel={t.sections.seeAllNew}
         tone="surface-2"
         cols={3}
+        priority
       />
       <Brand />
       <ProductRow
@@ -304,6 +305,7 @@ export default function HomePage() {
         linkLabel={t.sections.seeAllCatalogue}
         tone="surface"
         cols={4}
+        priority
       />
       <Store />
       <Instagram />

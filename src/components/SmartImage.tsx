@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, type CSSProperties } from 'react'
 import { IMAGES } from '../config/images'
 
 // ── Semaphore: max 4 concurrent image loads ──────────────────────────────────
-const MAX_CONCURRENT = 4
+const MAX_CONCURRENT = 8
 let activeLoads = 0
 const loadQueue: Array<() => void> = []
 
