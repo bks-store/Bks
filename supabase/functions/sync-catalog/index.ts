@@ -119,7 +119,7 @@ serve(async (req) => {
 
     const { error: sizeErr } = await supabase
       .from('product_sizes')
-      .upsert(dedupedSizes, { onConflict: 'gs_size_id', ignoreDuplicates: false })
+      .upsert(dedupedSizes, { onConflict: 'product_id,size', ignoreDuplicates: false })
 
     if (sizeErr) throw new Error(`Upsert tailles: ${sizeErr.message}`)
 
