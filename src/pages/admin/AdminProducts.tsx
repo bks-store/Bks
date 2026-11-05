@@ -108,11 +108,10 @@ export default function AdminProducts() {
     setToggling(null)
   }
 
-  // Convertit une URL Supabase Storage en miniature optimisée (120px, qualité 70)
   const thumb = (url: string | undefined) => {
     if (!url) return url
-    if (url.includes('/storage/v1/object/public/')) {
-      return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + '?width=120&quality=70'
+    if (url.includes('supabase.co/storage')) {
+      return `/api/img?url=${encodeURIComponent(url)}&w=120`
     }
     return url
   }
