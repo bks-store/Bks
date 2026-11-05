@@ -278,8 +278,8 @@ export default function HomePage() {
     <>
       <SEOHead
         path="/"
-        titleFr="BKS — Sneakers &amp; Streetwear Dinan"
-        titleEn="BKS — Sneakers &amp; Streetwear Dinan, France"
+        titleFr="Sneakers &amp; Streetwear à Dinan"
+        titleEn="Sneakers &amp; Streetwear in Dinan, France"
         descFr="Boutique sneakers indépendante à Dinan (22) — Jordan, Nike, Adidas, New Balance, éditions limitées. Sélection à la main par Damien. Livraison France et international."
         descEn="Independent sneaker boutique in Dinan, Brittany, France — Jordan, Nike, Adidas, New Balance, limited editions. Hand-picked by Damien. Shipping worldwide."
         schema={[LOCAL_BUSINESS_SCHEMA, FAQ_SCHEMA]}

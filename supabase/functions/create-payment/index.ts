@@ -44,7 +44,7 @@ serve(async (req) => {
     const payload: CheckoutPayload = await req.json()
     const { items, total, customer } = payload
 
-    if (!items?.length || !total || !customer?.name || !customer?.email) {
+    if (!items?.length || !customer?.name || !customer?.email) {
       return json({ error: 'Données manquantes' }, 400)
     }
     if (!customer?.address?.city || !customer?.address?.zip || !customer?.address?.line1) {
@@ -59,6 +59,30 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     )
+
+    // ── 0. Recalculer le total côté serveur (sécurité) ───────────────────────
+    const productIds = [...new Set(items.map((i) => i.productId))]
+    const { data: dbProducts, error: priceErr } = await supabase
+      .from('products')
+      .select('id, price_sale')
+      .in('id', productIds)
+    if (priceErr || !dbProducts?.length) {
+      return json({ error: 'Produits introuvables' }, 400)
+    }
+    const priceMap = Object.fromEntries(dbProducts.map((p) => [p.id, p.price_sale as number]))
+    const subtotal = items.reduce((sum, item) => {
+      const dbPrice = priceMap[item.productId]
+      if (!dbPrice) throw new Error(`Prix introuvable pour le produit ${item.productId}`)
+      return sum + dbPrice * item.quantity
+    }, 0)
+    const shipping = subtotal >= 150 ? 0 : 5.9
+    const verifiedTotal = Math.round((subtotal + shipping) * 100) / 100
+
+    // Rejet si le client envoie un montant différent (tolérance 1 centime)
+    if (total !== undefined && Math.abs(total - verifiedTotal) > 0.01) {
+      console.warn(`[create-payment] Montant client ${total} ≠ serveur ${verifiedTotal}`)
+      return json({ error: 'Montant invalide' }, 400)
+    }
 
     // ── 1. Créer la commande en base (pending) ────────────────────────────────
     const { data: order, error: orderErr } = await supabase
@@ -75,7 +99,7 @@ serve(async (req) => {
           country: customer.address.country ?? 'FR',
         },
         payment_status: 'pending',
-        payment_amount: total,
+        payment_amount: verifiedTotal,
         status: 'pending',
       })
       .select('id')
@@ -111,7 +135,7 @@ serve(async (req) => {
 
     // ── 3. Créer le PaymentIntent Stripe ──────────────────────────────────────
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(total * 100),  // centimes
+      amount: Math.round(verifiedTotal * 100),  // centimes
       currency: 'eur',
       metadata: { order_id: order.id },
       receipt_email: customer.email,

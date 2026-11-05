@@ -1,24 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { Routes, Route, useLocation, Link } from 'react-router-dom'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
 import CataloguePage from './pages/CataloguePage'
 import ProductPage from './pages/ProductPage'
-import AboutPage from './pages/AboutPage'
-import ContactPage from './pages/ContactPage'
-import CartPage from './pages/CartPage'
-import OrderConfirmedPage from './pages/OrderConfirmedPage'
-import AdminLogin from './pages/admin/AdminLogin'
-import AdminDashboard from './pages/admin/AdminDashboard'
-import AdminProducts from './pages/admin/AdminProducts'
-import AdminProductEdit from './pages/admin/AdminProductEdit'
-import AdminOrders from './pages/admin/AdminOrders'
-import AdminReports from './pages/admin/AdminReports'
-import AdminOrderDetail from './pages/admin/AdminOrderDetail'
-import AdminRubriques from './pages/admin/AdminRubriques'
-import AdminRubriqueEdit from './pages/admin/AdminRubriqueEdit'
-import AdminMedia from './pages/admin/AdminMedia'
 import AdminLayout from './components/admin/AdminLayout'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import { CartProvider } from './context/CartContext'
@@ -27,15 +13,33 @@ import { ContentProvider } from './context/ContentContext'
 import { ProductsProvider } from './context/ProductsContext'
 import { UserAuthProvider } from './context/UserAuthContext'
 import { ToastProvider } from './context/ToastContext'
-import ConnexionPage from './pages/ConnexionPage'
-import InscriptionPage from './pages/InscriptionPage'
-import MonComptePage from './pages/MonComptePage'
-import CgvPage from './pages/CgvPage'
-import ConfidentialitePage from './pages/ConfidentialitePage'
-import LivraisonPage from './pages/LivraisonPage'
-import MentionsLegalesPage from './pages/MentionsLegalesPage'
 import CookieBanner from './components/CookieBanner'
 import CartDrawer from './components/CartDrawer'
+
+// Pages secondaires — chargées en différé
+const AboutPage = lazy(() => import('./pages/AboutPage'))
+const ContactPage = lazy(() => import('./pages/ContactPage'))
+const CartPage = lazy(() => import('./pages/CartPage'))
+const OrderConfirmedPage = lazy(() => import('./pages/OrderConfirmedPage'))
+const ConnexionPage = lazy(() => import('./pages/ConnexionPage'))
+const InscriptionPage = lazy(() => import('./pages/InscriptionPage'))
+const MonComptePage = lazy(() => import('./pages/MonComptePage'))
+const CgvPage = lazy(() => import('./pages/CgvPage'))
+const ConfidentialitePage = lazy(() => import('./pages/ConfidentialitePage'))
+const LivraisonPage = lazy(() => import('./pages/LivraisonPage'))
+const MentionsLegalesPage = lazy(() => import('./pages/MentionsLegalesPage'))
+
+// Admin — toujours chargé en différé
+const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'))
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'))
+const AdminProductEdit = lazy(() => import('./pages/admin/AdminProductEdit'))
+const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'))
+const AdminReports = lazy(() => import('./pages/admin/AdminReports'))
+const AdminOrderDetail = lazy(() => import('./pages/admin/AdminOrderDetail'))
+const AdminRubriques = lazy(() => import('./pages/admin/AdminRubriques'))
+const AdminRubriqueEdit = lazy(() => import('./pages/admin/AdminRubriqueEdit'))
+const AdminMedia = lazy(() => import('./pages/admin/AdminMedia'))
 
 function NotFoundPage() {
   return (
@@ -61,25 +65,27 @@ function StoreFront() {
       <CartDrawer />
       <main className="flex-1">
         <div key={pathname} className="page-fade">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/catalogue" element={<CataloguePage />} />
-            <Route path="/catalogue/:category" element={<CataloguePage />} />
-            <Route path="/rubrique/:slug" element={<CataloguePage />} />
-            <Route path="/produit/:id" element={<ProductPage />} />
-            <Route path="/a-propos" element={<AboutPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/panier" element={<CartPage />} />
-            <Route path="/commande-confirmee" element={<OrderConfirmedPage />} />
-            <Route path="/connexion" element={<ConnexionPage />} />
-            <Route path="/inscription" element={<InscriptionPage />} />
-            <Route path="/mon-compte" element={<MonComptePage />} />
-            <Route path="/cgv" element={<CgvPage />} />
-            <Route path="/confidentialite" element={<ConfidentialitePage />} />
-            <Route path="/livraison" element={<LivraisonPage />} />
-            <Route path="/mentions-legales" element={<MentionsLegalesPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+          <Suspense fallback={null}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/catalogue" element={<CataloguePage />} />
+              <Route path="/catalogue/:category" element={<CataloguePage />} />
+              <Route path="/rubrique/:slug" element={<CataloguePage />} />
+              <Route path="/produit/:id" element={<ProductPage />} />
+              <Route path="/a-propos" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/panier" element={<CartPage />} />
+              <Route path="/commande-confirmee" element={<OrderConfirmedPage />} />
+              <Route path="/connexion" element={<ConnexionPage />} />
+              <Route path="/inscription" element={<InscriptionPage />} />
+              <Route path="/mon-compte" element={<MonComptePage />} />
+              <Route path="/cgv" element={<CgvPage />} />
+              <Route path="/confidentialite" element={<ConfidentialitePage />} />
+              <Route path="/livraison" element={<LivraisonPage />} />
+              <Route path="/mentions-legales" element={<MentionsLegalesPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Suspense>
         </div>
       </main>
       <Footer />
@@ -91,17 +97,19 @@ function AdminArea() {
   return (
     <ProtectedRoute>
       <AdminLayout>
-        <Routes>
-          <Route index element={<AdminDashboard />} />
-          <Route path="produits" element={<AdminProducts />} />
-          <Route path="produits/:id" element={<AdminProductEdit />} />
-          <Route path="commandes" element={<AdminOrders />} />
-          <Route path="commandes/:id" element={<AdminOrderDetail />} />
-          <Route path="rubriques" element={<AdminRubriques />} />
-          <Route path="rubriques/:id" element={<AdminRubriqueEdit />} />
-          <Route path="photos" element={<AdminMedia />} />
-          <Route path="rapports" element={<AdminReports />} />
-        </Routes>
+        <Suspense fallback={null}>
+          <Routes>
+            <Route index element={<AdminDashboard />} />
+            <Route path="produits" element={<AdminProducts />} />
+            <Route path="produits/:id" element={<AdminProductEdit />} />
+            <Route path="commandes" element={<AdminOrders />} />
+            <Route path="commandes/:id" element={<AdminOrderDetail />} />
+            <Route path="rubriques" element={<AdminRubriques />} />
+            <Route path="rubriques/:id" element={<AdminRubriqueEdit />} />
+            <Route path="photos" element={<AdminMedia />} />
+            <Route path="rapports" element={<AdminReports />} />
+          </Routes>
+        </Suspense>
       </AdminLayout>
     </ProtectedRoute>
   )
@@ -115,11 +123,13 @@ export default function App() {
         <UserAuthProvider>
         <ToastProvider>
         <CartProvider>
-          <Routes>
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/*" element={<AdminArea />} />
-            <Route path="/*" element={<StoreFront />} />
-          </Routes>
+          <Suspense fallback={null}>
+            <Routes>
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/*" element={<AdminArea />} />
+              <Route path="/*" element={<StoreFront />} />
+            </Routes>
+          </Suspense>
         </CartProvider>
         </ToastProvider>
         </UserAuthProvider>
