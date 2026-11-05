@@ -31,6 +31,8 @@ export default function CataloguePage() {
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null)
   const [sortBy, setSortBy] = useState<'nouveautes' | 'prix-asc' | 'prix-desc'>('nouveautes')
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 12
 
   useEffect(() => {
     document.body.style.overflow = filtersOpen ? 'hidden' : ''
@@ -40,7 +42,10 @@ export default function CataloguePage() {
   const toggle = <T,>(list: T[], setList: (v: T[]) => void, value: T) =>
     setList(list.includes(value) ? list.filter(x => x !== value) : [...list, value])
 
-  const clearAll = () => { setSelectedBrands([]); setSelectedSizes([]); setSelectedPrice(null) }
+  const clearAll = () => { setSelectedBrands([]); setSelectedSizes([]); setSelectedPrice(null); setPage(1) }
+
+  // Reset page quand les filtres changent
+  useEffect(() => { setPage(1) }, [selectedBrands, selectedSizes, selectedPrice, sortBy, slug, category, query])
 
   const BRANDS = [...new Set(allProducts.map(p => p.brand))].sort()
 
@@ -71,6 +76,8 @@ export default function CataloguePage() {
 
   const activeCount = selectedBrands.length + selectedSizes.length + (selectedPrice !== null ? 1 : 0)
   const countLabel = `${filtered.length} ${filtered.length !== 1 ? t.catalogue.resultsPlural : t.catalogue.results}`
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   if (slug && !rubrique) {
     if (contentLoading) return <div className="container" style={{minHeight:'60vh'}} />
@@ -187,12 +194,44 @@ export default function CataloguePage() {
             </div>
           ) : productsLoading ? (
             <div className="pgrid">
-              <ProductGridSkeleton count={8} />
+              <ProductGridSkeleton count={12} />
             </div>
           ) : (
-            <div className="pgrid">
-              {filtered.map((p, i) => <ProductCard key={p.id} product={p} priority={i < 6} />)}
-            </div>
+            <>
+              <div className="pgrid">
+                {paginated.map((p, i) => <ProductCard key={p.id} product={p} priority={i < 6} />)}
+              </div>
+              {totalPages > 1 && (
+                <nav className="pagination" aria-label="Pages">
+                  <button
+                    className="pagination__btn"
+                    onClick={() => { setPage(p => p - 1); window.scrollTo({top: 0, behavior: 'smooth'}) }}
+                    disabled={page === 1}
+                    aria-label="Page précédente"
+                  >
+                    ←
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
+                    <button
+                      key={n}
+                      className={`pagination__btn ${n === page ? 'is-active' : ''}`}
+                      onClick={() => { setPage(n); window.scrollTo({top: 0, behavior: 'smooth'}) }}
+                      aria-current={n === page ? 'page' : undefined}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                  <button
+                    className="pagination__btn"
+                    onClick={() => { setPage(p => p + 1); window.scrollTo({top: 0, behavior: 'smooth'}) }}
+                    disabled={page === totalPages}
+                    aria-label="Page suivante"
+                  >
+                    →
+                  </button>
+                </nav>
+              )}
+            </>
           )}
         </div>
       </div>
