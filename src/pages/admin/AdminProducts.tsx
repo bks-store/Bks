@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Search, Edit2, Eye, EyeOff, Package, Loader2, Trash2, RefreshCw, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react'
+import { Plus, Search, Edit2, Eye, EyeOff, Package, Loader2, Trash2, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react'
 import { supabase, isConfigured } from '../../lib/supabase'
 import { useTranslation } from '../../i18n/useTranslation'
 import type { DbProduct } from '../../types/database'
@@ -39,7 +39,6 @@ export default function AdminProducts() {
   const [filter, setFilter] = useState<'all' | 'published' | 'unpublished'>('all')
   const [brandFilter, setBrandFilter] = useState<string>('')
   const [toggling, setToggling] = useState<string | null>(null)
-  const [togglingNew, setTogglingNew] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [syncing, setSyncing] = useState(false)
   const [syncResult, setSyncResult] = useState<{ ok: boolean; msg: string } | null>(null)
@@ -113,19 +112,7 @@ export default function AdminProducts() {
     setToggling(null)
   }
 
-  const toggleNew = async (product: DbProduct) => {
-    setTogglingNew(product.id)
-    if (isConfigured) {
-      const client = supabase as unknown as { from: (t: string) => any }
-      await client.from('products').update({ is_new: !product.is_new }).eq('id', product.id)
-    }
-    setProducts(prev => prev.map(p =>
-      p.id === product.id ? { ...p, is_new: !p.is_new } : p
-    ))
-    setTogglingNew(null)
-  }
-
-  const thumb = (url: string | undefined) => {
+const thumb = (url: string | undefined) => {
     if (!url) return url
     if (url.includes('supabase.co/storage')) {
       return `/api/img?url=${encodeURIComponent(url)}&w=120`
@@ -354,19 +341,6 @@ export default function AdminProducts() {
 
                   {/* Actions */}
                   <div style={{display:'flex', alignItems:'center', gap:'4px', flexShrink:0}}>
-                    <button
-                      onClick={() => toggleNew(product)}
-                      disabled={togglingNew === product.id}
-                      style={{width:36, height:36, borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'transparent', border:'none', cursor:'pointer', outline:'none', transition:'background 0.15s'}}
-                      title={product.is_new ? 'Retirer des nouveautés' : 'Mettre en nouveauté'}
-                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
-                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                    >
-                      {togglingNew === product.id
-                        ? <Loader2 size={16} className="animate-spin" color="var(--accent)" />
-                        : <Sparkles size={16} color={product.is_new ? '#C8955A' : 'var(--ink-faint)'} />
-                      }
-                    </button>
                     <button
                       onClick={() => togglePublish(product)}
                       disabled={toggling === product.id}
