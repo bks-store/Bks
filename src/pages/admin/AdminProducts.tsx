@@ -130,6 +130,9 @@ export default function AdminProducts() {
   // Reset page quand filtre/marque/recherche change
   useEffect(() => { setPage(1) }, [brandFilter, filter, search])
 
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
   const filtered = products.filter(p => {
     if (!brandFilter || p.brand !== brandFilter) return false
     const matchSearch = search === '' ||
@@ -251,8 +254,6 @@ export default function AdminProducts() {
 
       {/* Products list */}
       <div ref={listRef} />
-      {(() => { const totalPages = Math.ceil(filtered.length / PAGE_SIZE); const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE); return (
-      <>
       {loading ? (
         <div style={{display:'flex', justifyContent:'center', padding:'5rem 0'}}>
           <Loader2 size={28} className="animate-spin" color="var(--accent)" />
@@ -263,147 +264,146 @@ export default function AdminProducts() {
           <p style={{fontSize:'0.875rem'}}>Aucun produit trouvé</p>
         </div>
       ) : (
-        <div className="admin-card" style={{overflow:'hidden'}}>
-          {paginated.map((product, idx) => {
-            const imgSrc = product.images?.[0]
-            return (
-              <div key={product.id} style={{
-                display:'flex', alignItems:'center', gap:'1rem',
-                padding:'0.875rem 1.25rem',
-                borderTop: idx === 0 ? 'none' : '1px solid var(--line)',
-                transition:'background 0.15s',
-              }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(138,90,48,0.025)')}
-                onMouseLeave={e => (e.currentTarget.style.background = '')}
-              >
-                {/* Product image */}
-                <div style={{
-                  width:68, height:68, flexShrink:0, borderRadius:8,
-                  overflow:'hidden', background:'var(--surface)',
-                  border:'1px solid var(--line)',
-                }}>
-                  {imgSrc ? (
-                    <img
-                      src={thumb(imgSrc)}
-                      alt={product.name}
-                      loading="lazy"
-                      decoding="async"
-                      style={{width:'100%', height:'100%', objectFit:'cover'}}
-                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
-                    />
-                  ) : (
-                    <div style={{width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center'}}>
-                      <Package size={22} color="var(--ink-faint)" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div style={{flex:1, minWidth:0}}>
-                  <div style={{display:'flex', alignItems:'center', gap:'0.4rem', flexWrap:'wrap', marginBottom:'0.25rem'}}>
-                    <p style={{fontSize:'0.9375rem', fontWeight:500, color:'var(--ink)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>
-                      {product.name}
-                    </p>
-                    {product.is_new && (
-                      <span style={{fontSize:'0.5625rem', fontWeight:700, padding:'0.15rem 0.5rem', borderRadius:999, background:'rgba(200,149,90,0.14)', color:'var(--accent)', letterSpacing:'0.08em', textTransform:'uppercase', flexShrink:0}}>
-                        New
-                      </span>
-                    )}
-                    {product.is_featured && (
-                      <span style={{fontSize:'0.5625rem', fontWeight:700, padding:'0.15rem 0.5rem', borderRadius:999, background:'rgba(74,106,134,0.1)', color:'#4A6A86', letterSpacing:'0.08em', textTransform:'uppercase', flexShrink:0}}>
-                        Vedette
-                      </span>
+        <>
+          <div className="admin-card" style={{overflow:'hidden'}}>
+            {paginated.map((product, idx) => {
+              const imgSrc = product.images?.[0]
+              return (
+                <div key={product.id} style={{
+                  display:'flex', alignItems:'center', gap:'1rem',
+                  padding:'0.875rem 1.25rem',
+                  borderTop: idx === 0 ? 'none' : '1px solid var(--line)',
+                  transition:'background 0.15s',
+                }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(138,90,48,0.025)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '')}
+                >
+                  {/* Product image */}
+                  <div style={{
+                    width:68, height:68, flexShrink:0, borderRadius:8,
+                    overflow:'hidden', background:'var(--surface)',
+                    border:'1px solid var(--line)',
+                  }}>
+                    {imgSrc ? (
+                      <img
+                        src={thumb(imgSrc)}
+                        alt={product.name}
+                        loading="lazy"
+                        decoding="async"
+                        style={{width:'100%', height:'100%', objectFit:'cover'}}
+                        onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                      />
+                    ) : (
+                      <div style={{width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                        <Package size={22} color="var(--ink-faint)" />
+                      </div>
                     )}
                   </div>
-                  <p style={{fontSize:'0.75rem', color:'var(--ink-faint)'}}>
-                    {product.brand}
-                    <span style={{margin:'0 0.35rem', opacity:0.4}}>·</span>
-                    <span style={{fontWeight:600, color:'var(--ink)'}}>
-                      {product.price_sale.toLocaleString('fr-FR', {style:'currency', currency:'EUR'})}
-                    </span>
-                    {product.price_buy ? (
-                      <span style={{marginLeft:'0.4rem', opacity:0.55}}>
-                        achat {product.price_buy.toFixed(0)} €
+
+                  {/* Info */}
+                  <div style={{flex:1, minWidth:0}}>
+                    <div style={{display:'flex', alignItems:'center', gap:'0.4rem', flexWrap:'wrap', marginBottom:'0.25rem'}}>
+                      <p style={{fontSize:'0.9375rem', fontWeight:500, color:'var(--ink)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>
+                        {product.name}
+                      </p>
+                      {product.is_new && (
+                        <span style={{fontSize:'0.5625rem', fontWeight:700, padding:'0.15rem 0.5rem', borderRadius:999, background:'rgba(200,149,90,0.14)', color:'var(--accent)', letterSpacing:'0.08em', textTransform:'uppercase', flexShrink:0}}>
+                          New
+                        </span>
+                      )}
+                      {product.is_featured && (
+                        <span style={{fontSize:'0.5625rem', fontWeight:700, padding:'0.15rem 0.5rem', borderRadius:999, background:'rgba(74,106,134,0.1)', color:'#4A6A86', letterSpacing:'0.08em', textTransform:'uppercase', flexShrink:0}}>
+                          Vedette
+                        </span>
+                      )}
+                    </div>
+                    <p style={{fontSize:'0.75rem', color:'var(--ink-faint)'}}>
+                      {product.brand}
+                      <span style={{margin:'0 0.35rem', opacity:0.4}}>·</span>
+                      <span style={{fontWeight:600, color:'var(--ink)'}}>
+                        {product.price_sale.toLocaleString('fr-FR', {style:'currency', currency:'EUR'})}
                       </span>
-                    ) : null}
-                  </p>
-                </div>
+                      {product.price_buy ? (
+                        <span style={{marginLeft:'0.4rem', opacity:0.55}}>
+                          achat {product.price_buy.toFixed(0)} €
+                        </span>
+                      ) : null}
+                    </p>
+                  </div>
 
-                {/* Stock type badge */}
-                <div style={{display:'flex', alignItems:'center', gap:'0.4rem', flexShrink:0}}>
-                  <div style={{
-                    width:6, height:6, borderRadius:'50%',
-                    background: product.stock_type === 'boutique' ? '#4E7A43' : '#C8955A',
-                  }} />
-                  <span style={{fontSize:'0.6875rem', color:'var(--ink-faint)', display:'none'}}>
-                    {product.stock_type}
-                  </span>
-                </div>
+                  {/* Stock type badge */}
+                  <div style={{display:'flex', alignItems:'center', gap:'0.4rem', flexShrink:0}}>
+                    <div style={{
+                      width:6, height:6, borderRadius:'50%',
+                      background: product.stock_type === 'boutique' ? '#4E7A43' : '#C8955A',
+                    }} />
+                  </div>
 
-                {/* Actions */}
-                <div style={{display:'flex', alignItems:'center', gap:'4px', flexShrink:0}}>
-                  <button
-                    onClick={() => togglePublish(product)}
-                    disabled={toggling === product.id}
-                    style={{width:36, height:36, borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'transparent', border:'none', cursor:'pointer', transition:'background 0.15s'}}
-                    title={product.is_published ? 'Masquer' : 'Publier'}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                  >
-                    {toggling === product.id
-                      ? <Loader2 size={16} className="animate-spin" color="var(--accent)" />
-                      : product.is_published
-                        ? <Eye size={16} color="#4E7A43" />
-                        : <EyeOff size={16} color="var(--ink-faint)" />
-                    }
-                  </button>
-                  <Link
-                    to={`/admin/produits/${product.id}`}
-                    style={{width:36, height:36, borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'transparent', transition:'background 0.15s', color:'var(--accent)'}}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                  >
-                    <Edit2 size={16} strokeWidth={1.8} />
-                  </Link>
-                  <button
-                    onClick={() => deleteProduct(product)}
-                    disabled={deleting === product.id}
-                    style={{width:36, height:36, borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'transparent', border:'none', cursor:'pointer', transition:'background 0.15s'}}
-                    title="Supprimer"
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(166,65,44,0.06)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                  >
-                    {deleting === product.id
-                      ? <Loader2 size={16} className="animate-spin" color="#A6412C" />
-                      : <Trash2 size={16} color="#A6412C" />
-                    }
-                  </button>
+                  {/* Actions */}
+                  <div style={{display:'flex', alignItems:'center', gap:'4px', flexShrink:0}}>
+                    <button
+                      onClick={() => togglePublish(product)}
+                      disabled={toggling === product.id}
+                      style={{width:36, height:36, borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'transparent', border:'none', cursor:'pointer', outline:'none', transition:'background 0.15s'}}
+                      title={product.is_published ? 'Masquer' : 'Publier'}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      {toggling === product.id
+                        ? <Loader2 size={16} className="animate-spin" color="var(--accent)" />
+                        : product.is_published
+                          ? <Eye size={16} color="#4E7A43" />
+                          : <EyeOff size={16} color="var(--ink-faint)" />
+                      }
+                    </button>
+                    <Link
+                      to={`/admin/produits/${product.id}`}
+                      style={{width:36, height:36, borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'transparent', transition:'background 0.15s', color:'var(--accent)'}}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <Edit2 size={16} strokeWidth={1.8} />
+                    </Link>
+                    <button
+                      onClick={() => deleteProduct(product)}
+                      disabled={deleting === product.id}
+                      style={{width:36, height:36, borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', background:'transparent', border:'none', cursor:'pointer', outline:'none', transition:'background 0.15s'}}
+                      title="Supprimer"
+                      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(166,65,44,0.06)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      {deleting === product.id
+                        ? <Loader2 size={16} className="animate-spin" color="#A6412C" />
+                        : <Trash2 size={16} color="#A6412C" />
+                      }
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+          </div>
+
+          {totalPages > 1 && (
+            <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:'0.3rem', padding:'1.5rem 0'}}>
+              <button
+                onClick={() => { setPage(p => p - 1); scrollToList() }}
+                disabled={page === 1}
+                style={{minWidth:'2rem', height:'2rem', borderRadius:4, border:'1px solid var(--line)', background:'transparent', color:'var(--ink-soft)', fontSize:'0.8125rem', cursor:'pointer', outline:'none', opacity: page === 1 ? 0.3 : 1}}
+              >←</button>
+              {Array.from({length: totalPages}, (_, i) => i + 1).map(n => (
+                <button key={n} onClick={() => { setPage(n); scrollToList() }}
+                  style={{minWidth:'2rem', height:'2rem', borderRadius:4, border:'1px solid var(--line)', background: n === page ? 'var(--a-sidebar)' : 'transparent', color: n === page ? '#F4EEE5' : 'var(--ink-soft)', fontSize:'0.8125rem', fontWeight: n === page ? 600 : 400, cursor:'pointer', outline:'none'}}
+                >{n}</button>
+              ))}
+              <button
+                onClick={() => { setPage(p => p + 1); scrollToList() }}
+                disabled={page === totalPages}
+                style={{minWidth:'2rem', height:'2rem', borderRadius:4, border:'1px solid var(--line)', background:'transparent', color:'var(--ink-soft)', fontSize:'0.8125rem', cursor:'pointer', outline:'none', opacity: page === totalPages ? 0.3 : 1}}
+              >→</button>
+            </div>
+          )}
+        </>
       )}
-      {totalPages > 1 && (
-        <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:'0.3rem', padding:'1.5rem 0'}}>
-          <button
-            onClick={() => { setPage(p => p - 1); scrollToList() }}
-            disabled={page === 1}
-            style={{minWidth:'2rem', height:'2rem', borderRadius:4, border:'1px solid var(--line)', background:'transparent', color:'var(--ink-soft)', fontSize:'0.8125rem', cursor:'pointer', opacity: page === 1 ? 0.3 : 1}}
-          >←</button>
-          {Array.from({length: totalPages}, (_, i) => i + 1).map(n => (
-            <button key={n} onClick={() => { setPage(n); scrollToList() }}
-              style={{minWidth:'2rem', height:'2rem', borderRadius:4, border:'1px solid var(--line)', background: n === page ? 'var(--a-sidebar)' : 'transparent', color: n === page ? '#F4EEE5' : 'var(--ink-soft)', fontSize:'0.8125rem', fontWeight: n === page ? 600 : 400, cursor:'pointer'}}
-            >{n}</button>
-          ))}
-          <button
-            onClick={() => { setPage(p => p + 1); scrollToList() }}
-            disabled={page === totalPages}
-            style={{minWidth:'2rem', height:'2rem', borderRadius:4, border:'1px solid var(--line)', background:'transparent', color:'var(--ink-soft)', fontSize:'0.8125rem', cursor:'pointer', opacity: page === totalPages ? 0.3 : 1}}
-          >→</button>
-        </div>
-      )}
-      </> )})()}
     </div>
   )
 }
