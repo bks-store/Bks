@@ -271,10 +271,7 @@ function Instagram() {
 export default function HomePage() {
   const { t } = useTranslation()
   const { products } = useProducts()
-  const markedNew = products.filter(p => p.isNew && p.images.length > 0)
-  const nouveautes = markedNew.length > 0
-    ? markedNew
-    : products.filter(p => p.images.length > 0).slice(0, 9)
+  const nouveautes = products.filter(p => p.isNew && p.images.length > 0)
   const featured = products.filter(p => p.isFeatured && p.images.length > 0)
 
   return (
