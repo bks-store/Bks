@@ -56,7 +56,7 @@ serve(async (req) => {
         brand: item.brand_name,
         category: 'sneakers',
         stock_type: 'dropshipping',
-        price_sale: Math.round((minBuy * MARKUP + 0.01) / 10) * 10 - 0.01,
+        price_sale: Math.ceil((minBuy * MARKUP + 0.01) / 10) * 10 - 0.01,
         price_buy: minBuy,
         last_sync_at: now,
         sync_status: 'synced',
@@ -204,7 +204,7 @@ serve(async (req) => {
 
     // Normaliser les prix de tous les produits vers le format X9.99
     const { data: allProducts } = await supabase.from('products').select('id, price_sale')
-    const roundTo999 = (p: number) => Math.round((p + 0.01) / 10) * 10 - 0.01
+    const roundTo999 = (p: number) => Math.ceil((p + 0.01) / 10) * 10 - 0.01
     const toRound = (allProducts ?? []).filter((p: { price_sale: number }) =>
       Math.abs(roundTo999(p.price_sale) - p.price_sale) > 0.001
     )

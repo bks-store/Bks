@@ -286,9 +286,9 @@ export default function AdminProductEdit() {
                   const buy = parseFloat(e.target.value)
                   setPriceBuy(e.target.value)
                   if (!isNaN(buy) && buy > 0) {
-                    // Majoration 65% TVA incluse : PV TTC = PA * 1.65
+                    // Majoration 65% TVA incluse : PV TTC = PA * 1.65, arrondi X9.99
                     const pvTTC = buy * 1.65
-                    setPriceSale(Math.ceil(pvTTC * 100 - 1) / 100 + '')
+                    setPriceSale((Math.ceil((pvTTC + 0.01) / 10) * 10 - 0.01).toFixed(2))
                   }
                 }}
                 placeholder="Confidentiel"
