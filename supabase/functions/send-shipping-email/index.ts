@@ -115,6 +115,7 @@ serve(async (req) => {
     headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       from: 'BKS <commandes@bks-store.com>',
+      reply_to: 'bks@bks-store.com',
       to: [String(order.customer_email)],
       subject: `Votre commande #${ref} est en route — BKS`,
       html,
