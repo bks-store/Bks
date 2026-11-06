@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, Search, Edit2, Eye, EyeOff, Package, Loader2, Trash2, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react'
 import { supabase, isConfigured } from '../../lib/supabase'
@@ -44,6 +44,8 @@ export default function AdminProducts() {
   const [syncResult, setSyncResult] = useState<{ ok: boolean; msg: string } | null>(null)
   const [page, setPage] = useState(1)
   const PAGE_SIZE = 35
+  const listRef = useRef<HTMLDivElement>(null)
+  const scrollToList = () => listRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   const load = async () => {
     setLoading(true)
@@ -248,6 +250,7 @@ export default function AdminProducts() {
       </div>
 
       {/* Products list */}
+      <div ref={listRef} />
       {(() => { const totalPages = Math.ceil(filtered.length / PAGE_SIZE); const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE); return (
       <>
       {loading ? (
@@ -384,17 +387,17 @@ export default function AdminProducts() {
       {totalPages > 1 && (
         <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:'0.3rem', padding:'1.5rem 0'}}>
           <button
-            onClick={() => setPage(p => p - 1)}
+            onClick={() => { setPage(p => p - 1); scrollToList() }}
             disabled={page === 1}
             style={{minWidth:'2rem', height:'2rem', borderRadius:4, border:'1px solid var(--line)', background:'transparent', color:'var(--ink-soft)', fontSize:'0.8125rem', cursor:'pointer', opacity: page === 1 ? 0.3 : 1}}
           >←</button>
           {Array.from({length: totalPages}, (_, i) => i + 1).map(n => (
-            <button key={n} onClick={() => setPage(n)}
+            <button key={n} onClick={() => { setPage(n); scrollToList() }}
               style={{minWidth:'2rem', height:'2rem', borderRadius:4, border:'1px solid var(--line)', background: n === page ? 'var(--a-sidebar)' : 'transparent', color: n === page ? '#F4EEE5' : 'var(--ink-soft)', fontSize:'0.8125rem', fontWeight: n === page ? 600 : 400, cursor:'pointer'}}
             >{n}</button>
           ))}
           <button
-            onClick={() => setPage(p => p + 1)}
+            onClick={() => { setPage(p => p + 1); scrollToList() }}
             disabled={page === totalPages}
             style={{minWidth:'2rem', height:'2rem', borderRadius:4, border:'1px solid var(--line)', background:'transparent', color:'var(--ink-soft)', fontSize:'0.8125rem', cursor:'pointer', opacity: page === totalPages ? 0.3 : 1}}
           >→</button>

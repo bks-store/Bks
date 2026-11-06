@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useParams, useSearchParams, Link } from 'react-router-dom'
 import { SlidersHorizontal, X, ChevronDown } from 'lucide-react'
 import ProductCard from '../components/ProductCard'
@@ -33,6 +33,9 @@ export default function CataloguePage() {
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [page, setPage] = useState(1)
   const PAGE_SIZE = 12
+  const gridRef = useRef<HTMLDivElement>(null)
+
+  const scrollToGrid = () => gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   useEffect(() => {
     document.body.style.overflow = filtersOpen ? 'hidden' : ''
@@ -185,7 +188,7 @@ export default function CataloguePage() {
           )}
         </aside>
 
-        <div>
+        <div ref={gridRef}>
           {filtered.length === 0 ? (
             <div className="empty">
               <h2 className="display h-md">{t.catalogue.noResults}</h2>
@@ -205,7 +208,7 @@ export default function CataloguePage() {
                 <nav className="pagination" aria-label="Pages">
                   <button
                     className="pagination__btn"
-                    onClick={() => { setPage(p => p - 1); window.scrollTo({top: 0, behavior: 'smooth'}) }}
+                    onClick={() => { setPage(p => p - 1); scrollToGrid() }}
                     disabled={page === 1}
                     aria-label="Page précédente"
                   >
@@ -215,7 +218,7 @@ export default function CataloguePage() {
                     <button
                       key={n}
                       className={`pagination__btn ${n === page ? 'is-active' : ''}`}
-                      onClick={() => { setPage(n); window.scrollTo({top: 0, behavior: 'smooth'}) }}
+                      onClick={() => { setPage(n); scrollToGrid() }}
                       aria-current={n === page ? 'page' : undefined}
                     >
                       {n}
@@ -223,7 +226,7 @@ export default function CataloguePage() {
                   ))}
                   <button
                     className="pagination__btn"
-                    onClick={() => { setPage(p => p + 1); window.scrollTo({top: 0, behavior: 'smooth'}) }}
+                    onClick={() => { setPage(p => p + 1); scrollToGrid() }}
                     disabled={page === totalPages}
                     aria-label="Page suivante"
                   >
