@@ -139,12 +139,14 @@ export default function AdminProductEdit() {
     const productId = isNew ? `new-${Date.now()}` : id
     const newUrls: string[] = []
     for (const file of Array.from(files)) {
-      const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
-      const path = `manual/${productId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-      const { error } = await supabase.storage.from('product-images').upload(path, file, { upsert: true })
-      if (!error) {
-        const { data } = supabase.storage.from('product-images').getPublicUrl(path)
-        newUrls.push(data.publicUrl)
+      const form = new FormData()
+      form.append('file', file)
+      form.append('productId', productId ?? 'unknown')
+      const { data, error } = await supabase.functions.invoke('upload-image', { body: form })
+      if (!error && data?.url) {
+        newUrls.push(data.url)
+      } else {
+        console.error('[upload-image]', error ?? data)
       }
     }
     setImages(prev => [...prev, ...newUrls])
