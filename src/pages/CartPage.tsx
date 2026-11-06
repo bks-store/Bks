@@ -170,7 +170,7 @@ function StripePaymentForm({
 // ── Main CartPage ─────────────────────────────────────────────────────────────
 export default function CartPage() {
   const { items, removeItem, updateQuantity, total } = useCart()
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const { user } = useUserAuth()
   const totalQty = items.reduce((s, i) => s + i.quantity, 0)
   const SHIPPING = 5.90
@@ -234,7 +234,7 @@ export default function CartPage() {
       }
 
       const { data, error: fnErr } = await supabase.functions.invoke('create-payment', {
-        body: { items, total: totalWithShipping, customer: form },
+        body: { items, total: totalWithShipping, locale, customer: form },
       })
 
       if (fnErr) throw new Error(fnErr.message)

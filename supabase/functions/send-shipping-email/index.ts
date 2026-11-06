@@ -33,12 +33,37 @@ serve(async (req) => {
   if (!order) return new Response(JSON.stringify({ ok: false, error: 'Commande introuvable' }), { status: 404, headers: CORS })
   if (!order.tracking_number) return new Response(JSON.stringify({ ok: false, error: 'Numéro de suivi manquant' }), { status: 400, headers: CORS })
 
+  const locale = String(order.locale ?? 'fr') === 'en' ? 'en' : 'fr'
+  const tr = locale === 'en' ? {
+    banner: 'Your order is on its way',
+    title: 'Your parcel has been shipped.',
+    intro: (ref: string) => `Your order <strong style="color:#28170E;">#${ref}</strong> has just been shipped. Track it in real time with the link below.`,
+    trackingLabel: 'Tracking number',
+    trackBtn: 'Track my parcel →',
+    trackUrl: (t: string) => `https://www.royalmail.com/track-your-item#/tracking-results/${t}`,
+    summaryLabel: 'Order summary',
+    sizeQty: (size: string, qty: number) => `Size ${size} · Qty ${qty}`,
+    contact: 'Any questions? Reply to this email or write to us at',
+    subject: (ref: string) => `Your order #${ref} is on its way — BKS`,
+  } : {
+    banner: 'Votre commande est en route',
+    title: 'Votre colis est expédié.',
+    intro: (ref: string) => `Votre commande <strong style="color:#28170E;">#${ref}</strong> vient d'être expédiée. Vous pouvez suivre votre colis en temps réel avec le lien ci-dessous.`,
+    trackingLabel: 'Numéro de suivi',
+    trackBtn: 'Suivre mon colis →',
+    trackUrl: (t: string) => `https://www.laposte.fr/outils/suivre-vos-envois?code=${t}`,
+    summaryLabel: 'Rappel de votre commande',
+    sizeQty: (size: string, qty: number) => `Pointure ${size} · Qté ${qty}`,
+    contact: 'Des questions ? Répondez à cet email ou écrivez-nous à',
+    subject: (ref: string) => `Votre commande #${ref} est en route — BKS`,
+  }
+  const fmtEur = (n: number) => n.toLocaleString(locale === 'en' ? 'en-GB' : 'fr-FR', { style: 'currency', currency: 'EUR' })
+
   const ref = String(order.id).slice(0, 8).toUpperCase()
   const tracking = order.tracking_number as string
-  const colissimoUrl = `https://www.laposte.fr/outils/suivre-vos-envois?code=${tracking}`
 
   const html = `<!DOCTYPE html>
-<html lang="fr">
+<html lang="${locale}">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#EDE8E1;font-family:Georgia,serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#EDE8E1;padding:48px 16px;">
@@ -53,22 +78,22 @@ serve(async (req) => {
 
         <!-- Bandeau -->
         <tr><td style="background:#4E7A43;padding:13px 48px;text-align:center;">
-          <p style="color:#ffffff;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;margin:0;font-family:-apple-system,sans-serif;font-weight:600;">Votre commande est en route</p>
+          <p style="color:#ffffff;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;margin:0;font-family:-apple-system,sans-serif;font-weight:600;">${tr.banner}</p>
         </td></tr>
 
         <!-- Corps -->
         <tr><td style="background:#ffffff;padding:48px 48px 40px;">
-          <h1 style="color:#28170E;font-size:28px;font-weight:400;margin:0 0 12px;line-height:1.3;font-family:Georgia,serif;">Votre colis est expédié.</h1>
+          <h1 style="color:#28170E;font-size:28px;font-weight:400;margin:0 0 12px;line-height:1.3;font-family:Georgia,serif;">${tr.title}</h1>
           <p style="color:#6B5D54;font-size:15px;margin:0 0 36px;line-height:1.75;font-family:-apple-system,sans-serif;">
-            Votre commande <strong style="color:#28170E;">#${ref}</strong> vient d'être expédiée. Vous pouvez suivre votre colis en temps réel avec le lien ci-dessous.
+            ${tr.intro(ref)}
           </p>
 
           <!-- Tracking -->
           <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:36px;">
             <tr><td style="border:1px solid #DDD5CB;border-radius:4px;padding:20px 24px;">
-              <p style="font-size:10px;color:#9E8E84;text-transform:uppercase;letter-spacing:0.14em;margin:0 0 6px;font-family:-apple-system,sans-serif;">Numéro de suivi</p>
+              <p style="font-size:10px;color:#9E8E84;text-transform:uppercase;letter-spacing:0.14em;margin:0 0 6px;font-family:-apple-system,sans-serif;">${tr.trackingLabel}</p>
               <p style="font-size:20px;color:#28170E;font-weight:400;margin:0 0 16px;letter-spacing:0.08em;font-family:Georgia,serif;">${tracking}</p>
-              <a href="${colissimoUrl}" style="display:inline-block;background:#28170E;color:#F4EFE6;text-decoration:none;padding:13px 28px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;font-family:-apple-system,sans-serif;">Suivre mon colis →</a>
+              <a href="${tr.trackUrl(tracking)}" style="display:inline-block;background:#28170E;color:#F4EFE6;text-decoration:none;padding:13px 28px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;font-family:-apple-system,sans-serif;">${tr.trackBtn}</a>
             </td></tr>
           </table>
 
@@ -78,23 +103,23 @@ serve(async (req) => {
           </table>
 
           <!-- Rappel articles -->
-          <p style="font-size:10px;color:#9E8E84;text-transform:uppercase;letter-spacing:0.14em;margin:0 0 16px;font-family:-apple-system,sans-serif;">Rappel de votre commande</p>
+          <p style="font-size:10px;color:#9E8E84;text-transform:uppercase;letter-spacing:0.14em;margin:0 0 16px;font-family:-apple-system,sans-serif;">${tr.summaryLabel}</p>
           <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
             ${(order.order_items as Array<{product_brand:string;product_name:string;size:string;quantity:number;unit_price:number}>).map(i => `
             <tr>
               <td style="padding:12px 0;border-bottom:1px solid #EDE8E1;vertical-align:top;">
                 <span style="font-size:10px;color:#C8955A;text-transform:uppercase;letter-spacing:0.12em;font-family:-apple-system,sans-serif;">${i.product_brand}</span><br>
                 <strong style="color:#28170E;font-size:14px;font-weight:500;font-family:-apple-system,sans-serif;">${i.product_name}</strong><br>
-                <span style="color:#9E8E84;font-size:12px;font-family:-apple-system,sans-serif;">Pointure ${i.size} · Qté ${i.quantity}</span>
+                <span style="color:#9E8E84;font-size:12px;font-family:-apple-system,sans-serif;">${tr.sizeQty(i.size, i.quantity)}</span>
               </td>
               <td style="padding:12px 0;border-bottom:1px solid #EDE8E1;text-align:right;vertical-align:top;white-space:nowrap;">
-                <span style="font-size:14px;font-weight:600;color:#28170E;font-family:-apple-system,sans-serif;">${(i.unit_price * i.quantity).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
+                <span style="font-size:14px;font-weight:600;color:#28170E;font-family:-apple-system,sans-serif;">${fmtEur(i.unit_price * i.quantity)}</span>
               </td>
             </tr>`).join('')}
           </table>
 
           <p style="color:#9E8E84;font-size:13px;line-height:1.75;margin:0;font-family:-apple-system,sans-serif;">
-            Des questions ? Répondez à cet email ou écrivez-nous à <a href="mailto:bks@bks-store.com" style="color:#C8955A;text-decoration:none;">bks@bks-store.com</a>
+            ${tr.contact} <a href="mailto:bks@bks-store.com" style="color:#C8955A;text-decoration:none;">bks@bks-store.com</a>
           </p>
         </td></tr>
 
@@ -117,7 +142,7 @@ serve(async (req) => {
       from: 'BKS <commandes@bks-store.com>',
       reply_to: 'bks@bks-store.com',
       to: [String(order.customer_email)],
-      subject: `Votre commande #${ref} est en route — BKS`,
+      subject: tr.subject(ref),
       html,
     }),
   })

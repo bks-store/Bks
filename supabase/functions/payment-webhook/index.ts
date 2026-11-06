@@ -69,10 +69,51 @@ serve(async (req) => {
   return new Response('ok', { status: 200 })
 })
 
+// ── Traductions emails ────────────────────────────────────────────────────────
+const i18n = {
+  fr: {
+    lang: 'fr',
+    banner: 'Commande confirmée',
+    title: 'Merci pour votre confiance.',
+    intro: 'Votre paiement a bien été reçu. Nous préparons votre commande avec soin et vous contacterons dès l\'expédition.',
+    refLabel: 'Référence commande',
+    detailLabel: 'Détail de la commande',
+    sizeQty: (size: string, qty: number) => `Pointure ${size} · Qté ${qty}`,
+    subtotalLabel: 'Sous-total',
+    shippingLabel: 'Livraison',
+    shippingFree: 'Offerte',
+    totalLabel: 'Total',
+    addressLabel: 'Adresse de livraison',
+    contact: 'Une question sur votre commande ?<br>Répondez à cet email ou écrivez-nous à',
+    subject: (ref: string) => `Commande confirmée #${ref} — BKS`,
+    unsubFooter: '',
+  },
+  en: {
+    lang: 'en',
+    banner: 'Order confirmed',
+    title: 'Thank you for your trust.',
+    intro: 'Your payment has been received. We are carefully preparing your order and will contact you once it ships.',
+    refLabel: 'Order reference',
+    detailLabel: 'Order details',
+    sizeQty: (size: string, qty: number) => `Size ${size} · Qty ${qty}`,
+    subtotalLabel: 'Subtotal',
+    shippingLabel: 'Shipping',
+    shippingFree: 'Free',
+    totalLabel: 'Total',
+    addressLabel: 'Delivery address',
+    contact: 'Any question about your order?<br>Reply to this email or write to us at',
+    subject: (ref: string) => `Order confirmed #${ref} — BKS`,
+    unsubFooter: '',
+  },
+}
+
 // ── Email de confirmation commande ────────────────────────────────────────────
 async function sendConfirmationEmail(order: Record<string, unknown>) {
   const resendKey = Deno.env.get('RESEND_API_KEY')
   if (!resendKey) return
+
+  const locale = String(order.locale ?? 'fr') === 'en' ? 'en' : 'fr'
+  const tr = i18n[locale]
 
   const items = (order.order_items as Array<{
     product_brand: string; product_name: string; size: string; quantity: number; unit_price: number
@@ -82,21 +123,22 @@ async function sendConfirmationEmail(order: Record<string, unknown>) {
   const total = Number(order.payment_amount ?? 0)
   const shipping = total >= 150 ? 0 : 5.90
   const subtotal = total - shipping
+  const fmtEur = (n: number) => n.toLocaleString(locale === 'en' ? 'en-GB' : 'fr-FR', { style: 'currency', currency: 'EUR' })
 
   const itemsHtml = items.map(i => `
     <tr>
       <td style="padding:14px 0;border-bottom:1px solid #EDE8E1;vertical-align:top;">
         <span style="font-size:10px;color:#C8955A;text-transform:uppercase;letter-spacing:0.12em;font-family:-apple-system,sans-serif;">${i.product_brand}</span><br>
         <strong style="color:#28170E;font-size:14px;font-weight:500;font-family:-apple-system,sans-serif;">${i.product_name}</strong><br>
-        <span style="color:#9E8E84;font-size:12px;font-family:-apple-system,sans-serif;">Pointure ${i.size} · Qté ${i.quantity}</span>
+        <span style="color:#9E8E84;font-size:12px;font-family:-apple-system,sans-serif;">${tr.sizeQty(i.size, i.quantity)}</span>
       </td>
       <td style="padding:14px 0;border-bottom:1px solid #EDE8E1;text-align:right;vertical-align:top;white-space:nowrap;">
-        <span style="font-size:14px;font-weight:600;color:#28170E;font-family:-apple-system,sans-serif;">${(i.unit_price * i.quantity).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
+        <span style="font-size:14px;font-weight:600;color:#28170E;font-family:-apple-system,sans-serif;">${fmtEur(i.unit_price * i.quantity)}</span>
       </td>
     </tr>`).join('')
 
   const html = `<!DOCTYPE html>
-<html lang="fr">
+<html lang="${tr.lang}">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#EDE8E1;font-family:Georgia,serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#EDE8E1;padding:48px 16px;">
@@ -111,23 +153,23 @@ async function sendConfirmationEmail(order: Record<string, unknown>) {
 
         <!-- Bandeau confirmation -->
         <tr><td style="background:#C8955A;padding:14px 48px;text-align:center;">
-          <p style="color:#28170E;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;margin:0;font-family:-apple-system,sans-serif;font-weight:600;">Commande confirmée</p>
+          <p style="color:#28170E;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;margin:0;font-family:-apple-system,sans-serif;font-weight:600;">${tr.banner}</p>
         </td></tr>
 
         <!-- Corps -->
         <tr><td style="background:#ffffff;padding:48px 48px 40px;">
 
           <!-- Intro -->
-          <h1 style="color:#28170E;font-size:28px;font-weight:400;margin:0 0 12px;line-height:1.3;font-family:Georgia,serif;">Merci pour votre confiance.</h1>
+          <h1 style="color:#28170E;font-size:28px;font-weight:400;margin:0 0 12px;line-height:1.3;font-family:Georgia,serif;">${tr.title}</h1>
           <p style="color:#6B5D54;font-size:15px;margin:0 0 36px;line-height:1.75;font-family:-apple-system,sans-serif;">
-            Votre paiement a bien été reçu. Nous préparons votre commande avec soin et vous contacterons dès l'expédition.
+            ${tr.intro}
           </p>
 
           <!-- Référence -->
           <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:36px;">
             <tr>
               <td style="border:1px solid #DDD5CB;border-radius:4px;padding:20px 24px;">
-                <p style="font-size:10px;color:#9E8E84;text-transform:uppercase;letter-spacing:0.14em;margin:0 0 6px;font-family:-apple-system,sans-serif;">Référence commande</p>
+                <p style="font-size:10px;color:#9E8E84;text-transform:uppercase;letter-spacing:0.14em;margin:0 0 6px;font-family:-apple-system,sans-serif;">${tr.refLabel}</p>
                 <p style="font-size:22px;color:#28170E;font-weight:400;margin:0;letter-spacing:0.08em;font-family:Georgia,serif;">#${ref}</p>
               </td>
             </tr>
@@ -139,7 +181,7 @@ async function sendConfirmationEmail(order: Record<string, unknown>) {
           </table>
 
           <!-- Articles -->
-          <p style="font-size:10px;color:#9E8E84;text-transform:uppercase;letter-spacing:0.14em;margin:0 0 16px;font-family:-apple-system,sans-serif;">Détail de la commande</p>
+          <p style="font-size:10px;color:#9E8E84;text-transform:uppercase;letter-spacing:0.14em;margin:0 0 16px;font-family:-apple-system,sans-serif;">${tr.detailLabel}</p>
           <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
             ${itemsHtml}
           </table>
@@ -147,16 +189,16 @@ async function sendConfirmationEmail(order: Record<string, unknown>) {
           <!-- Totaux -->
           <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:36px;border-top:1px solid #EDE8E1;">
             <tr>
-              <td style="padding:10px 0 4px;color:#9E8E84;font-size:13px;font-family:-apple-system,sans-serif;">Sous-total</td>
-              <td style="padding:10px 0 4px;text-align:right;font-size:13px;color:#28170E;font-family:-apple-system,sans-serif;">${subtotal.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</td>
+              <td style="padding:10px 0 4px;color:#9E8E84;font-size:13px;font-family:-apple-system,sans-serif;">${tr.subtotalLabel}</td>
+              <td style="padding:10px 0 4px;text-align:right;font-size:13px;color:#28170E;font-family:-apple-system,sans-serif;">${fmtEur(subtotal)}</td>
             </tr>
             <tr>
-              <td style="padding:4px 0;color:#9E8E84;font-size:13px;font-family:-apple-system,sans-serif;">Livraison</td>
-              <td style="padding:4px 0;text-align:right;font-size:13px;font-family:-apple-system,sans-serif;">${shipping === 0 ? '<span style="color:#5A8C4E;">Offerte</span>' : shipping.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</td>
+              <td style="padding:4px 0;color:#9E8E84;font-size:13px;font-family:-apple-system,sans-serif;">${tr.shippingLabel}</td>
+              <td style="padding:4px 0;text-align:right;font-size:13px;font-family:-apple-system,sans-serif;">${shipping === 0 ? `<span style="color:#5A8C4E;">${tr.shippingFree}</span>` : fmtEur(shipping)}</td>
             </tr>
             <tr>
-              <td style="padding:16px 0 6px;color:#28170E;font-size:16px;font-weight:600;border-top:1px solid #DDD5CB;font-family:-apple-system,sans-serif;">Total</td>
-              <td style="padding:16px 0 6px;text-align:right;font-size:16px;font-weight:600;color:#28170E;border-top:1px solid #DDD5CB;font-family:-apple-system,sans-serif;">${total.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</td>
+              <td style="padding:16px 0 6px;color:#28170E;font-size:16px;font-weight:600;border-top:1px solid #DDD5CB;font-family:-apple-system,sans-serif;">${tr.totalLabel}</td>
+              <td style="padding:16px 0 6px;text-align:right;font-size:16px;font-weight:600;color:#28170E;border-top:1px solid #DDD5CB;font-family:-apple-system,sans-serif;">${fmtEur(total)}</td>
             </tr>
           </table>
 
@@ -177,8 +219,7 @@ async function sendConfirmationEmail(order: Record<string, unknown>) {
 
           <!-- Contact -->
           <p style="color:#9E8E84;font-size:13px;line-height:1.75;margin:0;font-family:-apple-system,sans-serif;">
-            Une question sur votre commande ?<br>
-            Répondez à cet email ou écrivez-nous à <a href="mailto:bks@bks-store.com" style="color:#C8955A;text-decoration:none;">bks@bks-store.com</a>
+            ${tr.contact} <a href="mailto:bks@bks-store.com" style="color:#C8955A;text-decoration:none;">bks@bks-store.com</a>
           </p>
         </td></tr>
 
@@ -201,7 +242,7 @@ async function sendConfirmationEmail(order: Record<string, unknown>) {
       from: 'BKS <commandes@bks-store.com>',
       reply_to: 'bks@bks-store.com',
       to: [String(order.customer_email)],
-      subject: `Commande confirmée #${ref} — BKS`,
+      subject: tr.subject(ref),
       html,
     }),
   })

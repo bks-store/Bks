@@ -23,6 +23,7 @@ interface CartItem {
 interface CheckoutPayload {
   items: CartItem[]
   total: number
+  locale?: string
   customer: {
     name: string
     email: string
@@ -42,7 +43,7 @@ serve(async (req) => {
 
   try {
     const payload: CheckoutPayload = await req.json()
-    const { items, total, customer } = payload
+    const { items, total, locale, customer } = payload
 
     if (!items?.length || !customer?.name || !customer?.email) {
       return json({ error: 'Données manquantes' }, 400)
@@ -101,6 +102,7 @@ serve(async (req) => {
         payment_status: 'pending',
         payment_amount: verifiedTotal,
         status: 'pending',
+        locale: locale === 'en' ? 'en' : 'fr',
       })
       .select('id')
       .single()
