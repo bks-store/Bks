@@ -130,9 +130,6 @@ export default function AdminProducts() {
   // Reset page quand filtre/marque/recherche change
   useEffect(() => { setPage(1) }, [brandFilter, filter, search])
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
-
   const filtered = products.filter(p => {
     if (!brandFilter || p.brand !== brandFilter) return false
     const matchSearch = search === '' ||
@@ -142,6 +139,9 @@ export default function AdminProducts() {
       filter === 'published' ? p.is_published : !p.is_published
     return matchSearch && matchFilter
   }).sort((a, b) => a.name.localeCompare(b.name))
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   return (
     <div>
