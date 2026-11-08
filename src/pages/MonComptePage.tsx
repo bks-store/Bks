@@ -302,8 +302,17 @@ export default function MonComptePage() {
             </div>
           )}
 
-          {/* Déconnexion */}
-          <div style={{ paddingTop: '1.5rem', borderTop: '1px solid var(--line)' }}>
+          {/* Liens utiles */}
+          <div style={{ paddingTop: '1.5rem', borderTop: '1px solid var(--line)', display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
+              <Link to="/livraison" style={{ fontSize: '0.8125rem', color: 'var(--ink-soft)', textDecoration: 'underline' }}>
+                Politique de retour
+              </Link>
+              <Link to="/contact" style={{ fontSize: '0.8125rem', color: 'var(--ink-soft)', textDecoration: 'underline' }}>
+                Nous contacter
+              </Link>
+            </div>
+
             <button
               onClick={handleSignOut}
               style={{

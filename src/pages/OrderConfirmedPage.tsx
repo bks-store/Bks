@@ -72,6 +72,12 @@ export default function OrderConfirmedPage() {
         <Link to="/catalogue" className="btn btn--solid">
           {o.continueShopping} <ArrowRight size={16} strokeWidth={1.5} />
         </Link>
+        <p style={{ fontSize: '0.8125rem', color: 'var(--ink-soft)', marginTop: '1rem' }}>
+          Besoin de faire un retour ?{' '}
+          <Link to="/livraison" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>
+            Voir la politique de retour
+          </Link>
+        </p>
 
         {!user && (
           <div style={{
