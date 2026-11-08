@@ -103,15 +103,47 @@ export default function LivraisonPage() {
         <div className="container" style={{ maxWidth: 680 }}>
           <p className="eyebrow" style={{ marginBottom: '1.25rem' }}>{l.returnsTitle}</p>
           <h2 className="display h-md" style={{ marginBottom: '1.5rem' }}>{l.returnsTitle}</h2>
-          <p className="lead" style={{ marginBottom: '2rem' }}>{l.returnsSub}</p>
-          <a
-            href="https://www.instagram.com/b.k.s_dinan/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="link-arrow"
-          >
-            {l.returnsContact} <ArrowRight size={14} strokeWidth={1.6} />
-          </a>
+          <p className="lead" style={{ marginBottom: '2.5rem' }}>{l.returnsSub}</p>
+
+          <div style={{ display: 'grid', gap: '2rem' }}>
+
+            {/* Conditions */}
+            <div>
+              <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: '0.75rem' }}>{(l as any).returnsCondTitle}</p>
+              <ul style={{ margin: 0, paddingLeft: '1.25rem', display: 'grid', gap: '0.4rem' }}>
+                {((l as any).returnsCond as string[]).map((c: string) => (
+                  <li key={c} style={{ fontSize: '0.9375rem', color: 'var(--ink)' }}>{c}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Étapes */}
+            <div>
+              <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: '0.75rem' }}>{(l as any).returnsHowTitle}</p>
+              <ol style={{ margin: 0, paddingLeft: '1.25rem', display: 'grid', gap: '0.6rem' }}>
+                {((l as any).returnsSteps as string[]).map((s: string, i: number) => (
+                  <li key={i} style={{ fontSize: '0.9375rem', color: 'var(--ink)', lineHeight: 1.6 }}>{s}</li>
+                ))}
+              </ol>
+            </div>
+
+            {/* Adresse */}
+            <div style={{ background: 'var(--surface)', borderRadius: 6, padding: '1.25rem 1.5rem' }}>
+              <p style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: '0.75rem' }}>{(l as any).returnsAddrTitle}</p>
+              {((l as any).returnsAddr as string[]).map((line: string) => (
+                <p key={line} style={{ fontSize: '0.9375rem', color: 'var(--ink)', margin: '0.1rem 0', fontWeight: line.startsWith('BKS') ? 600 : 400 }}>{line}</p>
+              ))}
+            </div>
+
+            {/* Frais */}
+            <p style={{ fontSize: '0.875rem', color: 'var(--ink-soft)', lineHeight: 1.65 }}>{(l as any).returnsCost}</p>
+
+            <div>
+              <a href="mailto:bks@bks-store.com" className="link-arrow">
+                {l.returnsContact} <ArrowRight size={14} strokeWidth={1.6} />
+              </a>
+            </div>
+          </div>
         </div>
       </section>
     </>

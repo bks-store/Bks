@@ -82,12 +82,22 @@ export default function CgvPage() {
         <p>
           Conformément à l'article L221-18 du Code de la consommation, le client dispose d'un délai de <strong>14 jours</strong> à
           compter de la réception du colis pour exercer son droit de rétractation, sans justification. Les produits doivent être
-          retournés dans leur état d'origine (non portés, boîte intacte). Les frais de retour sont à la charge du client sauf
-          erreur de BKS.
+          retournés dans leur état d'origine (non portés, semelles propres, boîte intacte avec tous les accessoires). Les frais de retour
+          sont à la charge du client, sauf erreur de BKS ou article défectueux.
         </p>
         <p>
-          Pour exercer ce droit, contacter BKS via Instagram <a href="https://www.instagram.com/b.k.s_dinan/" target="_blank" rel="noopener noreferrer">@b.k.s_dinan</a> ou
-          en se rendant directement en boutique.
+          Pour exercer ce droit, le client envoie un email à <a href="mailto:bks@bks-store.com">bks@bks-store.com</a> en indiquant
+          son numéro de commande et le motif du retour. Après confirmation de BKS (sous 48h), le colis est retourné à l'adresse suivante,
+          avec le numéro de commande indiqué sur le paquet :
+        </p>
+        <p style={{fontWeight:600}}>
+          BKS — Beau Kiosque de Soulier<br />
+          3 rue de la Chaux<br />
+          22100 Dinan, France
+        </p>
+        <p>
+          Le remboursement est effectué dans les 14 jours suivant la réception et la vérification de l'article retourné, par le même
+          moyen de paiement que celui utilisé lors de la commande.
         </p>
 
         <h2>Article 9 — Garanties</h2>
