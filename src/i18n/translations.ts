@@ -280,8 +280,8 @@ export const translations = {
       namePlaceholder: 'Votre nom',
       emailPlaceholder: 'votre@email.com',
       msgPlaceholder: 'Votre message…',
-      sendNote: 'Fonctionnalité d\'envoi à configurer. Pour un contact immédiat, utilisez Instagram.',
-      send: 'Envoyer (bientôt disponible)',
+      sendNote: 'Nous vous répondrons dans les meilleurs délais.',
+      send: 'Envoyer',
       boutique: 'Boutique',
     },
     // Auth client
@@ -768,8 +768,8 @@ export const translations = {
       namePlaceholder: 'Your name',
       emailPlaceholder: 'your@email.com',
       msgPlaceholder: 'Your message…',
-      sendNote: 'Send function not yet configured. For immediate contact, use Instagram.',
-      send: 'Send (coming soon)',
+      sendNote: 'We will get back to you as soon as possible.',
+      send: 'Send',
       boutique: 'Shop',
     },
     auth: {
