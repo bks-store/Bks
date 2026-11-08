@@ -1380,6 +1380,7 @@ textarea.a-input { resize: vertical; line-height: 1.55; }
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 0.3rem;
   padding: 2.5rem 0 1rem;
 }
@@ -1396,6 +1397,6 @@ textarea.a-input { resize: vertical; line-height: 1.55; }
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.pagination__btn:hover:not(:disabled) { border-color: var(--ink); color: var(--ink); }
-.pagination__btn.is-active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.pagination__btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.pagination__btn.is-active { background: var(--accent); color: #fff; border-color: var(--accent); }
 .pagination__btn:disabled { opacity: 0.3; cursor: default; }
