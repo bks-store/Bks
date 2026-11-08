@@ -66,12 +66,10 @@ export default function CgvPage() {
 
         <h2>Article 7 — Livraison</h2>
         <p>
-          Les commandes sont expédiées par Colissimo (La Poste) ou transporteur équivalent. Les délais indicatifs :
+          Les commandes sont expédiées par DHL. Les délais indicatifs :
         </p>
         <ul>
-          <li>France métropolitaine : 2 à 5 jours ouvrés</li>
-          <li>Europe : 4 à 8 jours ouvrés</li>
-          <li>International hors Europe : 7 à 14 jours ouvrés</li>
+          <li>France &amp; Europe : 5 à 8 jours ouvrés (expédition depuis la Pologne)</li>
         </ul>
         <p>
           Les frais de livraison sont calculés à la commande selon le poids et la destination. BKS ne peut être tenu responsable

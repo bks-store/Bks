@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Package, Truck } from 'lucide-react'
+import { ArrowRight, Truck } from 'lucide-react'
 import SEOHead from '../components/SEOHead'
 import { useTranslation } from '../i18n/useTranslation'
 
@@ -13,8 +13,8 @@ export default function LivraisonPage() {
         path="/livraison"
         titleFr="Livraison & retours"
         titleEn="Delivery & returns"
-        descFr="Livraison Colissimo en France et en Europe. Retours sous 14 jours. Livraison offerte dès 150 € en France."
-        descEn="Colissimo delivery in France and Europe. 14-day returns. Free delivery from €150 in France."
+        descFr="Livraison DHL en France et en Europe. Retours sous 14 jours. Livraison offerte dès 150 €."
+        descEn="DHL delivery in France and Europe. 14-day returns. Free delivery from €150."
       />
       <div className="container">
         <header className="page-head">
@@ -34,17 +34,12 @@ export default function LivraisonPage() {
         textAlign: 'center',
       }}>
         <p className="eyebrow" style={{ color: 'var(--bks-bronze)', marginBottom: '0.4rem' }}>{l.freeFrom}</p>
-        <p style={{ fontSize: '0.9375rem', opacity: 0.75 }}>{l.freeFromSub}</p>
+        <p style={{ fontSize: '0.9375rem', opacity: 0.75 }}>{(l as any).freeFromSub}</p>
       </div>
 
       <section className="section">
         <div className="container">
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '1.5rem',
-          }}>
-            {/* France */}
+          <div style={{ maxWidth: 480 }}>
             <div style={{
               padding: '1.75rem',
               border: '1px solid var(--line-strong)',
@@ -55,42 +50,18 @@ export default function LivraisonPage() {
             }}>
               <div style={{ color: 'var(--accent)' }}><Truck size={22} strokeWidth={1.5} /></div>
               <div>
-                <p style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{l.france}</p>
-                <p style={{ fontSize: '0.875rem', color: 'var(--ink-soft)' }}>{l.franceSub}</p>
+                <p style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{(l as any).deliveryTitle}</p>
+                <p style={{ fontSize: '0.875rem', color: 'var(--ink-soft)' }}>{(l as any).deliverySub}</p>
               </div>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
                 <tbody>
                   <tr style={{ borderBottom: '1px solid var(--line)' }}>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--ink-soft)' }}>Dès 150 €</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--ink-soft)' }}>{(l as any).deliveryFree}</td>
                     <td style={{ padding: '0.5rem 0', textAlign: 'right', fontWeight: 600, color: 'var(--accent)' }}>Offerte</td>
                   </tr>
                   <tr>
                     <td style={{ padding: '0.5rem 0', color: 'var(--ink-soft)' }}>Standard</td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', fontWeight: 600 }}>{l.franceStd}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            {/* Europe */}
-            <div style={{
-              padding: '1.75rem',
-              border: '1px solid var(--line-strong)',
-              borderRadius: '6px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1rem',
-            }}>
-              <div style={{ color: 'var(--accent)' }}><Package size={22} strokeWidth={1.5} /></div>
-              <div>
-                <p style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{l.europe}</p>
-                <p style={{ fontSize: '0.875rem', color: 'var(--ink-soft)' }}>{l.europeSub}</p>
-              </div>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
-                <tbody>
-                  <tr>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--ink-soft)' }}>Standard</td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', fontWeight: 600 }}>{l.europeStd}</td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right', fontWeight: 600 }}>{(l as any).deliveryStd}</td>
                   </tr>
                 </tbody>
               </table>
