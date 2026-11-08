@@ -257,11 +257,15 @@ function Instagram() {
           </a>
         </div>
         <div className="insta">
-          {MEDIA_SLOTS.filter(k => k.startsWith('instagram')).map(k => media(k)).map((src, idx) => (
-            <a key={src} href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label={`${i.cta} (${idx + 1})`}>
-              <div className="media"><SmartImage src={src} alt="" /></div>
-            </a>
-          ))}
+          {MEDIA_SLOTS.filter(k => k.startsWith('instagram')).map((k, idx) => {
+            const src = media(k)
+            if (!src) return null
+            return (
+              <a key={k} href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label={`${i.cta} (${idx + 1})`}>
+                <div className="media"><SmartImage src={src} alt="" /></div>
+              </a>
+            )
+          })}
         </div>
       </div>
     </section>
@@ -286,27 +290,31 @@ export default function HomePage() {
       />
       <Hero />
       <BrandsStrip />
-      <ProductRow
-        eyebrow={t.home.newEyebrow}
-        title={t.sections.nouveautes}
-        products={nouveautes}
-        link="/catalogue?nouveau=true"
-        linkLabel={t.sections.seeAllNew}
-        tone="surface-2"
-        cols={3}
-        priority
-      />
+      {nouveautes.length > 0 && (
+        <ProductRow
+          eyebrow={t.home.newEyebrow}
+          title={t.sections.nouveautes}
+          products={nouveautes}
+          link="/catalogue?nouveau=true"
+          linkLabel={t.sections.seeAllNew}
+          tone="surface-2"
+          cols={3}
+          priority
+        />
+      )}
       <Brand />
-      <ProductRow
-        eyebrow={t.home.featuredEyebrow}
-        title={t.sections.featured}
-        products={featured}
-        link="/catalogue"
-        linkLabel={t.sections.seeAllCatalogue}
-        tone="surface"
-        cols={4}
-        priority
-      />
+      {featured.length > 0 && (
+        <ProductRow
+          eyebrow={t.home.featuredEyebrow}
+          title={t.sections.featured}
+          products={featured}
+          link="/catalogue"
+          linkLabel={t.sections.seeAllCatalogue}
+          tone="surface"
+          cols={4}
+          priority
+        />
+      )}
       <Store />
       <Instagram />
     </>

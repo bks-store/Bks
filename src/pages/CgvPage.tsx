@@ -15,7 +15,7 @@ export default function CgvPage() {
           <Link to="/">Accueil</Link><span>/</span><span aria-current="page">Conditions générales de vente</span>
         </nav>
         <h1 className="display h-xl">Conditions générales de vente</h1>
-        <p style={{ color: 'var(--ink-soft)', marginTop: '0.5rem' }}>En vigueur au 1er janvier 2026</p>
+        <p style={{ color: 'var(--ink-soft)', marginTop: '0.5rem' }}>En vigueur au 8 novembre 2026</p>
       </header>
 
       <div className="prose" style={{ maxWidth: 720, paddingBottom: 'var(--section)' }}>
