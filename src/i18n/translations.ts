@@ -52,10 +52,10 @@ export const translations = {
         cta: 'Notre histoire',
       },
       store: {
-        eyebrow: 'La boutique',
+        eyebrow: 'La boutique — Dinan, Bretagne',
         title1: 'Venez nous voir',
         title2: 'à Dinan.',
-        text: "Essayez, comparez, prenez le temps. La sélection change chaque semaine.",
+        text: "Essayez, comparez, prenez le temps. La sélection change chaque semaine. À 30 min de Saint-Malo.",
         address: 'Adresse',
         hours: 'Horaires',
         directions: 'Itinéraire',

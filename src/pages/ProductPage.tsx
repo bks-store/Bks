@@ -78,7 +78,7 @@ export default function ProductPage() {
 
         <div className="product">
           <div className="product__media media">
-            <SmartImage src={productImage(product, 1200)} alt={`${product.brand} ${product.name}`} loading="eager" />
+            <SmartImage src={productImage(product, 1200)} alt={`${product.brand} ${product.name}`} loading="eager" imgWidth={1000} />
           </div>
 
           <div className="product__panel">

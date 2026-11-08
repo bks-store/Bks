@@ -43,6 +43,13 @@ function getIO() {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Adds Supabase image transform params to reduce egress bandwidth
+function optimizeUrl(src: string, width: number): string {
+  if (!src.includes('supabase.co/storage')) return src
+  const sep = src.includes('?') ? '&' : '?'
+  return `${src}${sep}width=${width}&quality=75&format=webp`
+}
+
 interface Props {
   src?: string
   alt: string
@@ -50,20 +57,22 @@ interface Props {
   loading?: 'eager' | 'lazy'
   fetchpriority?: 'high' | 'low' | 'auto'
   style?: CSSProperties
+  imgWidth?: number
 }
 
-export default function SmartImage({ src, alt, className = '', loading = 'lazy', fetchpriority, style }: Props) {
+export default function SmartImage({ src, alt, className = '', loading = 'lazy', fetchpriority, style, imgWidth = 600 }: Props) {
   const isPriority = loading === 'eager' || fetchpriority === 'high'
-  const [activeSrc, setActiveSrc] = useState<string | undefined>(isPriority ? src : undefined)
+  const optimized = src ? optimizeUrl(src, imgWidth) : src
+  const [activeSrc, setActiveSrc] = useState<string | undefined>(isPriority ? optimized : undefined)
   const [failed, setFailed] = useState(false)
   const placeholderRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!src || isPriority || activeSrc) return
+    if (!optimized || isPriority || activeSrc) return
     const el = placeholderRef.current
     if (!el) return
 
-    const startLoad = () => acquireSlot(() => setActiveSrc(src))
+    const startLoad = () => acquireSlot(() => setActiveSrc(optimized))
     const observer = getIO()
     if (observer) {
       ioCallbacks.set(el, startLoad)
@@ -75,7 +84,7 @@ export default function SmartImage({ src, alt, className = '', loading = 'lazy',
     }
   }, [src, isPriority, activeSrc])
 
-  if (!src || failed) {
+  if (!optimized || failed) {
     return (
       <div className={`img-fallback ${className}`} role="img" aria-label={alt} style={style}>
         <img src={IMAGES.logo.onDark} alt="" aria-hidden="true" />

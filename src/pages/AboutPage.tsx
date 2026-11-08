@@ -18,8 +18,8 @@ export default function AboutPage() {
         path="/a-propos"
         titleFr="À propos — L'histoire de BKS et de Damien"
         titleEn="About — The story of BKS and Damien"
-        descFr="Damien Holemy a fondé BKS à Dinan par passion pour les sneakers depuis l'enfance. Découvrez l'histoire de la boutique et sa philosophie."
-        descEn="Damien Holemy founded BKS in Dinan out of a lifelong passion for sneakers. Discover the story behind the shop and its philosophy."
+        descFr="Damien Holemy a fondé BKS à Dinan, Bretagne, par passion pour les sneakers. La seule boutique sneakers indépendante de la région entre Saint-Malo et Saint-Brieuc."
+        descEn="Damien Holemy founded BKS in Dinan, Brittany. The only independent sneaker shop in the area between Saint-Malo and Saint-Brieuc."
         schema={LOCAL_BUSINESS_SCHEMA}
       />
 

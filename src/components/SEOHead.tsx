@@ -10,8 +10,8 @@ const DEFAULT_OG_IMAGE = `${SITE_URL}/images/brand/logo-bks-3d-clean.png`
 
 // ── Descriptions par défaut (FR / EN) ─────────────────────────────────────────
 const DEFAULT_DESC: Record<string, string> = {
-  fr: 'Boutique sneakers à Dinan — sélection exclusive Jordan, Nike, Adidas, New Balance. Chaque paire choisie à la main par Damien. Livraison France et international.',
-  en: 'Sneaker boutique in Dinan, France — exclusive Jordan, Nike, Adidas, New Balance selection. Every pair hand-picked by Damien. Shipping France and worldwide.',
+  fr: 'Boutique sneakers à Dinan, Bretagne — Jordan, Nike, Adidas, New Balance. À 30 min de Saint-Malo. Sélection à la main par Damien. Livraison DHL France & Europe.',
+  en: 'Sneaker boutique in Dinan, Brittany — Jordan, Nike, Adidas, New Balance. 30 min from Saint-Malo. Hand-picked by Damien. DHL shipping France & Europe.',
 }
 
 interface SEOProps {
@@ -111,11 +111,11 @@ export const LOCAL_BUSINESS_SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'ClothingStore',
   name: 'BKS — Beau Kiosque de Soulier',
-  alternateName: 'BKS Dinan',
+  alternateName: ['BKS Dinan', 'BKS sneakers', 'Beau Kiosque de Soulier'],
   url: SITE_URL,
   logo: `${SITE_URL}/images/brand/logo-bks-3d-clean.png`,
   image: `${SITE_URL}/images/brand/logo-bks-3d-clean.png`,
-  description: 'Boutique indépendante de sneakers et chaussures rares à Dinan. Chaque paire est sélectionnée à la main par Damien Holemy.',
+  description: 'Boutique indépendante de sneakers et chaussures à Dinan, Bretagne. À 30 minutes de Saint-Malo et Saint-Brieuc. Sélection Jordan, Nike, Adidas, New Balance par Damien Holemy.',
   address: {
     '@type': 'PostalAddress',
     streetAddress: '3 rue de la Chaux',
@@ -172,10 +172,26 @@ export const FAQ_SCHEMA = {
     },
     {
       '@type': 'Question',
-      name: "BKS fait-il des livraisons en France et à l'international ?",
+      name: 'Où acheter des sneakers près de Saint-Malo ?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: "Oui, BKS propose la livraison partout en France et à l'international. Vous pouvez commander en ligne et recevoir vos sneakers directement chez vous.",
+        text: 'BKS Dinan est la boutique de sneakers la plus proche de Saint-Malo (30 minutes). Au 3 rue de la Chaux, 22100 Dinan, vous trouverez Jordan, Nike, Adidas et New Balance sélectionnés à la main. Commande en ligne avec livraison DHL partout en France.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Quelle boutique de chaussures à Dinan Bretagne ?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'BKS — Beau Kiosque de Soulier est la seule boutique de sneakers indépendante de Dinan. Située au cœur de la cité médiévale, elle propose des sneakers et chaussures streetwear Jordan, Nike, Adidas, New Balance, Timberland et UGG.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: "BKS fait-il des livraisons en France et en Europe ?",
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: "Oui, BKS livre en France et en Europe par DHL en 5 à 8 jours ouvrés. La livraison est offerte dès 150 €. Commandez en ligne sur bks-store.com.",
       },
     },
     {
@@ -183,7 +199,7 @@ export const FAQ_SCHEMA = {
       name: 'Quelles marques de sneakers trouve-t-on chez BKS Dinan ?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'BKS propose des sneakers Jordan, Nike, Adidas, New Balance, Timberland, UGG et d\'autres marques streetwear sélectionnées. La boutique se spécialise dans les éditions limitées et les modèles exclusifs.',
+        text: 'BKS propose des sneakers Jordan, Nike, Adidas, New Balance, Timberland, UGG, Saucony et ASICS. La boutique se spécialise dans les éditions limitées et les modèles exclusifs sélectionnés à la main.',
       },
     },
     {
@@ -199,7 +215,7 @@ export const FAQ_SCHEMA = {
       name: 'Comment trouver la boutique de sneakers BKS en Bretagne ?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'BKS se trouve au cœur de la cité médiévale de Dinan en Bretagne, au 3 rue de la Chaux, 22100 Dinan. Facile d\'accès depuis Saint-Malo, Rennes et Saint-Brieuc.',
+        text: 'BKS se trouve au cœur de la cité médiévale de Dinan en Bretagne, au 3 rue de la Chaux, 22100 Dinan. Facile d\'accès depuis Saint-Malo (30 min), Rennes (1h) et Saint-Brieuc (45 min). Parking disponible à proximité.',
       },
     },
   ],
