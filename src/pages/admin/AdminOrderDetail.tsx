@@ -103,7 +103,9 @@ export default function AdminOrderDetail() {
         setGsError((data as any)?.error ?? error?.message ?? 'Erreur inconnue')
       } else {
         setGsSent(true)
-        setTimeout(() => setGsSent(false), 4000)
+        // Recharger la commande pour afficher définitivement le gs_dropship_order_id
+        const { data: refreshed } = await supabase.from('orders').select('*').eq('id', id as string).single()
+        if (refreshed) setOrder((prev: any) => ({ ...prev, gs_dropship_order_id: (refreshed as any).gs_dropship_order_id }))
       }
     } finally {
       setSendingGS(false)
