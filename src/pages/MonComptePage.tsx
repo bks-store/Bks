@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from '../i18n/useTranslation'
 import { useUserAuth } from '../context/UserAuthContext'
 import { supabase, isConfigured } from '../lib/supabase'
