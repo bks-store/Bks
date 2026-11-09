@@ -50,7 +50,22 @@ serve(async (req) => {
       await sendConfirmationEmail(order)
     }
 
-    console.log(`[payment-webhook] Commande ${orderId} → payée, email envoyé`)
+    // Transmettre automatiquement la commande à GoldenSneakers
+    try {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+      await fetch(`${supabaseUrl}/functions/v1/create-dropship-order`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ order_id: orderId }),
+      })
+    } catch (err) {
+      console.error(`[payment-webhook] Erreur transmission GoldenSneakers pour ${orderId}:`, err)
+    }
+
+    console.log(`[payment-webhook] Commande ${orderId} → payée, email envoyé, transmise à GoldenSneakers`)
   }
 
   // ── Paiement échoué ───────────────────────────────────────────────────────
