@@ -64,8 +64,23 @@ export default function AdminOrderDetail() {
   const handleSave = async (e: FormEvent) => {
     e.preventDefault()
     setSaving(true)
+    const prevTracking = order?.tracking_number ?? ''
+    const isNewTracking = tracking && tracking !== prevTracking
+    const isShipped = status === 'shipped'
+
     if (isConfigured) {
       await (supabase as any).from('orders').update({ status, tracking_number: tracking || null, notes: notes || null }).eq('id', id)
+
+      // Envoyer le mail d'expédition automatiquement si tracking ajouté et statut = Expédiée
+      if (isNewTracking && isShipped) {
+        setSendingEmail(true)
+        try {
+          const { error } = await supabase.functions.invoke('send-shipping-email', { body: { order_id: id } })
+          if (!error) { setEmailSent(true); setTimeout(() => setEmailSent(false), 4000) }
+        } finally {
+          setSendingEmail(false)
+        }
+      }
     }
     setOrder((prev: any) => prev ? { ...prev, status, tracking_number: tracking || null, notes: notes || null } : prev)
     setSaved(true)
