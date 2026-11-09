@@ -143,6 +143,9 @@ serve(async (req) => {
       receipt_email: customer.email,
       description: `BKS Dinan — ${items.length} article(s)`,
       automatic_payment_methods: { enabled: true },
+      payment_method_options: {
+        card: { request_three_d_secure: 'any' },
+      },
     })
 
     // Sauvegarder l'ID du PaymentIntent
