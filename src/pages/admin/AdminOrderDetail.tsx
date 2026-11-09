@@ -31,6 +31,9 @@ export default function AdminOrderDetail() {
   const [saved, setSaved] = useState(false)
   const [sendingEmail, setSendingEmail] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
+  const [sendingGS, setSendingGS] = useState(false)
+  const [gsSent, setGsSent] = useState(false)
+  const [gsError, setGsError] = useState('')
   const [status, setStatus] = useState<OrderStatus>('pending')
   const [tracking, setTracking] = useState('')
   const [notes, setNotes] = useState('')
@@ -86,6 +89,25 @@ export default function AdminOrderDetail() {
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
     setSaving(false)
+  }
+
+  const handleSendToGoldenSneakers = async () => {
+    if (!isConfigured) return
+    setSendingGS(true)
+    setGsError('')
+    try {
+      const { error, data } = await supabase.functions.invoke('create-dropship-order', {
+        body: { order_id: id },
+      })
+      if (error || (data as any)?.error) {
+        setGsError((data as any)?.error ?? error?.message ?? 'Erreur inconnue')
+      } else {
+        setGsSent(true)
+        setTimeout(() => setGsSent(false), 4000)
+      }
+    } finally {
+      setSendingGS(false)
+    }
   }
 
   const handleSendShippingEmail = async () => {
@@ -248,6 +270,29 @@ export default function AdminOrderDetail() {
             {saving ? <Loader2 size={16} className="animate-spin" /> : null}
             {t.admin.orders.save}
           </button>
+
+          {/* Transmission manuelle GoldenSneakers */}
+          {!order?.gs_dropship_order_id && (
+            <div style={{ borderTop: '1px solid var(--line)', paddingTop: '1rem' }}>
+              <button type="button" onClick={handleSendToGoldenSneakers} disabled={sendingGS}
+                className="w-full py-2.5 rounded-[4px] text-sm font-semibold tracking-wider flex items-center justify-center gap-2 disabled:opacity-60 transition-colors"
+                style={{ background: gsSent ? 'rgba(78,122,67,0.14)' : 'rgba(200,149,90,0.08)', color: gsSent ? '#4E7A43' : '#8A5A30', border: `1px solid ${gsSent ? '#4E7A43' : '#C8955A'}` }}>
+                {sendingGS ? <Loader2 size={14} className="animate-spin" /> : gsSent ? <Check size={14} /> : <Send size={14} />}
+                {gsSent ? 'Transmise à GoldenSneakers !' : 'Transmettre à GoldenSneakers'}
+              </button>
+              {gsError && (
+                <p className="text-xs mt-2 px-3 py-2 rounded-[4px]" style={{ background: 'rgba(166,65,44,0.1)', color: '#A6412C' }}>
+                  Erreur : {gsError}
+                </p>
+              )}
+            </div>
+          )}
+          {order?.gs_dropship_order_id && (
+            <p className="text-xs py-2 px-3 rounded-[4px] flex items-center gap-2"
+              style={{ background: 'rgba(78,122,67,0.1)', color: '#4E7A43' }}>
+              <Check size={13} /> Transmise à GoldenSneakers #{order.gs_dropship_order_id}
+            </p>
+          )}
         </form>
       </div>
     </div>
