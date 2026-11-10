@@ -17,6 +17,7 @@ import { useUserAuth } from '../context/UserAuthContext'
 import SmartImage from '../components/SmartImage'
 import { IMAGES } from '../config/images'
 import { formatPrice } from '../lib/format'
+import { useCurrency } from '../context/CurrencyContext'
 import { supabase, isConfigured } from '../lib/supabase'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY ?? '')
@@ -172,6 +173,7 @@ export default function CartPage() {
   const { items, removeItem, updateQuantity, total } = useCart()
   const { t, locale } = useTranslation()
   const { user } = useUserAuth()
+  const { formatPrice: fmtPrice, formatEur, isEuro } = useCurrency()
   const totalQty = items.reduce((s, i) => s + i.quantity, 0)
   const SHIPPING = 5.90
   const shippingCost = total >= 150 ? 0 : SHIPPING
@@ -350,7 +352,7 @@ export default function CartPage() {
                     onClick={() => removeItem(item.productId, item.size)} aria-label="Supprimer">
                     <X size={16} strokeWidth={1.4} />
                   </button>
-                  <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{formatPrice(item.price * item.quantity)}</span>
+                  <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{fmtPrice(item.price * item.quantity)}</span>
                 </div>
               </div>
             ))}
@@ -405,27 +407,38 @@ export default function CartPage() {
               </Field>
               <Field label="Pays" style={{ gridColumn: '1/-1' }}>
                 <select value={form.address.country} onChange={e => setAddr('country', e.target.value)} autoComplete="country">
-                  <optgroup label="Europe — Livraison 72h">
-                    <option value="FR">France</option>
-                    <option value="BE">Belgique</option>
-                    <option value="CH">Suisse</option>
-                    <option value="LU">Luxembourg</option>
-                    <option value="ES">Espagne</option>
-                    <option value="IT">Italie</option>
-                    <option value="DE">Allemagne</option>
-                    <option value="NL">Pays-Bas</option>
-                    <option value="PT">Portugal</option>
-                    <option value="AT">Autriche</option>
-                    <option value="GB">Royaume-Uni</option>
-                  </optgroup>
-                  <optgroup label="International">
-                    <option value="US">États-Unis</option>
-                    <option value="CA">Canada</option>
-                    <option value="AE">Émirats Arabes Unis (Dubaï)</option>
-                    <option value="JP">Japon</option>
-                    <option value="AU">Australie</option>
-                    <option value="SG">Singapour</option>
-                  </optgroup>
+                  <option value="FR">France</option>
+                  <option value="BE">Belgique</option>
+                  <option value="CH">Suisse</option>
+                  <option value="LU">Luxembourg</option>
+                  <option value="DE">Allemagne</option>
+                  <option value="ES">Espagne</option>
+                  <option value="IT">Italie</option>
+                  <option value="NL">Pays-Bas</option>
+                  <option value="PT">Portugal</option>
+                  <option value="AT">Autriche</option>
+                  <option value="GB">Royaume-Uni</option>
+                  <option value="IE">Irlande</option>
+                  <option value="SE">Suède</option>
+                  <option value="DK">Danemark</option>
+                  <option value="NO">Norvège</option>
+                  <option value="FI">Finlande</option>
+                  <option value="PL">Pologne</option>
+                  <option value="CZ">République tchèque</option>
+                  <option value="SK">Slovaquie</option>
+                  <option value="HU">Hongrie</option>
+                  <option value="RO">Roumanie</option>
+                  <option value="BG">Bulgarie</option>
+                  <option value="HR">Croatie</option>
+                  <option value="SI">Slovénie</option>
+                  <option value="EE">Estonie</option>
+                  <option value="LV">Lettonie</option>
+                  <option value="LT">Lituanie</option>
+                  <option value="GR">Grèce</option>
+                  <option value="CY">Chypre</option>
+                  <option value="MT">Malte</option>
+                  <option value="MC">Monaco</option>
+                  <option value="AD">Andorre</option>
                 </select>
               </Field>
             </div>
@@ -474,13 +487,13 @@ export default function CartPage() {
           <p className="eyebrow" style={{ marginBottom: '1rem' }}>{t.cart.subtotal}</p>
           <div className="summary__row">
             <span>{t.cart.subtotal}</span>
-            <span style={{ color: 'var(--ink)' }}>{formatPrice(total)}</span>
+            <span style={{ color: 'var(--ink)' }}>{fmtPrice(total)}</span>
           </div>
           <div className="summary__row">
             <span>{t.cart.shipping}</span>
             {total >= 150
               ? <span style={{ color: 'var(--accent)', fontWeight: 600 }}>Offerte ✓</span>
-              : <span style={{ color: 'var(--ink)' }}>5,90 €</span>
+              : <span style={{ color: 'var(--ink)' }}>{fmtPrice(5.90)}</span>
             }
           </div>
           {total < 150 && (
@@ -495,7 +508,10 @@ export default function CartPage() {
           )}
           <div className="summary__total">
             <span>{t.cart.total}</span>
-            <span>{formatPrice(totalWithShipping)}</span>
+            <div style={{ textAlign: 'right' }}>
+              <span>{fmtPrice(totalWithShipping)}</span>
+              {!isEuro && <div style={{ fontSize: '0.75rem', color: 'var(--ink-soft)', marginTop: '0.1rem' }}>Débité : {formatEur(totalWithShipping)}</div>}
+            </div>
           </div>
 
           {step === 'cart' && (
@@ -521,7 +537,7 @@ export default function CartPage() {
             >
               {loading
                 ? <><Loader2 size={15} className="animate-spin" /> Préparation…</>
-                : <>Procéder au paiement <Lock size={14} strokeWidth={1.8} /></>}
+                : <>Procéder au paiement {!isEuro && <span style={{fontSize:'0.8em',opacity:0.7}}>({formatEur(totalWithShipping)})</span>} <Lock size={14} strokeWidth={1.8} /></>}
             </button>
           )}
 

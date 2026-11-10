@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom'
 import { X, Minus, Plus, ShoppingBag, ArrowRight, Trash2 } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { useTranslation } from '../i18n/useTranslation'
-import { formatPrice } from '../lib/format'
+import { useCurrency } from '../context/CurrencyContext'
 
 export default function CartDrawer() {
   const { items, isCartOpen, closeCart, removeItem, updateQuantity, total, count } = useCart()
   const { t } = useTranslation()
+  const { formatPrice } = useCurrency()
 
   // Lock body scroll when open
   useEffect(() => {

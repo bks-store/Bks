@@ -52,6 +52,15 @@ serve(async (req) => {
       return json({ error: 'Adresse de livraison incomplète' }, 400)
     }
 
+    const ALLOWED_COUNTRIES = new Set([
+      'FR','BE','CH','LU','DE','ES','IT','NL','PT','AT','GB','IE',
+      'SE','DK','NO','FI','PL','CZ','SK','HU','RO','BG','HR','SI',
+      'EE','LV','LT','GR','CY','MT','MC','AD',
+    ])
+    if (!ALLOWED_COUNTRIES.has(customer.address.country?.toUpperCase())) {
+      return json({ error: 'Livraison uniquement disponible en Europe.' }, 400)
+    }
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {
       apiVersion: '2024-04-10',
     })

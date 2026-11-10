@@ -3,10 +3,11 @@ import type { Product } from '../data/products'
 import { productImage } from '../config/images'
 import { useTranslation } from '../i18n/useTranslation'
 import SmartImage from './SmartImage'
-import { formatPrice } from '../lib/format'
+import { useCurrency } from '../context/CurrencyContext'
 
 export default function ProductCard({ product, priority }: { product: Product; priority?: boolean }) {
   const { t } = useTranslation()
+  const { formatPrice, formatEur, isEuro } = useCurrency()
   const img1 = productImage(product)
   const img2 = product.images[1] ?? null
 
@@ -36,6 +37,7 @@ export default function ProductCard({ product, priority }: { product: Product; p
         <h3 className="pcard__name">{product.name}</h3>
         <p className="pcard__price">
           {formatPrice(product.price)}
+          {!isEuro && <span style={{ fontSize: '0.75em', opacity: 0.5, marginLeft: '0.35em' }}>≈ {formatEur(product.price)}</span>}
           {product.originalPrice && <s>{formatPrice(product.originalPrice)}</s>}
         </p>
       </div>

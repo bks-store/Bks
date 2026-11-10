@@ -8,6 +8,7 @@ import ProductPage from './pages/ProductPage'
 import AdminLayout from './components/admin/AdminLayout'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import { CartProvider } from './context/CartContext'
+import { CurrencyProvider } from './context/CurrencyContext'
 import { AdminProvider } from './context/AdminContext'
 import { ContentProvider } from './context/ContentContext'
 import { ProductsProvider } from './context/ProductsContext'
@@ -124,6 +125,7 @@ export default function App() {
         <ProductsProvider>
         <UserAuthProvider>
         <ToastProvider>
+        <CurrencyProvider>
         <CartProvider>
           <Suspense fallback={null}>
             <Routes>
@@ -133,6 +135,7 @@ export default function App() {
             </Routes>
           </Suspense>
         </CartProvider>
+        </CurrencyProvider>
         </ToastProvider>
         </UserAuthProvider>
         </ProductsProvider>
