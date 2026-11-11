@@ -6,22 +6,30 @@ import { useProducts } from '../context/ProductsContext'
 const BRAND_ORDER = ['Nike', 'Jordan', 'New Balance', 'Adidas', 'Asics', 'Ugg', 'Timberland', 'Autry', 'On', 'Salomon', 'Saucony', 'Yeezy']
 
 const SI = 'https://cdn.jsdelivr.net/npm/simple-icons@14/icons'
-const svgWordmark = (text: string) =>
-  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><text x="0" y="50" font-family="Arial Black,sans-serif" font-size="52" font-weight="900" fill="black">${text}</text></svg>`)}`
+const svg = (content: string, vb = '0 0 200 80') =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}">${content}</svg>`)}`
 
 const BRAND_LOGOS: Record<string, string> = {
   'Nike': `${SI}/nike.svg`,
   'Jordan': `${SI}/jordan.svg`,
   'New Balance': `${SI}/newbalance.svg`,
   'Adidas': `${SI}/adidas.svg`,
-  'Asics': svgWordmark('ASICS'),
-  'Ugg': svgWordmark('UGG'),
-  'Timberland': svgWordmark('TIMBERLAND'),
-  'Autry': svgWordmark('AUTRY'),
-  'On': svgWordmark('On'),
-  'Salomon': svgWordmark('SALOMON'),
-  'Saucony': svgWordmark('SAUCONY'),
-  'Yeezy': svgWordmark('YEEZY'),
+  // ASICS — 3 speed stripes (chevrons diagonaux, logo historique)
+  'Asics': svg('<path d="M4,72 L32,8 L46,8 L18,72Z M48,72 L76,8 L90,8 L62,72Z M92,72 L120,8 L134,8 L106,72Z" fill="black"/>', '0 0 140 80'),
+  // UGG — wordmark bold compact
+  'Ugg': svg('<text x="4" y="72" font-family="Arial Black,sans-serif" font-size="76" font-weight="900" fill="black">UGG</text>', '0 0 180 80'),
+  // Timberland — arbre iconique (tronc + couronne triangulaire)
+  'Timberland': svg('<rect x="44" y="62" width="12" height="18" fill="black"/><polygon points="50,2 10,42 26,42 8,62 46,62 46,62 54,62 54,62 92,62 74,42 90,42" fill="black"/>', '0 0 100 82'),
+  // Autry — wordmark
+  'Autry': svg('<text x="2" y="68" font-family="Arial Black,sans-serif" font-size="62" font-weight="900" fill="black">AUTRY</text>', '0 0 240 76'),
+  // On Running — wordmark minimaliste
+  'On': svg('<text x="4" y="72" font-family="Helvetica Neue,Arial,sans-serif" font-size="80" font-weight="800" fill="black">On</text>', '0 0 140 82'),
+  // Salomon — wordmark
+  'Salomon': svg('<text x="1" y="62" font-family="Arial Black,sans-serif" font-size="52" font-weight="900" fill="black" letter-spacing="-1">SALOMON</text>', '0 0 290 68'),
+  // Saucony — wordmark
+  'Saucony': svg('<text x="1" y="62" font-family="Arial Black,sans-serif" font-size="52" font-weight="900" fill="black" letter-spacing="-1">SAUCONY</text>', '0 0 285 68'),
+  // Yeezy — wordmark
+  'Yeezy': svg('<text x="2" y="68" font-family="Arial Black,sans-serif" font-size="62" font-weight="900" fill="black">YEEZY</text>', '0 0 240 76'),
 }
 
 export default function BrandsPage() {

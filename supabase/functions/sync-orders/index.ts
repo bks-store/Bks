@@ -42,24 +42,21 @@ serve(async (req) => {
 
     for (const order of pendingOrders) {
       try {
-        // 2. Interroger GS pour l'état de cette commande dropship
-        const gsRes = await fetch(
-          `${GS_API_BASE}/orders-dropship/${order.gs_dropship_order_id}/`,
-          { headers: { Authorization: `Bearer ${gsToken}` } },
-        )
+        const headers = { Authorization: `Bearer ${gsToken}` }
+        const gsId = order.gs_dropship_order_id
 
-        if (!gsRes.ok) {
-          errors.push(`GS ${gsRes.status} pour commande ${order.gs_dropship_order_id}`)
+        // 2a. Statut de la commande
+        const orderRes = await fetch(`${GS_API_BASE}/orders-dropship/order-details/${gsId}/`, { headers })
+        if (!orderRes.ok) {
+          errors.push(`GS order-details ${orderRes.status} pour ${gsId}`)
           continue
         }
+        const gsOrder = await orderRes.json()
 
-        const gsOrder = await gsRes.json()
-
-        // 3. Mettre à jour le statut "En préparation" si GS confirme
+        // 3. Mettre à jour le statut "En préparation" si GS confirme (TO_SHIP)
         if (
           order.status === 'confirmed' &&
-          gsOrder.status &&
-          ['processing', 'preparing', 'in_progress', 'confirmed'].includes(String(gsOrder.status).toLowerCase())
+          String(gsOrder.status ?? '').toUpperCase() === 'TO_SHIP'
         ) {
           await supabase
             .from('orders')
@@ -67,13 +64,30 @@ serve(async (req) => {
             .eq('id', order.id)
         }
 
+        // 2b. Détails du colis (tracking)
+        let gsPackage: Record<string, unknown> = {}
+        const pkgRes = await fetch(`${GS_API_BASE}/orders-dropship/package-details/${gsId}/`, { headers })
+        if (pkgRes.ok) gsPackage = await pkgRes.json()
+
         // 4. Si GS a un numéro de suivi → mettre à jour + envoyer email client
-        const tracking = gsOrder.tracking_number ?? gsOrder.tracking ?? gsOrder.waybill ?? null
-        if (tracking) {
+        const tracking =
+          (gsPackage as Record<string, unknown>).tracking_numbers
+            ?? gsPackage.tracking_number
+            ?? gsOrder.tracking_numbers
+            ?? gsOrder.tracking_number
+            ?? gsOrder.waybill
+            ?? null
+
+        // tracking_numbers peut être un tableau → prendre le premier
+        const trackingStr: string | null = Array.isArray(tracking)
+          ? (tracking[0] ? String(tracking[0]) : null)
+          : (tracking ? String(tracking) : null)
+
+        if (trackingStr) {
           await supabase
             .from('orders')
             .update({
-              tracking_number: String(tracking),
+              tracking_number: trackingStr,
               status: 'shipped',
               updated_at: new Date().toISOString(),
             })
