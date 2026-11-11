@@ -44,16 +44,19 @@
     <svg style="display:none" aria-hidden="true">
       <defs>
         <filter id="bg-white" color-interpolation-filters="sRGB">
-          <!-- Rend les pixels quasi-noirs transparents via la luminance -->
+          <!-- Pente très élevée : seul le noir pur → transparent, tout le reste → opaque -->
+          <!-- Seuil : pixels où R+G+B < 0.003 (≈ rgb(0,0,0) uniquement) -->
           <feColorMatrix in="SourceGraphic" type="matrix"
             values="1 0 0 0 0
                     0 1 0 0 0
                     0 0 1 0 0
-                    6 6 6 0 -0.05"
+                    50 50 50 0 -0.15"
             result="masked"/>
+          <!-- Micro-blur 0.6px pour lisser les contours (antialiasing naturel) -->
+          <feGaussianBlur stdDeviation="0.6" in="masked" result="soft"/>
           <!-- Fond blanc derrière -->
-          <feFlood flood-color="#ffffff" result="white"/>
-          <feComposite in="masked" in2="white" operator="over"/>
+          <feFlood flood-color="#ffffff" result="bg"/>
+          <feComposite in="soft" in2="bg" operator="over"/>
         </filter>
       </defs>
     </svg>
