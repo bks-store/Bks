@@ -39,5 +39,23 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Filtre SVG : supprime le fond noir des photos produits GoldenSneakers -->
+    <svg style="display:none" aria-hidden="true">
+      <defs>
+        <filter id="bg-white" color-interpolation-filters="sRGB">
+          <!-- Rend les pixels quasi-noirs transparents via la luminance -->
+          <feColorMatrix in="SourceGraphic" type="matrix"
+            values="1 0 0 0 0
+                    0 1 0 0 0
+                    0 0 1 0 0
+                    6 6 6 0 -0.05"
+            result="masked"/>
+          <!-- Fond blanc derrière -->
+          <feFlood flood-color="#ffffff" result="white"/>
+          <feComposite in="masked" in2="white" operator="over"/>
+        </filter>
+      </defs>
+    </svg>
   </body>
 </html>
