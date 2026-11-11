@@ -6,7 +6,7 @@ export type ProductCategory = 'sneakers' | 'streetwear' | 'accessoires'
 
 export type DbProduct = {
   id: string
-  slug: string | null
+  slug?: string | null
   created_at: string
   updated_at: string
   name: string

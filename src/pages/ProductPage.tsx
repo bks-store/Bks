@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { ArrowRight, Check } from 'lucide-react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { ArrowRight, ArrowLeft, Check } from 'lucide-react'
 import { useProducts } from '../context/ProductsContext'
 import { useCart } from '../context/CartContext'
 import { useToast } from '../context/ToastContext'
@@ -13,6 +13,7 @@ import SEOHead, { buildProductSchema, SITE_URL } from '../components/SEOHead'
 
 export default function ProductPage() {
   const { id: slugOrId } = useParams()
+  const navigate = useNavigate()
   const { addItem, openCart } = useCart()
   const { t } = useTranslation()
   const { addToast } = useToast()
@@ -72,11 +73,29 @@ export default function ProductPage() {
         schema={buildProductSchema({ ...product, images: product.images.length ? product.images : ogImage ? [ogImage] : [] })}
       />
       <div className="container">
-        <nav className="crumbs" aria-label="Fil d'Ariane" style={{paddingTop:'2rem'}}>
-          <Link to="/">Accueil</Link><span>/</span>
-          <Link to="/catalogue">Catalogue</Link><span>/</span>
-          <span aria-current="page">{product.name}</span>
-        </nav>
+        <div style={{ paddingTop: '2rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+          <button
+            onClick={() => navigate(-1)}
+            aria-label="Retour"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.4em',
+              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+              fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.14em',
+              textTransform: 'uppercase', color: 'var(--ink-soft)',
+              transition: 'color 0.15s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--ink)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--ink-soft)')}
+          >
+            <ArrowLeft size={13} strokeWidth={1.8} />
+            Retour
+          </button>
+          <nav className="crumbs" aria-label="Fil d'Ariane" style={{ padding: 0 }}>
+            <Link to="/">Accueil</Link><span>/</span>
+            <Link to="/catalogue">Catalogue</Link><span>/</span>
+            <span aria-current="page">{product.name}</span>
+          </nav>
+        </div>
 
         <div className="product">
           {/* Galerie photos */}
