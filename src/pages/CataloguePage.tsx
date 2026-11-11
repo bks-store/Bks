@@ -49,9 +49,25 @@ export default function CataloguePage() {
       else prev.set('price', String(p))
       return prev
     }, { replace: true })
-  const [sortBy, setSortBy] = useState<'nouveautes' | 'prix-asc' | 'prix-desc'>('nouveautes')
+  const sortByParam = searchParams.get('tri') as 'nouveautes' | 'prix-asc' | 'prix-desc' | null
+  const sortBy = sortByParam ?? 'nouveautes'
+  const setSortBy = (v: 'nouveautes' | 'prix-asc' | 'prix-desc') =>
+    setSearchParams(prev => {
+      if (v === 'nouveautes') prev.delete('tri')
+      else prev.set('tri', v)
+      return prev
+    }, { replace: true })
+  const pageParam = searchParams.get('p')
+  const page = pageParam !== null ? Math.max(1, Number(pageParam)) : 1
+  const setPage = (n: number | ((prev: number) => number)) => {
+    const next = typeof n === 'function' ? n(page) : n
+    setSearchParams(prev => {
+      if (next <= 1) prev.delete('p')
+      else prev.set('p', String(next))
+      return prev
+    }, { replace: true })
+  }
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const [page, setPage] = useState(1)
   const PAGE_SIZE = 12
   const gridRef = useRef<HTMLDivElement>(null)
 
@@ -65,10 +81,18 @@ export default function CataloguePage() {
   const toggle = <T,>(list: T[], setList: (v: T[]) => void, value: T) =>
     setList(list.includes(value) ? list.filter(x => x !== value) : [...list, value])
 
-  const clearAll = () => { setSelectedBrands([]); setSelectedSizes([]); setSelectedPrice(null); setPage(1) }
+  const clearAll = () => {
+    setSearchParams(prev => {
+      prev.delete('brand'); prev.delete('size'); prev.delete('price'); prev.delete('p')
+      return prev
+    }, { replace: true })
+  }
 
   // Reset page quand les filtres changent
-  useEffect(() => { setPage(1) }, [brandParam, selectedSizes, selectedPrice, sortBy, slug, category, query])
+  useEffect(() => {
+    setSearchParams(prev => { prev.delete('p'); return prev }, { replace: true })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [brandParam, JSON.stringify(selectedSizes), selectedPrice, sortBy, slug, category, query])
 
   const BRANDS = [...new Set(allProducts.map(p => p.brand))].sort()
 
