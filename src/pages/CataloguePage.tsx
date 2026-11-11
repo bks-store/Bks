@@ -25,7 +25,6 @@ export default function CataloguePage() {
   const query = rawQuery.toLowerCase()
   const { t } = useTranslation()
 
-  const brandParam = searchParams.get('brand')
   // URL est la source de vérité pour les filtres → le bouton retour retrouve toujours le bon état
   const selectedBrands = searchParams.getAll('brand')
   const setSelectedBrands = (brands: string[]) =>
