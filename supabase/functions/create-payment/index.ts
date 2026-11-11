@@ -94,6 +94,19 @@ serve(async (req) => {
       return json({ error: 'Montant invalide' }, 400)
     }
 
+    // ── 0b. Vérifier la disponibilité des tailles ─────────────────────────────
+    for (const item of items) {
+      const { data: sizeRow } = await supabase
+        .from('product_sizes')
+        .select('available, stock_qty')
+        .eq('product_id', item.productId)
+        .eq('size', item.size)
+        .maybeSingle()
+      if (!sizeRow || !sizeRow.available) {
+        return json({ error: `Taille ${item.size} non disponible pour "${item.name}". Veuillez mettre à jour votre panier.` }, 400)
+      }
+    }
+
     // ── 1. Créer la commande en base (pending) ────────────────────────────────
     const { data: order, error: orderErr } = await supabase
       .from('orders')
