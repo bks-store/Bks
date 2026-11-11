@@ -520,7 +520,7 @@ export default function CartPage() {
               className="btn btn--solid btn--block"
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
             >
-              Passer commande <ChevronRight size={15} strokeWidth={1.8} />
+              Continuer <ChevronRight size={15} strokeWidth={1.8} />
             </button>
           )}
 
