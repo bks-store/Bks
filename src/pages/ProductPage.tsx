@@ -106,7 +106,7 @@ export default function ProductPage() {
                     <img
                       src={img}
                       alt=""
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%', mixBlendMode: 'multiply' }}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', mixBlendMode: 'multiply' }}
                     />
                   </button>
                 ))}
