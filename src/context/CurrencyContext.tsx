@@ -65,9 +65,15 @@ const CurrencyContext = createContext<CurrencyContextType>({
 const CACHE_KEY = 'bks_fx_rates'
 const CACHE_TTL = 24 * 60 * 60 * 1000 // 24h
 
+// Taux de secours si l'API est indisponible (mis à jour manuellement si besoin)
+const FALLBACK_RATES: Record<string, number> = {
+  GBP: 0.84, CHF: 0.94, SEK: 11.5, DKK: 7.46, NOK: 11.8,
+  PLN: 4.27, CZK: 25.2, HUF: 405, RON: 4.97, ISK: 150,
+}
+
 export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [currency] = useState<string>(detectCurrency)
-  const [rate, setRate] = useState(1)
+  const [rate, setRate] = useState(() => FALLBACK_RATES[detectCurrency()] ?? 1)
 
   useEffect(() => {
     if (currency === 'EUR') return
@@ -95,7 +101,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
           if (data.rates[currency]) setRate(data.rates[currency])
         }
       })
-      .catch(() => { /* fallback: keep rate = 1 (EUR) */ })
+      .catch(() => { /* fallback: taux hardcodés déjà initialisés */ })
   }, [currency])
 
   const formatEur = (eurAmount: number) =>
