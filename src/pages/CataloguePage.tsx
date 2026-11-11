@@ -19,14 +19,21 @@ export default function CataloguePage() {
   const { rubriqueBySlug, loading: contentLoading } = useContent()
   const { products: allProducts, loading: productsLoading } = useProducts()
   const rubrique = slug ? rubriqueBySlug(slug) : undefined
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const isNew = searchParams.get('nouveau') === 'true'
   const rawQuery = (searchParams.get('q') ?? '').trim()
   const query = rawQuery.toLowerCase()
   const { t } = useTranslation()
 
   const brandParam = searchParams.get('brand')
-  const [selectedBrands, setSelectedBrands] = useState<string[]>(brandParam ? [brandParam] : [])
+  // URL est la source de vérité pour les marques → le bouton retour retrouve toujours le bon filtre
+  const selectedBrands = searchParams.getAll('brand')
+  const setSelectedBrands = (brands: string[]) =>
+    setSearchParams(prev => {
+      prev.delete('brand')
+      brands.forEach(b => prev.append('brand', b))
+      return prev
+    }, { replace: true })
   const [selectedSizes, setSelectedSizes] = useState<string[]>([])
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null)
   const [sortBy, setSortBy] = useState<'nouveautes' | 'prix-asc' | 'prix-desc'>('nouveautes')
@@ -36,11 +43,6 @@ export default function CataloguePage() {
   const gridRef = useRef<HTMLDivElement>(null)
 
   const scrollToGrid = () => gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-
-  // Sync brand filter when URL param changes (e.g. navigating from search clears brand filter)
-  useEffect(() => {
-    setSelectedBrands(brandParam ? [brandParam] : [])
-  }, [brandParam])
 
   useEffect(() => {
     document.body.style.overflow = filtersOpen ? 'hidden' : ''
@@ -53,7 +55,7 @@ export default function CataloguePage() {
   const clearAll = () => { setSelectedBrands([]); setSelectedSizes([]); setSelectedPrice(null); setPage(1) }
 
   // Reset page quand les filtres changent
-  useEffect(() => { setPage(1) }, [selectedBrands, selectedSizes, selectedPrice, sortBy, slug, category, query])
+  useEffect(() => { setPage(1) }, [brandParam, selectedSizes, selectedPrice, sortBy, slug, category, query])
 
   const BRANDS = [...new Set(allProducts.map(p => p.brand))].sort()
 

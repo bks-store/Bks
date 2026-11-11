@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Loader2, Check, Send } from 'lucide-react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { ArrowLeft, Loader2, Check, Send, Trash2 } from 'lucide-react'
 import { supabase, isConfigured } from '../../lib/supabase'
 import { useTranslation } from '../../i18n/useTranslation'
 import type { DbOrder, OrderStatus } from '../../types/database'
@@ -24,6 +24,7 @@ const DEMO_ORDER: any = {
 
 export default function AdminOrderDetail() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const { t } = useTranslation()
   const [order, setOrder] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -37,6 +38,7 @@ export default function AdminOrderDetail() {
   const [status, setStatus] = useState<OrderStatus>('pending')
   const [tracking, setTracking] = useState('')
   const [notes, setNotes] = useState('')
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     const load = async () => {
@@ -110,6 +112,16 @@ export default function AdminOrderDetail() {
     } finally {
       setSendingGS(false)
     }
+  }
+
+  const handleDelete = async () => {
+    if (!window.confirm('Supprimer cette commande ? Cette action est irréversible.')) return
+    setDeleting(true)
+    if (isConfigured) {
+      await supabase.from('order_items').delete().eq('order_id', id)
+      await supabase.from('orders').delete().eq('id', id)
+    }
+    navigate('/admin/commandes')
   }
 
   const handleSendShippingEmail = async () => {
@@ -296,6 +308,24 @@ export default function AdminOrderDetail() {
             </p>
           )}
         </form>
+
+        {/* Supprimer — uniquement si non payée */}
+        {order.payment_status !== 'paid' && (
+          <div className="rounded-[6px] p-5 mt-4" style={{background:'var(--card)', border:'1px solid var(--line)'}}>
+            <h3 className="text-xs font-semibold tracking-wider uppercase mb-3" style={{color:'#A6412C'}}>Zone dangereuse</h3>
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="w-full py-3 rounded-[4px] text-sm font-semibold tracking-wider flex items-center justify-center gap-2 disabled:opacity-60 transition-colors"
+              style={{background:'rgba(166,65,44,0.08)', color:'#A6412C', border:'1px solid rgba(166,65,44,0.3)'}}>
+              {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+              Supprimer cette commande
+            </button>
+            <p className="text-xs mt-2 text-center" style={{color:'var(--ink)', opacity:0.35}}>
+              Uniquement pour les commandes non payées
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )
