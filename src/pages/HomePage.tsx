@@ -185,7 +185,7 @@ function Brand() {
     <section className="section bg-deep">
       <div className="container brand">
         <div className="brand__media media">
-          <SmartImage src={media('brand')} alt="Damien Holemy, fondateur de BKS" />
+          <SmartImage src={media('brand')} alt="Damien, fondateur de BKS" />
         </div>
         <div className="brand__text">
           <img src={IMAGES.logo.onDark} alt="" aria-hidden="true" className="brand__logo" />

@@ -115,7 +115,7 @@ export const LOCAL_BUSINESS_SCHEMA = {
   url: SITE_URL,
   logo: `${SITE_URL}/images/brand/logo-bks-3d-clean.png`,
   image: `${SITE_URL}/images/brand/logo-bks-3d-clean.png`,
-  description: 'Boutique indépendante de sneakers et chaussures à Dinan, Bretagne. À 30 minutes de Saint-Malo et Saint-Brieuc. Sélection Jordan, Nike, Adidas, New Balance par Damien Holemy.',
+  description: 'Boutique indépendante de sneakers et chaussures à Dinan, Bretagne. À 30 minutes de Saint-Malo et Saint-Brieuc. Sélection Jordan, Nike, Adidas, New Balance par Damien.',
   address: {
     '@type': 'PostalAddress',
     streetAddress: '3 rue de la Chaux',

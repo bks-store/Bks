@@ -18,8 +18,8 @@ export default function AboutPage() {
         path="/a-propos"
         titleFr="À propos — L'histoire de BKS et de Damien"
         titleEn="About — The story of BKS and Damien"
-        descFr="Damien Holemy a fondé BKS à Dinan, Bretagne, par passion pour les sneakers. La seule boutique sneakers indépendante de la région entre Saint-Malo et Saint-Brieuc."
-        descEn="Damien Holemy founded BKS in Dinan, Brittany. The only independent sneaker shop in the area between Saint-Malo and Saint-Brieuc."
+        descFr="Damien a fondé BKS à Dinan, Bretagne, par passion pour les sneakers. La seule boutique sneakers indépendante de la région entre Saint-Malo et Saint-Brieuc."
+        descEn="Damien founded BKS in Dinan, Brittany. The only independent sneaker shop in the area between Saint-Malo and Saint-Brieuc."
         schema={LOCAL_BUSINESS_SCHEMA}
       />
 
@@ -112,13 +112,13 @@ export default function AboutPage() {
       <section className="section bg-surface-2">
         <div className="container split">
           <div className="prose-bks split__main">
-            <p>BKS — <em>Beau Kiosque de Soulier</em> — est une boutique indépendante de sneakers et de chaussures rares, fondée à Dinan par Damien Holemy.</p>
+            <p>BKS — <em>Beau Kiosque de Soulier</em> — est une boutique indépendante de sneakers et de chaussures rares, fondée à Dinan par Damien.</p>
             <p>Tout commence au début des années 2000 : Damien, une dizaine d'années, regarde un clip de 50 Cent à la télé. Des Air Force 1 aux pieds. C'est le déclic. Depuis, la passion pour les chaussures ne l'a plus quitté.</p>
             <p>Après des années en Angleterre dans le commerce international, il s'installe à Dinan en 2021. Au printemps 2026, il décide de concrétiser son projet : « Le style de chaussures que j'achète, on les trouve que chez les indépendants, à Rennes ou à Saint-Brieuc. Je me suis dit qu'il fallait faire quelque chose ici. »</p>
             <p>Résultat : un espace chaleureux, une dominance de bois, une touche américaine. À l'entrée, le maillot de Kobe Bryant. Dans les rayons, des Jordan, des Air Max, des UGG — des paires qu'on ne trouve pas ailleurs.</p>
             <blockquote className="brand__quote" style={{ borderColor: 'var(--accent)', marginTop: '2rem' }}>
               <p style={{ color: 'var(--ink)' }}>« On essaye de proposer la perle rare. Je choisis chaque modèle, un par un. »</p>
-              <footer style={{ color: 'var(--ink-soft)' }}>Damien Holemy, fondateur</footer>
+              <footer style={{ color: 'var(--ink-soft)' }}>Damien, fondateur</footer>
             </blockquote>
           </div>
 
