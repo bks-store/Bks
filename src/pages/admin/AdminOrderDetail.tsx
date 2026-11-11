@@ -39,6 +39,7 @@ export default function AdminOrderDetail() {
   const [tracking, setTracking] = useState('')
   const [notes, setNotes] = useState('')
   const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
 
   useEffect(() => {
     const load = async () => {
@@ -117,9 +118,12 @@ export default function AdminOrderDetail() {
   const handleDelete = async () => {
     if (!window.confirm('Supprimer cette commande ? Cette action est irréversible.')) return
     setDeleting(true)
+    setDeleteError('')
     if (isConfigured) {
-      await supabase.from('order_items').delete().eq('order_id', id)
-      await supabase.from('orders').delete().eq('id', id)
+      const { error: itemsErr } = await supabase.from('order_items').delete().eq('order_id', id)
+      if (itemsErr) { setDeleteError(`Erreur articles : ${itemsErr.message}`); setDeleting(false); return }
+      const { error: orderErr } = await supabase.from('orders').delete().eq('id', id)
+      if (orderErr) { setDeleteError(`Erreur commande : ${orderErr.message}`); setDeleting(false); return }
     }
     navigate('/admin/commandes')
   }
@@ -321,6 +325,11 @@ export default function AdminOrderDetail() {
               {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
               Supprimer cette commande
             </button>
+            {deleteError && (
+              <p className="text-xs mt-2 px-3 py-2 rounded-[4px]" style={{background:'rgba(166,65,44,0.1)', color:'#A6412C'}}>
+                {deleteError}
+              </p>
+            )}
             <p className="text-xs mt-2 text-center" style={{color:'var(--ink)', opacity:0.35}}>
               Uniquement pour les commandes non payées
             </p>
