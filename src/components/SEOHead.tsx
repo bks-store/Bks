@@ -241,7 +241,7 @@ export function buildProductSchema(product: {
     image: product.images.map(img =>
       img.startsWith('http') ? img : `${SITE_URL}${img}`
     ),
-    url: `${SITE_URL}/produit/${product.id}`,
+    url: `${SITE_URL}/produit/${(product as { slug?: string }).slug ?? product.id}`,
     offers: {
       '@type': 'Offer',
       price: product.price.toFixed(2),

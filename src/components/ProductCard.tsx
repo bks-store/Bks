@@ -12,7 +12,7 @@ export default function ProductCard({ product, priority }: { product: Product; p
   const img2 = product.images[1] ?? null
 
   return (
-    <Link to={`/produit/${product.id}`} className="pcard">
+    <Link to={`/produit/${product.slug ?? product.id}`} className="pcard">
       <div className="media media--zoom pcard__media">
         <SmartImage
           src={img1}

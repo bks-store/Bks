@@ -12,12 +12,12 @@ import { useTranslation } from '../i18n/useTranslation'
 import SEOHead, { buildProductSchema, SITE_URL } from '../components/SEOHead'
 
 export default function ProductPage() {
-  const { id } = useParams()
+  const { id: slugOrId } = useParams()
   const { addItem, openCart } = useCart()
   const { t } = useTranslation()
   const { addToast } = useToast()
   const { products, loading } = useProducts()
-  const product = products.find(p => p.id === id)
+  const product = products.find(p => (p.slug && p.slug === slugOrId) || p.id === slugOrId)
 
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [added, setAdded] = useState(false)
@@ -62,7 +62,7 @@ export default function ProductPage() {
   return (
     <>
       <SEOHead
-        path={`/produit/${product.id}`}
+        path={`/produit/${product.slug ?? product.id}`}
         titleFr={productTitle}
         titleEn={productTitle}
         descFr={descFr}

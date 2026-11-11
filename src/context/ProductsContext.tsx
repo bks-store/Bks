@@ -7,6 +7,7 @@ import type { ProductWithSizes } from '../types/database'
 function toProduct(db: ProductWithSizes): Product {
   return {
     id: db.id,
+    slug: db.slug ?? undefined,
     name: db.name,
     brand: db.brand,
     price: db.price_sale,
@@ -48,7 +49,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
     setLoading(true)
     const { data: rows } = await supabase
       .from('products')
-      .select('id,name,brand,price_sale,price_original,category,subcategory,images,description,is_new,is_featured,stock_type,tags,product_sizes(size,available)')
+      .select('id,slug,name,brand,price_sale,price_original,category,subcategory,images,description,is_new,is_featured,stock_type,tags,product_sizes(size,available)')
       .eq('is_published', true)
       .order('created_at', { ascending: false })
 
