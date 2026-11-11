@@ -191,7 +191,7 @@ export default function CataloguePage() {
                       : '1px solid var(--line)',
                     borderRadius: '3px',
                     background: selectedSizes.includes(size) ? 'var(--ink)' : 'transparent',
-                    color: selectedSizes.includes(size) ? 'var(--bg)' : 'var(--ink)',
+                    color: selectedSizes.includes(size) ? 'var(--btn-ink)' : 'var(--ink)',
                     cursor: 'pointer',
                     transition: 'all 0.12s',
                     lineHeight: 1,
@@ -257,18 +257,6 @@ export default function CataloguePage() {
                 <span>{brand}</span>
               </label>
             ))}
-          </div>
-
-          <div className="filter-group">
-            <h3 className="eyebrow">{t.catalogue.size}</h3>
-            <div className="chips">
-              {SIZES_ALL.map(size => (
-                <button key={size} className={`chip ${selectedSizes.includes(size) ? 'is-active' : ''}`}
-                  onClick={() => toggle(selectedSizes, setSelectedSizes, size)} aria-pressed={selectedSizes.includes(size)}>
-                  {size}
-                </button>
-              ))}
-            </div>
           </div>
 
           <div className="filter-group">
