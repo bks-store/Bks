@@ -100,7 +100,6 @@ serve(async (req) => {
           size: size.size_eu ?? size.size_us,
           size_eu: size.size_eu,
           size_us: size.size_us,
-          available: size.available_quantity > 0,
           stock_qty: size.available_quantity,
           price_buy: size.offer_price,
           barcode: size.barcode,
