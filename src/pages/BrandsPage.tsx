@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import SEOHead from '../components/SEOHead'
 import { useProducts } from '../context/ProductsContext'
-import { useTranslation } from '../i18n/useTranslation'
 
 const BRAND_ORDER = ['Nike', 'Jordan', 'New Balance', 'Adidas', 'Asics', 'Ugg', 'Timberland', 'Autry', 'On', 'Salomon', 'Saucony', 'Yeezy']
 
@@ -27,7 +26,6 @@ const BRAND_LOGOS: Record<string, string> = {
 
 export default function BrandsPage() {
   const { products } = useProducts()
-  const { t } = useTranslation()
 
   // Comptage par marque
   const brandCounts = products.reduce<Record<string, number>>((acc, p) => {
@@ -66,7 +64,7 @@ export default function BrandsPage() {
         {/* Carte "Tout" */}
         <Link to="/catalogue" className="brand-card brand-card--all" data-brand="Tout">
           <div className="brand-card__inner">
-            <span className="brand-card__name">{t.nav?.allProducts ?? 'Tout'}</span>
+            <span className="brand-card__name">Tout</span>
             <span className="brand-card__count">{products.length} modèle{products.length !== 1 ? 's' : ''}</span>
             <ArrowRight size={14} strokeWidth={1.5} className="brand-card__arrow" />
           </div>
