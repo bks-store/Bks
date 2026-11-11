@@ -30,14 +30,14 @@ export default function CataloguePage() {
   const selectedBrands = searchParams.getAll('brand')
   const setSelectedBrands = (brands: string[]) =>
     setSearchParams(prev => {
-      prev.delete('brand')
+      prev.delete('brand'); prev.delete('p')
       brands.forEach(b => prev.append('brand', b))
       return prev
     }, { replace: true })
   const selectedSizes = searchParams.getAll('size')
   const setSelectedSizes = (sizes: string[]) =>
     setSearchParams(prev => {
-      prev.delete('size')
+      prev.delete('size'); prev.delete('p')
       sizes.forEach(s => prev.append('size', s))
       return prev
     }, { replace: true })
@@ -45,6 +45,7 @@ export default function CataloguePage() {
   const selectedPrice = priceParam !== null ? Number(priceParam) : null
   const setSelectedPrice = (p: number | null) =>
     setSearchParams(prev => {
+      prev.delete('p')
       if (p === null) prev.delete('price')
       else prev.set('price', String(p))
       return prev
@@ -53,6 +54,7 @@ export default function CataloguePage() {
   const sortBy = sortByParam ?? 'nouveautes'
   const setSortBy = (v: 'nouveautes' | 'prix-asc' | 'prix-desc') =>
     setSearchParams(prev => {
+      prev.delete('p')
       if (v === 'nouveautes') prev.delete('tri')
       else prev.set('tri', v)
       return prev
@@ -87,12 +89,6 @@ export default function CataloguePage() {
       return prev
     }, { replace: true })
   }
-
-  // Reset page quand les filtres changent
-  useEffect(() => {
-    setSearchParams(prev => { prev.delete('p'); return prev }, { replace: true })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [brandParam, JSON.stringify(selectedSizes), selectedPrice, sortBy, slug, category, query])
 
   const BRANDS = [...new Set(allProducts.map(p => p.brand))].sort()
 
