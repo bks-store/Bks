@@ -21,7 +21,7 @@ const BRAND_LOGOS: Record<string, string> = {
   'On':          `${WM}/9/92/On-cloud-logo-white-background.svg`,
   'Salomon':     `${WM}/b/bc/Salomon_logo.svg`,
   'Saucony':     `${WM}/a/ac/Logo_Saucony.svg`,
-  'Autry':       svgText('AUTRY'),
+  'Autry':       'https://static.autry-usa.com/upload/box/4_it_img_20241118121119-logo-black.svg',
   'Yeezy':       svgText('YEEZY'),
 }
 
