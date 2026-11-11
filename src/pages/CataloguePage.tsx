@@ -186,9 +186,7 @@ export default function CataloguePage() {
                     padding: '0.3rem 0.65rem',
                     fontSize: '0.8125rem',
                     fontWeight: selectedSizes.includes(size) ? 600 : 400,
-                    border: selectedSizes.includes(size)
-                      ? '1.5px solid var(--ink)'
-                      : '1px solid var(--line)',
+                    border: selectedSizes.includes(size) ? '1.5px solid var(--ink)' : '1px solid var(--line)',
                     borderRadius: '3px',
                     background: selectedSizes.includes(size) ? 'var(--ink)' : 'transparent',
                     color: selectedSizes.includes(size) ? 'var(--btn-ink)' : 'var(--ink)',
@@ -251,6 +249,10 @@ export default function CataloguePage() {
 
           <div className="filter-group">
             <h3 className="eyebrow">{t.catalogue.brand}</h3>
+            <label className="check">
+              <input type="checkbox" checked={selectedBrands.length === 0} onChange={() => setSelectedBrands([])} />
+              <span>Tout</span>
+            </label>
             {BRANDS.map(brand => (
               <label key={brand} className="check">
                 <input type="checkbox" checked={selectedBrands.includes(brand)} onChange={() => toggle(selectedBrands, setSelectedBrands, brand)} />
