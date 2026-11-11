@@ -166,7 +166,7 @@ export const translations = {
       p1: "Damien a grandi avec les sneakers. À 10 ans, il voit son premier clip avec des Air Force 1. Depuis, la passion n'a jamais cessé. En 2026, il franchit le pas et ouvre BKS à Dinan.",
       p2: "L'ambiance est chaleureuse, les murs sont en bois, un maillot de Kobe Bryant accueille les clients. Chaque paire exposée a été choisie un par un, parce qu'elle vaut vraiment le détour.",
       address: '3 rue de la Chaux, 22100 Dinan',
-      hours: 'Lun & Mer : 14h – 18h30\nMar, Jeu & Ven : 10h30 – 12h30 · 14h – 18h30\nSam : 10h30 – 12h30 · 14h – 19h',
+      hours: 'Lun & Mer : 14h – 18h30\nMar, Jeu, Ven & Sam : 10h30 – 12h30 · 14h – 19h',
       learnMore: 'En savoir plus',
       instagram: 'Instagram',
     },
@@ -194,8 +194,8 @@ export const translations = {
       authentic: 'Boutique indépendante · Produits authentiques · Paiement sécurisé',
       hours: {
         mon: 'Lun & Mer : 14h – 18h30',
-        tueThur: 'Mar, Jeu & Ven : 10h30 – 12h30 · 14h – 18h30',
-        wedFriSat: 'Sam : 10h30 – 12h30 · 14h – 19h',
+        tueThur: 'Mar, Jeu, Ven & Sam : 10h30 – 12h30 · 14h – 19h',
+        wedFriSat: '',
       },
     },
     // Livraison
@@ -259,8 +259,8 @@ export const translations = {
       social: 'Réseaux sociaux',
       practical: 'Informations pratiques',
       mon: 'Lundi & Mercredi : 14h – 18h30',
-      tueThur: 'Mardi, Jeudi & Vendredi : 10h30 – 12h30 · 14h – 18h30',
-      wedFriSat: 'Samedi : 10h30 – 12h30 · 14h – 19h',
+      tueThur: 'Mardi, Jeudi, Vendredi & Samedi : 10h30 – 12h30 · 14h – 19h',
+      wedFriSat: '',
       closed: 'Fermé le dimanche',
     },
     // Contact
@@ -654,7 +654,7 @@ export const translations = {
       p1: "Damien grew up with sneakers. At 10, he saw his first music video featuring Air Force 1s. The passion never stopped. In 2026, he took the leap and opened BKS in Dinan.",
       p2: "The atmosphere is warm, the walls are wood, a Kobe Bryant jersey greets customers at the door. Every pair on display was hand-picked because it's genuinely worth the trip.",
       address: '3 rue de la Chaux, 22100 Dinan',
-      hours: 'Mon & Wed: 2pm–6:30pm\nTue, Thu & Fri: 10:30am–12:30pm · 2pm–6:30pm\nSat: 10:30am–12:30pm · 2pm–7pm',
+      hours: 'Mon & Wed: 2pm–6:30pm\nTue, Thu, Fri & Sat: 10:30am–12:30pm · 2pm–7pm',
       learnMore: 'Learn more',
       instagram: 'Instagram',
     },
@@ -728,8 +728,8 @@ export const translations = {
       authentic: 'Independent shop · Authentic products · Secure payment',
       hours: {
         mon: 'Mon & Wed: 2:00pm – 6:30pm',
-        tueThur: 'Tue, Thu & Fri: 10:30am – 12:30pm · 2:00pm – 6:30pm',
-        wedFriSat: 'Sat: 10:30am – 12:30pm · 2:00pm – 7:00pm',
+        tueThur: 'Tue, Thu, Fri & Sat: 10:30am – 12:30pm · 2:00pm – 7:00pm',
+        wedFriSat: '',
       },
     },
     about: {
@@ -740,8 +740,8 @@ export const translations = {
       social: 'Social media',
       practical: 'Practical info',
       mon: 'Monday & Wednesday: 2:00pm – 6:30pm',
-      tueThur: 'Tuesday, Thursday & Friday: 10:30am – 12:30pm · 2:00pm – 6:30pm',
-      wedFriSat: 'Saturday: 10:30am – 12:30pm · 2:00pm – 7:00pm',
+      tueThur: 'Tuesday, Thursday, Friday & Saturday: 10:30am – 12:30pm · 2:00pm – 7:00pm',
+      wedFriSat: '',
       closed: 'Closed on Sundays',
     },
     contact: {

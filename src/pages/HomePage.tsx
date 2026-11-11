@@ -225,7 +225,7 @@ function Store() {
             </div>
             <div className="store__row">
               <dt>{s.hours}</dt>
-              <dd>{t.footer.hours.mon}<br />{t.footer.hours.tueThur}<br />{t.footer.hours.wedFriSat}</dd>
+              <dd>{t.footer.hours.mon}<br />{t.footer.hours.tueThur}</dd>
             </div>
           </dl>
           <div className="store__actions">

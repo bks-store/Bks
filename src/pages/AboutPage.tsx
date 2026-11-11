@@ -142,7 +142,6 @@ export default function AboutPage() {
                   <dd style={{ fontSize: '0.9375rem', lineHeight: 1.8, color: 'rgba(244,239,230,0.85)' }}>
                     {t.about.mon}<br />
                     {t.about.tueThur}<br />
-                    {t.about.wedFriSat}<br />
                     <span style={{ color: 'rgba(244,239,230,0.4)', fontSize: '0.875rem' }}>{t.about.closed}</span>
                   </dd>
                 </div>

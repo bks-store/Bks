@@ -80,8 +80,7 @@ export default function Footer() {
                 <li>3 rue de la Chaux<br />22100 Dinan</li>
                 <li>
                   {t.footer.hours.mon}<br />
-                  {t.footer.hours.tueThur}<br />
-                  {t.footer.hours.wedFriSat}
+                  {t.footer.hours.tueThur}
                 </li>
               </ul>
             </div>
