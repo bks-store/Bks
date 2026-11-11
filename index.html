@@ -44,19 +44,35 @@
     <svg style="display:none" aria-hidden="true">
       <defs>
         <filter id="bg-white" color-interpolation-filters="sRGB">
-          <!-- Pente très élevée : seul le noir pur → transparent, tout le reste → opaque -->
-          <!-- Seuil : pixels où R+G+B < 0.003 (≈ rgb(0,0,0) uniquement) -->
+          <!--
+            Stratégie 4 étapes :
+            1. Créer un canal alpha pur depuis la luminance (fond noir → A=0, chaussure → A=1)
+            2. Éroder de 1px pour supprimer le halo de compression JPEG en bordure
+            3. Flouter légèrement pour antialiaser l'arête
+            4. Appliquer ce masque aux COULEURS ORIGINALES (pas les couleurs du masque)
+          -->
+
+          <!-- Étape 1 : canal alpha blanc — A = 10*(R+G+B) − 0.1 -->
+          <!-- Résultat : image entièrement blanche, alpha = masque de luminance -->
           <feColorMatrix in="SourceGraphic" type="matrix"
-            values="1 0 0 0 0
-                    0 1 0 0 0
-                    0 0 1 0 0
-                    50 50 50 0 -0.15"
-            result="masked"/>
-          <!-- Micro-blur 0.6px pour lisser les contours (antialiasing naturel) -->
-          <feGaussianBlur stdDeviation="0.6" in="masked" result="soft"/>
+            values="0 0 0 0 1
+                    0 0 0 0 1
+                    0 0 0 0 1
+                    10 10 10 0 -0.1"
+            result="alphaMask"/>
+
+          <!-- Étape 2 : éroder 1px → supprime la frange semi-transparente en bordure -->
+          <feMorphology operator="erode" radius="1" in="alphaMask" result="eroded"/>
+
+          <!-- Étape 3 : blur 1px → antialiasing naturel de l'arête -->
+          <feGaussianBlur stdDeviation="1" in="eroded" result="softMask"/>
+
+          <!-- Étape 4 : appliquer le masque aux couleurs originales (préserve les teintes) -->
+          <feComposite in="SourceGraphic" in2="softMask" operator="in" result="cutout"/>
+
           <!-- Fond blanc derrière -->
           <feFlood flood-color="#ffffff" result="bg"/>
-          <feComposite in="soft" in2="bg" operator="over"/>
+          <feComposite in="cutout" in2="bg" operator="over"/>
         </filter>
       </defs>
     </svg>
