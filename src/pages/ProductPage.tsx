@@ -73,24 +73,12 @@ export default function ProductPage() {
         schema={buildProductSchema({ ...product, images: product.images.length ? product.images : ogImage ? [ogImage] : [] })}
       />
       <div className="container">
-        <div style={{ paddingTop: '2rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <button
-            onClick={() => navigate(-1)}
-            aria-label="Retour"
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '0.4em',
-              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-              fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.14em',
-              textTransform: 'uppercase', color: 'var(--ink-soft)',
-              transition: 'color 0.15s',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'var(--ink)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--ink-soft)')}
-          >
-            <ArrowLeft size={13} strokeWidth={1.8} />
+        <div style={{ paddingTop: '2rem' }}>
+          <button onClick={() => navigate(-1)} className="btn-back">
+            <ArrowLeft size={12} strokeWidth={2} />
             Retour
           </button>
-          <nav className="crumbs" aria-label="Fil d'Ariane" style={{ padding: 0 }}>
+          <nav className="crumbs" aria-label="Fil d'Ariane">
             <Link to="/">Accueil</Link><span>/</span>
             <Link to="/catalogue">Catalogue</Link><span>/</span>
             <span aria-current="page">{product.name}</span>

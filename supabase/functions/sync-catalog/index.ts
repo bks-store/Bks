@@ -202,6 +202,25 @@ serve(async (req) => {
       }
     }
 
+    // 5b. Dépublier les produits GS supprimés du catalogue
+    const gsSKUs = new Set(catalog.map((c: GsProduct) => c.sku))
+    const { data: orphanedProducts } = await supabase
+      .from('products')
+      .select('id, sku')
+      .eq('sync_status', 'synced')
+      .eq('is_published', true)
+      .not('sku', 'is', null)
+
+    const toUnpublish = (orphanedProducts ?? []).filter(
+      (p: { sku: string }) => !gsSKUs.has(p.sku)
+    )
+    if (toUnpublish.length > 0) {
+      await supabase
+        .from('products')
+        .update({ is_published: false })
+        .in('id', toUnpublish.map((p: { id: string }) => p.id))
+    }
+
     // Normaliser les prix de tous les produits vers le format X9.99
     const { data: allProducts } = await supabase.from('products').select('id, price_sale')
     const roundTo999 = (p: number) => Math.ceil((p + 0.01) / 10) * 10 - 0.01
@@ -218,6 +237,7 @@ serve(async (req) => {
       JSON.stringify({
         ok: true,
         products_synced: catalog.length,
+        products_unpublished: toUnpublish.length,
         sizes_synced: sizesPayload.length,
         images_cached: imagesDownloaded,
         images_pending: Math.max(0, totalNeedsImg - imagesDownloaded),
