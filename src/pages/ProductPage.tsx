@@ -8,6 +8,7 @@ import ProductCard from '../components/ProductCard'
 import SmartImage from '../components/SmartImage'
 import { productImage } from '../config/images'
 import { formatPrice } from '../lib/format'
+import { useCurrency } from '../context/CurrencyContext'
 import { useTranslation } from '../i18n/useTranslation'
 import SEOHead, { buildProductSchema, SITE_URL } from '../components/SEOHead'
 
@@ -22,6 +23,8 @@ export default function ProductPage() {
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [added, setAdded] = useState(false)
   const [sizeError, setSizeError] = useState(false)
+  const [activeImg, setActiveImg] = useState(0)
+  const { formatPrice: fmtPrice, formatEur, isEuro } = useCurrency()
 
   if (loading) {
     return <div className="container" style={{minHeight:'60vh'}} />
@@ -77,16 +80,47 @@ export default function ProductPage() {
         </nav>
 
         <div className="product">
-          <div className="product__media media">
-            <SmartImage src={productImage(product, 1200)} alt={`${product.brand} ${product.name}`} loading="eager" imgWidth={1000} />
+          {/* Galerie photos */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div className="product__media media">
+              <SmartImage
+                src={product.images[activeImg] ?? productImage(product, 1200) ?? undefined}
+                alt={`${product.brand} ${product.name}`}
+                loading="eager"
+                imgWidth={1000}
+              />
+            </div>
+            {product.images.length > 1 && (
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                {product.images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImg(i)}
+                    style={{
+                      width: 72, height: 90, padding: 0, border: 'none', cursor: 'pointer', borderRadius: 4,
+                      outline: activeImg === i ? '2px solid var(--bks-brun, #2E1B11)' : '1px solid var(--line)',
+                      outlineOffset: 2, overflow: 'hidden', background: '#fff', flexShrink: 0,
+                    }}
+                    aria-label={`Vue ${i + 1}`}
+                  >
+                    <img
+                      src={img}
+                      alt=""
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%', mixBlendMode: 'multiply' }}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="product__panel">
             <p className="eyebrow">{product.brand}{product.isNew && ` — ${t.product.new}`}</p>
             <h1 className="display h-md">{product.name}</h1>
             <p className="product__price">
-              {formatPrice(product.price)}
-              {product.originalPrice && <s>{formatPrice(product.originalPrice)}</s>}
+              {fmtPrice(product.price)}
+              {!isEuro && <span style={{ fontSize: '0.75em', opacity: 0.5, marginLeft: '0.4em', fontWeight: 400 }}>≈ {formatEur(product.price)}</span>}
+              {product.originalPrice && <s style={{ fontSize: '0.8em', opacity: 0.5, fontWeight: 400 }}>{fmtPrice(product.originalPrice)}</s>}
             </p>
 
             <div className="product__label">
