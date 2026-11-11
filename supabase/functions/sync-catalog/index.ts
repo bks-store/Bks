@@ -202,22 +202,20 @@ serve(async (req) => {
       }
     }
 
-    // 5b. Dépublier les produits GS supprimés du catalogue
+    // 5b. Supprimer les produits GS absents du catalogue (tailles d'abord, puis produit)
     const gsSKUs = new Set(catalog.map((c: GsProduct) => c.sku))
     const { data: orphanedProducts } = await supabase
       .from('products')
       .select('id, sku')
-      .eq('is_published', true)
       .not('sku', 'is', null)
 
-    const toUnpublish = (orphanedProducts ?? []).filter(
+    const toDelete = (orphanedProducts ?? []).filter(
       (p: { sku: string }) => !gsSKUs.has(p.sku)
     )
-    if (toUnpublish.length > 0) {
-      await supabase
-        .from('products')
-        .update({ is_published: false })
-        .in('id', toUnpublish.map((p: { id: string }) => p.id))
+    if (toDelete.length > 0) {
+      const idsToDelete = toDelete.map((p: { id: string }) => p.id)
+      await supabase.from('product_sizes').delete().in('product_id', idsToDelete)
+      await supabase.from('products').delete().in('id', idsToDelete)
     }
 
     // Normaliser les prix de tous les produits vers le format X9.99
@@ -236,7 +234,7 @@ serve(async (req) => {
       JSON.stringify({
         ok: true,
         products_synced: catalog.length,
-        products_unpublished: toUnpublish.length,
+        products_deleted: toDelete.length,
         sizes_synced: sizesPayload.length,
         images_cached: imagesDownloaded,
         images_pending: Math.max(0, totalNeedsImg - imagesDownloaded),
