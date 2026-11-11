@@ -4,8 +4,26 @@ import SEOHead from '../components/SEOHead'
 import { useProducts } from '../context/ProductsContext'
 import { useTranslation } from '../i18n/useTranslation'
 
-// Logos marques (fichiers dans public/images/brands/ si dispo, sinon initiales)
 const BRAND_ORDER = ['Nike', 'Jordan', 'New Balance', 'Adidas', 'Asics', 'Ugg', 'Timberland', 'Autry', 'On', 'Salomon', 'Saucony', 'Yeezy']
+
+const SI = 'https://cdn.jsdelivr.net/npm/simple-icons@14/icons'
+const svgWordmark = (text: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><text x="0" y="50" font-family="Arial Black,sans-serif" font-size="52" font-weight="900" fill="black">${text}</text></svg>`)}`
+
+const BRAND_LOGOS: Record<string, string> = {
+  'Nike': `${SI}/nike.svg`,
+  'Jordan': `${SI}/jordan.svg`,
+  'New Balance': `${SI}/newbalance.svg`,
+  'Adidas': `${SI}/adidas.svg`,
+  'Asics': svgWordmark('ASICS'),
+  'Ugg': svgWordmark('UGG'),
+  'Timberland': svgWordmark('TIMBERLAND'),
+  'Autry': svgWordmark('AUTRY'),
+  'On': svgWordmark('On'),
+  'Salomon': svgWordmark('SALOMON'),
+  'Saucony': svgWordmark('SAUCONY'),
+  'Yeezy': svgWordmark('YEEZY'),
+}
 
 export default function BrandsPage() {
   const { products } = useProducts()
@@ -56,13 +74,22 @@ export default function BrandsPage() {
 
         {sorted.map(brand => {
           const count = brandCounts[brand] ?? 0
+          const logo = BRAND_LOGOS[brand]
           return (
             <Link
               key={brand}
               to={`/catalogue?brand=${encodeURIComponent(brand)}`}
-              className="brand-card"
+              className={`brand-card${logo ? ' brand-card--has-logo' : ''}`}
               data-brand={brand}
             >
+              {logo && (
+                <img
+                  src={logo}
+                  alt=""
+                  className="brand-card__logo"
+                  onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                />
+              )}
               <div className="brand-card__inner">
                 <span className="brand-card__name">{brand}</span>
                 <span className="brand-card__count">{count} modèle{count !== 1 ? 's' : ''}</span>

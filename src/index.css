@@ -1390,6 +1390,23 @@ textarea.a-input { resize: vertical; line-height: 1.55; }
 .brand-card--all:hover { border-color: var(--accent); }
 .brand-card--all .brand-card__name { color: var(--ink); }
 
+.brand-card--has-logo::before { display: none; }
+
+.brand-card__logo {
+  position: absolute;
+  right: -0.5rem;
+  bottom: -0.5rem;
+  width: 65%;
+  height: 65%;
+  object-fit: contain;
+  object-position: right bottom;
+  opacity: 0.055;
+  pointer-events: none;
+  user-select: none;
+  filter: brightness(0);
+}
+.brand-card:hover .brand-card__logo { opacity: 0.09; }
+
 .brand-card__inner {
   padding: 1.5rem 1.25rem;
   display: flex;
