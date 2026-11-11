@@ -207,7 +207,6 @@ serve(async (req) => {
     const { data: orphanedProducts } = await supabase
       .from('products')
       .select('id, sku')
-      .eq('sync_status', 'synced')
       .eq('is_published', true)
       .not('sku', 'is', null)
 
