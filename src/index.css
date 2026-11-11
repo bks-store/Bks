@@ -1360,15 +1360,43 @@ textarea.a-input { resize: vertical; line-height: 1.55; }
   text-decoration: none;
   border: 1px solid var(--line);
   border-radius: 4px;
+  position: relative;
+  overflow: hidden;
   transition: border-color 0.18s, background 0.18s;
 }
+.brand-card::before {
+  content: attr(data-brand);
+  position: absolute;
+  right: -0.25rem;
+  bottom: -0.6rem;
+  font-size: 3.75rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  opacity: 0.045;
+  line-height: 1;
+  pointer-events: none;
+  font-family: var(--ff-display);
+  white-space: nowrap;
+  user-select: none;
+}
 .brand-card:hover { border-color: var(--ink); background: var(--surface-2, var(--bg-surface)); }
+.brand-card:hover::before { opacity: 0.07; }
+
+.brand-card--all {
+  border-color: var(--ink-soft);
+  background: var(--surface-2, var(--bg-surface));
+}
+.brand-card--all:hover { border-color: var(--accent); }
+.brand-card--all .brand-card__name { color: var(--ink); }
 
 .brand-card__inner {
   padding: 1.5rem 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  position: relative;
+  z-index: 1;
 }
 .brand-card__name {
   font-family: var(--ff-display);

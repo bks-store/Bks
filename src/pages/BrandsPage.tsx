@@ -45,6 +45,15 @@ export default function BrandsPage() {
       </header>
 
       <div className="brands-grid">
+        {/* Carte "Tout" */}
+        <Link to="/catalogue" className="brand-card brand-card--all" data-brand="Tout">
+          <div className="brand-card__inner">
+            <span className="brand-card__name">{t.nav?.allProducts ?? 'Tout'}</span>
+            <span className="brand-card__count">{products.length} modèle{products.length !== 1 ? 's' : ''}</span>
+            <ArrowRight size={14} strokeWidth={1.5} className="brand-card__arrow" />
+          </div>
+        </Link>
+
         {sorted.map(brand => {
           const count = brandCounts[brand] ?? 0
           return (
@@ -52,6 +61,7 @@ export default function BrandsPage() {
               key={brand}
               to={`/catalogue?brand=${encodeURIComponent(brand)}`}
               className="brand-card"
+              data-brand={brand}
             >
               <div className="brand-card__inner">
                 <span className="brand-card__name">{brand}</span>
@@ -61,12 +71,6 @@ export default function BrandsPage() {
             </Link>
           )
         })}
-      </div>
-
-      <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid var(--line)' }}>
-        <Link to="/catalogue" className="link-arrow">
-          {t.sections.seeAllCatalogue} <ArrowRight size={14} strokeWidth={1.6} />
-        </Link>
       </div>
     </div>
   )
