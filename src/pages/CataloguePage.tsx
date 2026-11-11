@@ -37,6 +37,11 @@ export default function CataloguePage() {
 
   const scrollToGrid = () => gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
+  // Sync brand filter when URL param changes (e.g. navigating from search clears brand filter)
+  useEffect(() => {
+    setSelectedBrands(brandParam ? [brandParam] : [])
+  }, [brandParam])
+
   useEffect(() => {
     document.body.style.overflow = filtersOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }

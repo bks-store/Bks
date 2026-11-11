@@ -327,7 +327,7 @@ export default function CartPage() {
             {items.map(item => (
               <div key={`${item.productId}-${item.size}`} className="cart-line">
                 <Link to={`/produit/${item.productId}`} className="media">
-                  <SmartImage src={IMAGES.products[item.productId]} alt={`${item.brand} ${item.name}`} />
+                  <SmartImage src={item.imageUrl ?? IMAGES.products[item.productId]} alt={`${item.brand} ${item.name}`} />
                 </Link>
                 <div style={{ minWidth: 0 }}>
                   <p className="pcard__brand">{item.brand}</p>

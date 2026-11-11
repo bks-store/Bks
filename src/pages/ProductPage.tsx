@@ -42,11 +42,15 @@ export default function ProductPage() {
     )
   }
 
+  const productTitle = product.name.toLowerCase().startsWith(product.brand.toLowerCase())
+    ? product.name
+    : `${product.brand} ${product.name}`
+
   const handleAdd = () => {
     if (!selectedSize) { setSizeError(true); return }
-    addItem({ productId: product.id, name: product.name, brand: product.brand, price: product.price, size: selectedSize, quantity: 1 })
+    addItem({ productId: product.id, name: product.name, brand: product.brand, price: product.price, size: selectedSize, quantity: 1, imageUrl: productImage(product, 400) ?? undefined })
     setAdded(true)
-    addToast(`${product.brand} ${product.name} ajouté au panier`)
+    addToast(`${productTitle} ajouté au panier`)
     openCart()
     setTimeout(() => setAdded(false), 2500)
   }
@@ -54,9 +58,6 @@ export default function ProductPage() {
   const similar = products.filter(p => p.id !== product.id && (p.brand === product.brand || p.category === product.category)).slice(0, 4)
 
   const ogImage = productImage(product, 1200)
-  const productTitle = product.name.toLowerCase().startsWith(product.brand.toLowerCase())
-    ? product.name
-    : `${product.brand} ${product.name}`
   const descFr = `${productTitle} — ${product.description || 'Sneakers disponibles chez BKS Dinan. Livraison France et international.'}`
   const descEn = `${productTitle} — ${product.description || 'Sneakers available at BKS Dinan. Shipping France and worldwide.'}`
 
@@ -157,7 +158,7 @@ export default function ProductPage() {
             <div className="product__details">
               <details open>
                 <summary>{t.product.description}</summary>
-                <p>{product.description}</p>
+                <p>{product.description || `${productTitle} — disponible en boutique BKS à Dinan et en livraison France & international. Contactez-nous pour toute question sur ce modèle.`}</p>
               </details>
               <details>
                 <summary>{t.product.delivery} &amp; {t.product.returns.toLowerCase()}</summary>
