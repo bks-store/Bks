@@ -705,6 +705,7 @@ a:hover .media--zoom > img { transform: scale(1.03); }
 .product__details p { font-size: 0.9375rem; line-height: 1.75; color: var(--ink-soft); padding-bottom: 1.5rem; max-width: 34rem; }
 @media (min-width: 1024px) {
   .product { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2rem; align-items: start; }
+  .product__gallery { grid-column: 1 / 8; }
   .product__media { grid-column: 1 / 8; }
   .product__panel { grid-column: 9 / 13; position: sticky; top: calc(var(--header-h) + 2rem); }
 }

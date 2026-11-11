@@ -80,7 +80,7 @@ export default function ProductPage() {
 
         <div className="product">
           {/* Galerie photos */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <div className="product__gallery" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <div className="product__media media">
               <SmartImage
                 src={product.images[activeImg] ?? productImage(product, 1200) ?? undefined}
