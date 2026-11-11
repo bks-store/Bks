@@ -1394,16 +1394,19 @@ textarea.a-input { resize: vertical; line-height: 1.55; }
 
 .brand-card__logo {
   position: absolute;
-  right: -0.5rem;
-  bottom: -0.5rem;
-  width: 65%;
-  height: 65%;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  width: 52%;
+  height: 52%;
+  max-width: 52%;
+  max-height: 52%;
   object-fit: contain;
   object-position: right bottom;
   opacity: 0.055;
   pointer-events: none;
   user-select: none;
   filter: brightness(0);
+  overflow: hidden;
 }
 .brand-card:hover .brand-card__logo { opacity: 0.09; }
 
