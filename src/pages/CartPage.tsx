@@ -168,7 +168,11 @@ function StripePaymentForm({
 
       <ExpressCheckoutElement
         onConfirm={handlePay}
-        options={{ buttonHeight: 48, buttonTheme: { applePay: 'black', googlePay: 'black' } }}
+        options={{
+          buttonHeight: 48,
+          buttonTheme: { applePay: 'black', googlePay: 'black' },
+          paymentMethods: { applePay: 'always', googlePay: 'always', link: 'never', amazonPay: 'never', paypal: 'never' },
+        }}
       />
     </div>
   )
