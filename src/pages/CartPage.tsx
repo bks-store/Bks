@@ -520,7 +520,7 @@ export default function CartPage() {
               className="btn btn--solid btn--block"
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
             >
-              Renseigner mon adresse <ChevronRight size={15} strokeWidth={1.8} />
+              Passer commande <ChevronRight size={15} strokeWidth={1.8} />
             </button>
           )}
 

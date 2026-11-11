@@ -164,7 +164,7 @@ serve(async (req) => {
       metadata: { order_id: order.id },
       receipt_email: customer.email,
       description: `BKS Dinan — ${items.length} article(s)`,
-      automatic_payment_methods: { enabled: true },
+      payment_method_types: ['card', 'link', 'amazon_pay', 'alma'],
       payment_method_options: {
         card: { request_three_d_secure: 'any' },
       },
