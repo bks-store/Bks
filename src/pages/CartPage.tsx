@@ -8,6 +8,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import {
   Elements,
   PaymentElement,
+  ExpressCheckoutElement,
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js'
@@ -164,6 +165,11 @@ function StripePaymentForm({
         <ShieldCheck size={13} strokeWidth={1.6} />
         Paiement sécurisé — chiffrement SSL 256 bits
       </div>
+
+      <ExpressCheckoutElement
+        onConfirm={handlePay}
+        options={{ buttonHeight: 48, buttonTheme: { applePay: 'black', googlePay: 'black' } }}
+      />
     </div>
   )
 }
