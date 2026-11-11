@@ -162,6 +162,71 @@ export default function CataloguePage() {
         )}
       </header>
 
+      {/* Bandeau taille — uniquement sur sneakers/nouveautés/catalogue général */}
+      {!rubrique && !query && category !== 'streetwear' && category !== 'accessoires' && (
+        <div style={{
+          borderBottom: '1px solid var(--line)',
+          paddingBlock: '1.25rem 1rem',
+          marginBottom: '0.25rem',
+        }}>
+          <div style={{display:'flex', alignItems:'center', gap:'0.75rem', flexWrap:'wrap'}}>
+            <span style={{
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: 'var(--ink-soft)',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}>
+              Votre taille
+            </span>
+            <div style={{display:'flex', flexWrap:'wrap', gap:'0.4rem'}}>
+              {SIZES_ALL.map(size => (
+                <button
+                  key={size}
+                  onClick={() => toggle(selectedSizes, setSelectedSizes, size)}
+                  aria-pressed={selectedSizes.includes(size)}
+                  style={{
+                    padding: '0.3rem 0.65rem',
+                    fontSize: '0.8125rem',
+                    fontWeight: selectedSizes.includes(size) ? 600 : 400,
+                    border: selectedSizes.includes(size)
+                      ? '1.5px solid var(--ink)'
+                      : '1px solid var(--line)',
+                    borderRadius: '3px',
+                    background: selectedSizes.includes(size) ? 'var(--ink)' : 'transparent',
+                    color: selectedSizes.includes(size) ? 'var(--bg)' : 'var(--ink)',
+                    cursor: 'pointer',
+                    transition: 'all 0.12s',
+                    lineHeight: 1,
+                  }}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+            {selectedSizes.length > 0 && (
+              <button
+                onClick={() => setSelectedSizes([])}
+                style={{
+                  fontSize: '0.75rem',
+                  color: 'var(--ink-soft)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  padding: 0,
+                  flexShrink: 0,
+                }}
+              >
+                Effacer
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="toolbar">
         <span>{countLabel}</span>
         <div style={{display:'flex', alignItems:'center', gap:'1.5rem'}}>
