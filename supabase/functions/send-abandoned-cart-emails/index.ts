@@ -14,9 +14,9 @@ serve(async () => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   )
 
-  // Commandes pending depuis entre 23h et 25h, sans email envoyé, avec email client
-  const cutoffMin = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString()
-  const cutoffMax = new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString()
+  // Commandes pending depuis entre 55min et 65min, sans email envoyé, avec email client
+  const cutoffMin = new Date(Date.now() - 65 * 60 * 1000).toISOString()
+  const cutoffMax = new Date(Date.now() - 55 * 60 * 1000).toISOString()
 
   const { data: orders, error } = await supabase
     .from('orders')
