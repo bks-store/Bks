@@ -26,7 +26,7 @@ export default function CataloguePage() {
   const { t } = useTranslation()
 
   const brandParam = searchParams.get('brand')
-  // URL est la source de vérité pour les marques → le bouton retour retrouve toujours le bon filtre
+  // URL est la source de vérité pour les filtres → le bouton retour retrouve toujours le bon état
   const selectedBrands = searchParams.getAll('brand')
   const setSelectedBrands = (brands: string[]) =>
     setSearchParams(prev => {
@@ -34,8 +34,21 @@ export default function CataloguePage() {
       brands.forEach(b => prev.append('brand', b))
       return prev
     }, { replace: true })
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([])
-  const [selectedPrice, setSelectedPrice] = useState<number | null>(null)
+  const selectedSizes = searchParams.getAll('size')
+  const setSelectedSizes = (sizes: string[]) =>
+    setSearchParams(prev => {
+      prev.delete('size')
+      sizes.forEach(s => prev.append('size', s))
+      return prev
+    }, { replace: true })
+  const priceParam = searchParams.get('price')
+  const selectedPrice = priceParam !== null ? Number(priceParam) : null
+  const setSelectedPrice = (p: number | null) =>
+    setSearchParams(prev => {
+      if (p === null) prev.delete('price')
+      else prev.set('price', String(p))
+      return prev
+    }, { replace: true })
   const [sortBy, setSortBy] = useState<'nouveautes' | 'prix-asc' | 'prix-desc'>('nouveautes')
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [page, setPage] = useState(1)
