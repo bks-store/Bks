@@ -63,7 +63,8 @@ function StoreFront() {
   useEffect(() => {
     // Ne pas tracker les pages admin ni les bots
     if (pathname.startsWith('/admin')) return
-    supabase.from('page_views').insert({ path: pathname }).then(() => {})
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(supabase as any).from('page_views').insert({ path: pathname }).then(() => {})
   }, [pathname])
 
   return (
