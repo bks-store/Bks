@@ -293,10 +293,6 @@ export default function ProductPage() {
             </p>
 
             <div className="product__details">
-              <details open>
-                <summary>{t.product.description}</summary>
-                <p>{product.description || `${productTitle} — disponible en boutique BKS à Dinan et en livraison France & international. Contactez-nous pour toute question sur ce modèle.`}</p>
-              </details>
               <details>
                 <summary>{t.product.delivery} &amp; {t.product.returns.toLowerCase()}</summary>
                 <p>{t.product.delivery} {t.product.deliverySub} · {t.product.returns} {t.product.returnsSub} · {t.product.authentic} : {t.product.authenticSub.toLowerCase()}.</p>
