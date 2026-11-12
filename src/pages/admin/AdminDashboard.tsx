@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import {
   ShoppingBag, TrendingUp, ChevronRight, RefreshCw,
   AlertTriangle, Package, ArrowUpRight, Percent, Euro,
-  Loader2, CheckCircle2, AlertCircle,
+  Loader2, CheckCircle2, AlertCircle, Eye,
 } from 'lucide-react'
 import { supabase, isConfigured } from '../../lib/supabase'
 import { useTranslation } from '../../i18n/useTranslation'
@@ -25,6 +25,9 @@ interface FullStats {
   productsPublished: number
   productsTotal: number
   lastSync: string | null
+  visitsToday: number
+  visitsMonth: number
+  visitsPrevMonth: number
 }
 
 interface RecentOrder {
@@ -52,6 +55,7 @@ const DEMO: FullStats = {
   ordersMonth: 15, ordersToday: 1, ordersPending: 3,
   productsPublished: 1, productsTotal: 396,
   lastSync: new Date(Date.now() - 3600000).toISOString(),
+  visitsToday: 24, visitsMonth: 312, visitsPrevMonth: 198,
 }
 
 const DEMO_ORDERS: RecentOrder[] = [
@@ -97,9 +101,10 @@ export default function AdminDashboard() {
       const endPrevMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59).toISOString()
       const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString()
 
-      const [ordersRes, productsRes] = await Promise.all([
+      const [ordersRes, productsRes, visitsRes] = await Promise.all([
         supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(100),
         supabase.from('products').select('id, is_published, last_sync_at').order('last_sync_at', { ascending: false }).limit(500),
+        supabase.from('page_views').select('visited_at').gte('visited_at', startPrevMonth),
       ])
 
       const allOrders: DbOrder[] = ordersRes.data ?? []
@@ -133,6 +138,11 @@ export default function AdminDashboard() {
 
       const lastSync = allProducts.find(p => p.last_sync_at)?.last_sync_at ?? null
 
+      const allViews = (visitsRes.data ?? []) as { visited_at: string }[]
+      const visitsToday = allViews.filter(v => v.visited_at >= startToday).length
+      const visitsMonth = allViews.filter(v => v.visited_at >= startMonth).length
+      const visitsPrevMonth = allViews.filter(v => v.visited_at >= startPrevMonth && v.visited_at < startMonth).length
+
       setStats({
         caMonth, caPrevMonth, caToday,
         margeMonth,
@@ -143,6 +153,7 @@ export default function AdminDashboard() {
         productsPublished: allProducts.filter(p => p.is_published).length,
         productsTotal: allProducts.length,
         lastSync,
+        visitsToday, visitsMonth, visitsPrevMonth,
       })
       setOrders(allOrders.slice(0, 6) as RecentOrder[])
       setLoading(false)
@@ -301,6 +312,35 @@ export default function AdminDashboard() {
               {stats.ordersToday > 0 ? `+${stats.ordersToday} aujourd'hui` : 'Ce mois-ci'}
             </p>
           </div>
+
+          {/* Visites */}
+          {(() => {
+            const vTrend = stats.visitsPrevMonth > 0 ? ((stats.visitsMonth - stats.visitsPrevMonth) / stats.visitsPrevMonth) * 100 : null
+            return (
+              <div className="admin-card" style={{padding:'1.5rem'}}>
+                <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1rem'}}>
+                  <div style={{width:34, height:34, borderRadius:8, background:'rgba(61,106,134,0.1)', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                    <Eye size={16} color="#3D6A86" strokeWidth={1.8} />
+                  </div>
+                  {vTrend !== null && (
+                    <span style={{display:'flex', alignItems:'center', gap:'0.2rem', fontSize:'0.6875rem', fontWeight:700, color: vTrend >= 0 ? '#3D7A43' : '#A6412C'}}>
+                      <ArrowUpRight size={12} strokeWidth={2.5} style={{transform: vTrend < 0 ? 'rotate(90deg)' : undefined}} />
+                      {Math.abs(vTrend).toFixed(0)}%
+                    </span>
+                  )}
+                </div>
+                <p style={{fontSize:'0.6875rem', fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--ink-soft)', marginBottom:'0.4rem'}}>
+                  Visites
+                </p>
+                <p style={{fontFamily:'var(--ff-display)', fontSize:'clamp(1.75rem, 2.5vw, 2.25rem)', fontWeight:500, lineHeight:1, color:'var(--ink)', margin:0}}>
+                  {stats.visitsMonth.toLocaleString('fr-FR')}
+                </p>
+                <p style={{fontSize:'0.6875rem', color:'var(--ink-faint)', marginTop:'0.4rem'}}>
+                  {stats.visitsToday > 0 ? `${stats.visitsToday} aujourd'hui` : 'Ce mois-ci'}
+                </p>
+              </div>
+            )
+          })()}
 
         </div>
       </div>

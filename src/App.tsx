@@ -1,5 +1,6 @@
 import { useEffect, lazy, Suspense } from 'react'
 import { Routes, Route, useLocation, Link } from 'react-router-dom'
+import { supabase } from './lib/supabase'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
@@ -59,6 +60,11 @@ function NotFoundPage() {
 function StoreFront() {
   const { pathname } = useLocation()
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  useEffect(() => {
+    // Ne pas tracker les pages admin ni les bots
+    if (pathname.startsWith('/admin')) return
+    supabase.from('page_views').insert({ path: pathname }).then(() => {})
+  }, [pathname])
 
   return (
     <div className="min-h-screen flex flex-col">
