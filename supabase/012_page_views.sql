@@ -15,5 +15,5 @@ alter table page_views enable row level security;
 create policy "insert_anon" on page_views
   for insert to anon, authenticated with check (true);
 
-create policy "select_service" on page_views
-  for select using (auth.role() = 'service_role');
+create policy "select_admin" on page_views
+  for select using (auth.role() IN ('service_role', 'authenticated'));

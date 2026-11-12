@@ -61,8 +61,11 @@ function StoreFront() {
   const { pathname } = useLocation()
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
   useEffect(() => {
-    // Ne pas tracker les pages admin ni les bots
     if (pathname.startsWith('/admin')) return
+    // Dédupliquer par session : une seule entrée par chemin par onglet
+    const key = `pv:${pathname}`
+    if (sessionStorage.getItem(key)) return
+    sessionStorage.setItem(key, '1')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(supabase as any).from('page_views').insert({ path: pathname }).then(() => {})
   }, [pathname])
