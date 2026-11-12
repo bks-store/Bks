@@ -131,7 +131,7 @@ export default function ProductPage() {
                     style={{
                       width: 72, height: 90, padding: 0, border: 'none', cursor: 'pointer', borderRadius: 4,
                       outline: activeImg === i ? '2px solid var(--ink)' : '1px solid var(--line)',
-                      outlineOffset: 2, overflow: 'hidden', background: 'var(--surface-2)', flexShrink: 0,
+                      outlineOffset: 2, overflow: 'hidden', background: '#E9E0D2', flexShrink: 0,
                       transition: 'outline-color 0.15s',
                     }}
                     aria-label={`Vue ${i + 1}`}
