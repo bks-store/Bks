@@ -295,7 +295,7 @@ export default function ProductPage() {
             <div className="product__details">
               <details>
                 <summary>{t.product.delivery} &amp; {t.product.returns.toLowerCase()}</summary>
-                <p>{t.product.delivery} {t.product.deliverySub} · {t.product.returns} {t.product.returnsSub} · {t.product.authentic} : {t.product.authenticSub.toLowerCase()}.</p>
+                <p>{t.product.delivery} {t.product.deliverySub} · {t.product.returns} {t.product.returnsSub}.</p>
               </details>
             </div>
           </div>
