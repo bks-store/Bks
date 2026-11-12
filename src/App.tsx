@@ -63,7 +63,7 @@ function StoreFront() {
   useEffect(() => {
     if (pathname.startsWith('/admin')) return
     // Dédupliquer par session : une seule entrée par chemin par onglet
-    const key = `pv:${pathname}`
+    const key = `pv:session`
     if (sessionStorage.getItem(key)) return
     sessionStorage.setItem(key, '1')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
