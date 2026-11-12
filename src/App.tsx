@@ -62,10 +62,11 @@ function StoreFront() {
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
   useEffect(() => {
     if (pathname.startsWith('/admin')) return
-    // Dédupliquer par session : une seule entrée par chemin par onglet
-    const key = `pv:session`
-    if (sessionStorage.getItem(key)) return
-    sessionStorage.setItem(key, '1')
+    // Une seule visite par navigateur par jour
+    const today = new Date().toISOString().split('T')[0]
+    const key = `pv:${today}`
+    if (localStorage.getItem(key)) return
+    localStorage.setItem(key, '1')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(supabase as any).from('page_views').insert({ path: pathname }).then(() => {})
   }, [pathname])
