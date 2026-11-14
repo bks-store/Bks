@@ -17,6 +17,7 @@ import { UserAuthProvider } from './context/UserAuthContext'
 import { ToastProvider } from './context/ToastContext'
 import CookieBanner from './components/CookieBanner'
 import CartDrawer from './components/CartDrawer'
+import AnnouncementBar from './components/AnnouncementBar'
 
 // Pages secondaires — chargées en différé
 const BrandsPage = lazy(() => import('./pages/BrandsPage'))
@@ -73,6 +74,7 @@ function StoreFront() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <AnnouncementBar />
       <Header />
       <CookieBanner />
       <CartDrawer />

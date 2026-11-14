@@ -10,6 +10,8 @@ export default function ProductCard({ product, priority }: { product: Product; p
   const { formatPrice, formatEur, isEuro } = useCurrency()
   const img1 = productImage(product)
   const img2 = product.images[1] ?? null
+  const availableCount = product.sizes.filter(s => s.available).length
+  const isLowStock = availableCount > 0 && availableCount <= 2
 
   return (
     <Link to={`/produit/${product.slug ?? product.id}`} className="pcard">
@@ -33,6 +35,7 @@ export default function ProductCard({ product, priority }: { product: Product; p
         <div className="pcard__top">
           <span className="pcard__brand">{product.brand}</span>
           {product.isNew && <span className="pcard__flag">{t.product.new}</span>}
+          {isLowStock && <span className="pcard__flag" style={{ background: 'var(--accent)', color: '#fff' }}>Dernière taille</span>}
         </div>
         <h3 className="pcard__name">{product.name}</h3>
         <p className="pcard__price">

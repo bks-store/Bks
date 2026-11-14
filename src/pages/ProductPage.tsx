@@ -57,6 +57,7 @@ export default function ProductPage() {
 
   const similar = products.filter(p => p.id !== product.id && (p.brand === product.brand || p.category === product.category)).slice(0, 4)
   const availableSizes = product.sizes.filter(s => s.available)
+  const isLowStock = availableSizes.length > 0 && availableSizes.length <= 2
 
   const ogImage = productImage(product, 1200)
   const descFr = `${productTitle} — ${product.description || 'Sneakers disponibles chez BKS Dinan. Livraison France et international.'}`
@@ -241,6 +242,16 @@ export default function ProductPage() {
                 </p>
               )}
             </div>
+
+            {/* Urgence stock */}
+            {isLowStock && (
+              <p style={{
+                fontSize: '0.8125rem', fontWeight: 600, color: 'var(--accent)',
+                marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem',
+              }}>
+                🔥 Plus que {availableSizes.length} taille{availableSizes.length > 1 ? 's' : ''} disponible{availableSizes.length > 1 ? 's' : ''}
+              </p>
+            )}
 
             {/* Bouton ajouter */}
             <button
