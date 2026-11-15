@@ -74,7 +74,6 @@ function StoreFront() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <AnnouncementBar />
       <Header />
       <CookieBanner />
       <CartDrawer />
