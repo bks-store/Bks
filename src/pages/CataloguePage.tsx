@@ -76,25 +76,25 @@ export default function CataloguePage() {
   const scrollToGrid = () => gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   useEffect(() => {
+    const unlock = () => {
+      document.documentElement.style.overflow = ''
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+    }
     if (filtersOpen) {
       scrollPosRef.current = window.scrollY
+      document.documentElement.style.overflow = 'hidden'
       document.body.style.overflow = 'hidden'
       document.body.style.position = 'fixed'
       document.body.style.top = `-${scrollPosRef.current}px`
       document.body.style.width = '100%'
     } else {
-      document.body.style.overflow = ''
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.width = ''
-      window.scrollTo(0, scrollPosRef.current)
+      unlock()
+      requestAnimationFrame(() => window.scrollTo(0, scrollPosRef.current))
     }
-    return () => {
-      document.body.style.overflow = ''
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.width = ''
-    }
+    return unlock
   }, [filtersOpen])
 
   const toggle = <T,>(list: T[], setList: (v: T[]) => void, value: T) =>
