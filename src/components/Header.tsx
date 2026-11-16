@@ -8,7 +8,6 @@ import { useUserAuth } from '../context/UserAuthContext'
 
 import { IMAGES } from '../config/images'
 import { useContent } from '../context/ContentContext'
-
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -56,7 +55,7 @@ export default function Header() {
 
   const [bannerMain, ...bannerRest] = t.banner.split(' — ')
   const logo = (
-    <img src={IMAGES.logo.onDark} alt="BKS — Beau Kiosque de Soulier" width={1294} height={885} />
+    <img className="logo-noel" src={IMAGES.logo.noel} alt="BKS — Beau Kiosque de Soulier" width={313} height={240} />
   )
 
   return (

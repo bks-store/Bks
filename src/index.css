@@ -270,6 +270,7 @@ a:hover .media--zoom > img { transform: scale(1.03); }
 .site-header__left { display: flex; align-items: center; gap: 1rem; }
 .site-header__logo { display: flex; align-items: center; gap: 1rem; }
 .site-header__logo img { height: 40px; width: auto; }
+.site-header__logo img.logo-noel { height: 54px; }
 .site-header__logo--desktop { display: none; }
 .site-header__wordmark {
   display: none;
@@ -356,6 +357,7 @@ a:hover .media--zoom > img { transform: scale(1.03); }
   .burger, .site-header__logo--mobile { display: none; }
   .site-header__logo--desktop { display: flex; }
   .site-header__logo img { height: 50px; }
+  .site-header__logo img.logo-noel { height: 64px; }
   .site-header__nav { display: flex; gap: 2.75rem; }
   .lang-toggle--mobile { display: none; }
   .lang-toggle--desktop { display: flex; }

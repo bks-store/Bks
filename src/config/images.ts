@@ -8,6 +8,7 @@ export const IMAGES = {
     mark: '/images/brand/logo-bks-mark.png',
     monogram: '/images/brand/logo-bks-monogram.png',
     onDark: '/images/brand/logo-bks-3d-clean.png',
+    noel: '/images/brand/logo-bks-noel.webp',
   },
   hero: '/images/hero/hero-main.jpg',
   categories: {

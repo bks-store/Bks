@@ -17,6 +17,7 @@ import { UserAuthProvider } from './context/UserAuthContext'
 import { ToastProvider } from './context/ToastContext'
 import CookieBanner from './components/CookieBanner'
 import CartDrawer from './components/CartDrawer'
+import { ChristmasBar, SnowOverlay } from './components/ChristmasTheme'
 
 // Pages secondaires — chargées en différé
 const BrandsPage = lazy(() => import('./pages/BrandsPage'))
@@ -73,9 +74,11 @@ function StoreFront() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <ChristmasBar />
       <Header />
       <CookieBanner />
       <CartDrawer />
+      <SnowOverlay />
       <main className="flex-1">
         <div key={pathname} className="page-fade">
           <Suspense fallback={null}>
