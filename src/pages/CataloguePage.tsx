@@ -73,22 +73,15 @@ export default function CataloguePage() {
   const gridRef = useRef<HTMLDivElement>(null)
   const scrollPosRef = useRef(0)
 
-  const scrollToGrid = () => gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const scrollToGrid = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
   useEffect(() => {
-    const unlock = () => {
-      document.documentElement.style.overflow = ''
-      document.body.style.overflow = ''
-    }
-    if (filtersOpen) {
-      scrollPosRef.current = window.scrollY
-      document.documentElement.style.overflow = 'hidden'
-      document.body.style.overflow = 'hidden'
-    } else {
-      unlock()
+    if (!filtersOpen) {
       requestAnimationFrame(() => window.scrollTo(0, scrollPosRef.current))
+    } else {
+      scrollPosRef.current = window.scrollY
     }
-    return unlock
+    return undefined
   }, [filtersOpen])
 
   const toggle = <T,>(list: T[], setList: (v: T[]) => void, value: T) =>
