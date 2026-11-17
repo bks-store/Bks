@@ -227,6 +227,14 @@ export default function AdminDashboard() {
       <div>
         <p style={{fontSize:'0.5625rem', fontWeight:700, letterSpacing:'0.22em', textTransform:'uppercase', color:'var(--ink-faint)', marginBottom:'0.75rem'}}>
           Performance financière · 30 derniers jours
+          <span style={{fontWeight:400, letterSpacing:'0.05em', textTransform:'none', marginLeft:'0.5rem', opacity:0.7}}>
+            {(() => {
+              const now = new Date()
+              const from = new Date(now); from.setDate(now.getDate() - 29)
+              const fmt = (d: Date) => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+              return `${fmt(from)} – ${fmt(now)}`
+            })()}
+          </span>
         </p>
         <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:'0.75rem'}}>
 
