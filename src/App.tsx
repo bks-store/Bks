@@ -59,8 +59,16 @@ function NotFoundPage() {
 }
 
 function StoreFront() {
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  useEffect(() => {
+    if (typeof (window as any).gtag === 'function') {
+      ;(window as any).gtag('event', 'page_view', {
+        page_path: pathname + search,
+        page_title: document.title,
+      })
+    }
+  }, [pathname, search])
   useEffect(() => {
     if (pathname.startsWith('/admin')) return
     // Une seule visite par navigateur par jour
