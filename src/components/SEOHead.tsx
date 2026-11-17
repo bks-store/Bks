@@ -31,6 +31,8 @@ interface SEOProps {
   schema?: object | object[]
   // Empêcher l'indexation (admin, panier…)
   noIndex?: boolean
+  // Suffixe court — titre produit : "… — BKS Dinan" au lieu de "… — BKS — Sneakers & Streetwear"
+  compact?: boolean
 }
 
 export default function SEOHead({
@@ -43,14 +45,16 @@ export default function SEOHead({
   type = 'website',
   schema,
   noIndex = false,
+  compact = false,
 }: SEOProps) {
   const { locale } = useTranslation()
   const isFr = locale === 'fr'
 
   const rawTitle = isFr ? (titleFr ?? SITE_NAME_FULL) : (titleEn ?? SITE_NAME_FULL)
+  const suffix = compact ? 'BKS Dinan' : SITE_NAME_FULL
   const pageTitle = rawTitle === SITE_NAME_FULL
     ? rawTitle
-    : `${rawTitle} — ${SITE_NAME_FULL}`
+    : `${rawTitle} — ${suffix}`
 
   const description = isFr
     ? (descFr ?? DEFAULT_DESC.fr)
@@ -223,6 +227,7 @@ export const FAQ_SCHEMA = {
 
 export function buildProductSchema(product: {
   id: string
+  slug?: string
   name: string
   brand: string
   price: number
@@ -232,6 +237,9 @@ export function buildProductSchema(product: {
   sizes: { size: string; available: boolean }[]
 }) {
   const inStock = product.sizes.some(s => s.available)
+  const slug = (product as { slug?: string }).slug ?? product.id
+  const priceValidUntil = new Date(Date.now() + 90 * 86400000).toISOString().split('T')[0]
+
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -241,7 +249,8 @@ export function buildProductSchema(product: {
     image: product.images.map(img =>
       img.startsWith('http') ? img : `${SITE_URL}${img}`
     ),
-    url: `${SITE_URL}/produit/${(product as { slug?: string }).slug ?? product.id}`,
+    url: `${SITE_URL}/produit/${slug}`,
+    itemCondition: 'https://schema.org/NewCondition',
     offers: {
       '@type': 'Offer',
       price: product.price.toFixed(2),
@@ -249,8 +258,72 @@ export function buildProductSchema(product: {
       availability: inStock
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
-      seller: { '@type': 'Organization', name: 'BKS Dinan' },
-      priceValidUntil: new Date(Date.now() + 90 * 86400000).toISOString().split('T')[0],
+      itemCondition: 'https://schema.org/NewCondition',
+      seller: {
+        '@type': 'Organization',
+        name: 'BKS Dinan',
+        url: SITE_URL,
+      },
+      priceValidUntil,
+      shippingDetails: [
+        {
+          '@type': 'OfferShippingDetails',
+          shippingRate: { '@type': 'MonetaryAmount', value: '5.90', currency: 'EUR' },
+          shippingDestination: {
+            '@type': 'DefinedRegion',
+            addressCountry: 'FR',
+          },
+          deliveryTime: {
+            '@type': 'ShippingDeliveryTime',
+            handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+            transitTime: { '@type': 'QuantitativeValue', minValue: 3, maxValue: 6, unitCode: 'DAY' },
+          },
+        },
+        {
+          '@type': 'OfferShippingDetails',
+          shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'EUR' },
+          shippingDestination: {
+            '@type': 'DefinedRegion',
+            addressCountry: 'FR',
+          },
+          deliveryTime: {
+            '@type': 'ShippingDeliveryTime',
+            handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+            transitTime: { '@type': 'QuantitativeValue', minValue: 3, maxValue: 6, unitCode: 'DAY' },
+          },
+          name: 'Livraison offerte dès 150 €',
+        },
+      ],
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'FR',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 30,
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+      },
+      ...(product.originalPrice && product.originalPrice > product.price ? {
+        priceSpecification: {
+          '@type': 'UnitPriceSpecification',
+          price: product.price.toFixed(2),
+          priceCurrency: 'EUR',
+          priceType: 'https://schema.org/SalePrice',
+          referenceQuantity: { '@type': 'QuantitativeValue', value: 1 },
+        },
+      } : {}),
     },
+  }
+}
+
+export function buildBreadcrumbSchema(items: { name: string; url: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: item.name,
+      item: item.url,
+    })),
   }
 }

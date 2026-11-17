@@ -9,7 +9,7 @@ import SmartImage from '../components/SmartImage'
 import { productImage } from '../config/images'
 import { useCurrency } from '../context/CurrencyContext'
 import { useTranslation } from '../i18n/useTranslation'
-import SEOHead, { buildProductSchema, SITE_URL } from '../components/SEOHead'
+import SEOHead, { buildProductSchema, buildBreadcrumbSchema, SITE_URL } from '../components/SEOHead'
 
 export default function ProductPage() {
   const { id: slugOrId } = useParams()
@@ -60,8 +60,26 @@ export default function ProductPage() {
   const isLowStock = availableSizes.length > 0 && availableSizes.length <= 2
 
   const ogImage = productImage(product, 1200)
-  const descFr = `${productTitle} — ${product.description || 'Sneakers disponibles chez BKS Dinan. Livraison France et international.'}`
-  const descEn = `${productTitle} — ${product.description || 'Sneakers available at BKS Dinan. Shipping France and worldwide.'}`
+
+  const availSizeList = availableSizes.map(s => s.size).join(', ')
+  const priceStr = product.price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+  const descFr = availSizeList
+    ? `${productTitle} — ${priceStr}. Tailles disponibles : ${availSizeList}. Boutique BKS à Dinan, Bretagne. Livraison DHL France & Europe.`
+    : `${productTitle} — ${priceStr}. ${product.description || 'Boutique BKS à Dinan, Bretagne. Livraison DHL France & Europe.'}`
+  const descEn = availSizeList
+    ? `${productTitle} — ${priceStr}. Available sizes: ${availSizeList}. BKS store in Dinan, Brittany. DHL shipping France & Europe.`
+    : `${productTitle} — ${priceStr}. ${product.description || 'BKS store in Dinan, Brittany. DHL shipping France & Europe.'}`
+
+  const categoryLabel = product.category === 'sneakers' ? 'Sneakers'
+    : product.category === 'streetwear' ? 'Streetwear' : 'Accessoires'
+
+  const breadcrumb = buildBreadcrumbSchema([
+    { name: 'Accueil', url: 'https://www.bks-store.com/' },
+    { name: categoryLabel, url: `https://www.bks-store.com/catalogue` },
+    { name: productTitle, url: `https://www.bks-store.com/produit/${product.slug ?? product.id}` },
+  ])
+
+  const productImages = product.images.length ? product.images : ogImage ? [ogImage] : []
 
   return (
     <>
@@ -73,7 +91,8 @@ export default function ProductPage() {
         descEn={descEn}
         image={ogImage?.startsWith('http') ? ogImage : ogImage ? `${SITE_URL}${ogImage}` : undefined}
         type="product"
-        schema={buildProductSchema({ ...product, images: product.images.length ? product.images : ogImage ? [ogImage] : [] })}
+        compact
+        schema={[buildProductSchema({ ...product, images: productImages }), breadcrumb]}
       />
       <div className="container">
         <div style={{ paddingTop: '2rem' }}>
