@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import SEOHead from '../components/SEOHead'
 import { useProducts } from '../context/ProductsContext'
+import { useTranslation } from '../i18n/useTranslation'
 
 const BRAND_ORDER = ['Nike', 'Jordan', 'New Balance', 'Adidas', 'Asics', 'Ugg', 'Timberland', 'Autry', 'On', 'Salomon', 'Saucony', 'Yeezy']
 
@@ -27,6 +28,7 @@ const BRAND_LOGOS: Record<string, string> = {
 
 export default function BrandsPage() {
   const { products } = useProducts()
+  const { t } = useTranslation()
 
   // Comptage par marque
   const brandCounts = products.reduce<Record<string, number>>((acc, p) => {
@@ -53,20 +55,20 @@ export default function BrandsPage() {
 
       <header className="page-head">
         <nav className="crumbs" aria-label="Fil d'Ariane">
-          <Link to="/">Accueil</Link><span>/</span><span aria-current="page">Marques</span>
+          <Link to="/">{t.nav.home}</Link><span>/</span><span aria-current="page">{t.brands.title}</span>
         </nav>
-        <h1 className="display h-lg">Marques</h1>
+        <h1 className="display h-lg">{t.brands.title}</h1>
         <p className="lead" style={{ color: 'var(--ink-soft)', marginTop: '0.5rem' }}>
-          {sorted.length} marques disponibles
+          {sorted.length} {t.brands.available}
         </p>
       </header>
 
       <div className="brands-grid">
         {/* Carte "Tout" */}
-        <Link to="/catalogue" className="brand-card brand-card--all" data-brand="Tout">
+        <Link to="/catalogue" className="brand-card brand-card--all" data-brand={t.brands.all}>
           <div className="brand-card__inner">
-            <span className="brand-card__name">Tout</span>
-            <span className="brand-card__count">{products.length} modèle{products.length !== 1 ? 's' : ''}</span>
+            <span className="brand-card__name">{t.brands.all}</span>
+            <span className="brand-card__count">{products.length} {products.length !== 1 ? t.brands.models : t.brands.model}</span>
             <ArrowRight size={14} strokeWidth={1.5} className="brand-card__arrow" />
           </div>
         </Link>
@@ -91,7 +93,7 @@ export default function BrandsPage() {
               )}
               <div className="brand-card__inner">
                 <span className="brand-card__name">{brand}</span>
-                <span className="brand-card__count">{count} modèle{count !== 1 ? 's' : ''}</span>
+                <span className="brand-card__count">{count} {count !== 1 ? t.brands.models : t.brands.model}</span>
                 <ArrowRight size={14} strokeWidth={1.5} className="brand-card__arrow" />
               </div>
             </Link>

@@ -57,7 +57,7 @@ export default function AboutPage() {
             paddingRight: 'clamp(0px, 4vw, 3rem)',
           }}>
             <nav className="crumbs" style={{ marginBottom: '2rem', opacity: 0.5 }} aria-label="Fil d'Ariane">
-              <Link to="/" style={{ color: 'var(--bks-creme)' }}>Accueil</Link>
+              <Link to="/" style={{ color: 'var(--bks-creme)' }}>{t.nav.home}</Link>
               <span style={{ margin: '0 0.5rem' }}>/</span>
               <span aria-current="page" style={{ color: 'var(--bks-creme)' }}>{t.footer.about}</span>
             </nav>
@@ -74,14 +74,14 @@ export default function AboutPage() {
               maxWidth: '32rem',
               marginBottom: '2.5rem',
             }}>
-              Une boutique indépendante née d'une passion. Chaque paire, choisie à la main par Damien.
+              {t.about.subtitle}
             </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8125rem', color: 'rgba(244,239,230,0.5)' }}>
                 <MapPin size={13} strokeWidth={1.5} /> 3 rue de la Chaux, Dinan
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8125rem', color: 'rgba(244,239,230,0.5)' }}>
-                <Clock size={13} strokeWidth={1.5} /> Lun–Sam
+                <Clock size={13} strokeWidth={1.5} /> {t.about.shortHours}
               </span>
             </div>
           </div>
@@ -112,13 +112,13 @@ export default function AboutPage() {
       <section className="section bg-surface-2">
         <div className="container split">
           <div className="prose-bks split__main">
-            <p>BKS — <em>Beau Kiosque de Soulier</em> — est une boutique indépendante de sneakers et de chaussures rares, fondée à Dinan par Damien.</p>
-            <p>Tout commence au début des années 2000 : Damien, une dizaine d'années, regarde un clip de 50 Cent à la télé. Des Air Force 1 aux pieds. C'est le déclic. Depuis, la passion pour les chaussures ne l'a plus quitté.</p>
-            <p>Après des années en Angleterre dans le commerce international, il s'installe à Dinan en 2021. Au printemps 2026, il décide de concrétiser son projet : « Le style de chaussures que j'achète, on les trouve que chez les indépendants, à Rennes ou à Saint-Brieuc. Je me suis dit qu'il fallait faire quelque chose ici. »</p>
-            <p>Résultat : un espace chaleureux, une dominance de bois, une touche américaine. À l'entrée, le maillot de Kobe Bryant. Dans les rayons, des Jordan, des Air Max, des UGG — des paires qu'on ne trouve pas ailleurs.</p>
+            <p>{t.about.storyP1}</p>
+            <p>{t.about.storyP2}</p>
+            <p>{t.about.storyP3}</p>
+            <p>{t.about.storyP4}</p>
             <blockquote className="brand__quote" style={{ borderColor: 'var(--accent)', marginTop: '2rem' }}>
-              <p style={{ color: 'var(--ink)' }}>« On essaye de proposer la perle rare. Je choisis chaque modèle, un par un. »</p>
-              <footer style={{ color: 'var(--ink-soft)' }}>Damien, fondateur</footer>
+              <p style={{ color: 'var(--ink)' }}>{t.about.storyQuote}</p>
+              <footer style={{ color: 'var(--ink-soft)' }}>{t.about.storyAuthor}</footer>
             </blockquote>
           </div>
 
@@ -170,7 +170,7 @@ export default function AboutPage() {
             <div className="section-head">
               <div>
                 <p className="eyebrow">3 rue de la Chaux, Dinan</p>
-                <h2 className="display h-lg">La boutique <em>en images</em></h2>
+                <h2 className="display h-lg">{t.about.galleryTitle} <em>{t.about.galleryTitleEm}</em></h2>
               </div>
             </div>
             <div className="gallery">

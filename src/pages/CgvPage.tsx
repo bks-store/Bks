@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
 import SEOHead from '../components/SEOHead'
+import { useTranslation } from '../i18n/useTranslation'
 
 export default function CgvPage() {
+  const { t } = useTranslation()
   return (
     <div className="container">
       <SEOHead
@@ -12,7 +14,7 @@ export default function CgvPage() {
       />
       <header className="page-head">
         <nav className="crumbs" aria-label="Fil d'Ariane">
-          <Link to="/">Accueil</Link><span>/</span><span aria-current="page">Conditions générales de vente</span>
+          <Link to="/">{t.nav.home}</Link><span>/</span><span aria-current="page">{t.footer.cgv}</span>
         </nav>
         <h1 className="display h-xl">Conditions générales de vente</h1>
         <p style={{ color: 'var(--ink-soft)', marginTop: '0.5rem' }}>En vigueur au 8 novembre 2026</p>

@@ -232,6 +232,11 @@ export const translations = {
     // Marques (bandeau homepage)
     brands: {
       eyebrow: 'Nos marques',
+      title: 'Marques',
+      available: 'marques disponibles',
+      all: 'Tout',
+      model: 'modèle',
+      models: 'modèles',
     },
     // Commande confirmée
     orderConfirmed: {
@@ -254,6 +259,16 @@ export const translations = {
     about: {
       title1: "L'histoire de",
       title2: 'BKS',
+      subtitle: "Une boutique indépendante née d'une passion. Chaque paire, choisie à la main par Damien.",
+      shortHours: 'Lun–Sam',
+      galleryTitle: 'La boutique',
+      galleryTitleEm: 'en images',
+      storyP1: 'BKS — Beau Kiosque de Soulier — est une boutique indépendante de sneakers et de chaussures rares, fondée à Dinan par Damien.',
+      storyP2: "Tout commence au début des années 2000 : Damien, une dizaine d'années, regarde un clip de 50 Cent à la télé. Des Air Force 1 aux pieds. C'est le déclic. Depuis, la passion pour les chaussures ne l'a plus quitté.",
+      storyP3: "Après des années en Angleterre dans le commerce international, il s'installe à Dinan en 2021. Au printemps 2026, il décide de concrétiser son projet : « Le style de chaussures que j'achète, on les trouve que chez les indépendants, à Rennes ou à Saint-Brieuc. Je me suis dit qu'il fallait faire quelque chose ici. »",
+      storyP4: "Résultat : un espace chaleureux, une dominance de bois, une touche américaine. À l'entrée, le maillot de Kobe Bryant. Dans les rayons, des Jordan, des Air Max, des UGG — des paires qu'on ne trouve pas ailleurs.",
+      storyQuote: '« On essaye de proposer la perle rare. Je choisis chaque modèle, un par un. »',
+      storyAuthor: 'Damien, fondateur',
       address: 'Adresse',
       hours: 'Horaires',
       social: 'Réseaux sociaux',
@@ -694,6 +709,11 @@ export const translations = {
     },
     brands: {
       eyebrow: 'Our brands',
+      title: 'Brands',
+      available: 'brands available',
+      all: 'All',
+      model: 'style',
+      models: 'styles',
     },
     orderConfirmed: {
       loading: 'Verifying payment…',
@@ -735,6 +755,16 @@ export const translations = {
     about: {
       title1: 'The story of',
       title2: 'BKS',
+      subtitle: 'An independent shop born from a passion. Every pair, hand-picked by Damien.',
+      shortHours: 'Mon–Sat',
+      galleryTitle: 'The shop',
+      galleryTitleEm: 'in pictures',
+      storyP1: 'BKS — Beau Kiosque de Soulier — is an independent sneaker and rare shoe boutique, founded in Dinan by Damien.',
+      storyP2: "It all started in the early 2000s: Damien, around ten years old, watches a 50 Cent music video on TV. Air Force 1s on his feet. That was the spark. His passion for shoes never left him.",
+      storyP3: "After years in England working in international trade, he settled in Dinan in 2021. In spring 2026, he decided to bring his project to life: \"The kind of shoes I buy, you only find them at independents, in Rennes or Saint-Brieuc. I told myself someone needed to do something here.\"",
+      storyP4: "The result: a warm space, wood everywhere, an American touch. At the entrance, a Kobe Bryant jersey. On the shelves, Jordans, Air Maxes, UGGs — pairs you won't find anywhere else.",
+      storyQuote: '"We try to offer the rare find. I pick every model, one by one."',
+      storyAuthor: 'Damien, founder',
       address: 'Address',
       hours: 'Opening hours',
       social: 'Social media',

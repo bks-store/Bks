@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
 import SEOHead from '../components/SEOHead'
+import { useTranslation } from '../i18n/useTranslation'
 
 export default function MentionsLegalesPage() {
+  const { t } = useTranslation()
   return (
     <div className="container">
       <SEOHead
@@ -12,7 +14,7 @@ export default function MentionsLegalesPage() {
       />
       <header className="page-head">
         <nav className="crumbs" aria-label="Fil d'Ariane">
-          <Link to="/">Accueil</Link><span>/</span><span aria-current="page">Mentions légales</span>
+          <Link to="/">{t.nav.home}</Link><span>/</span><span aria-current="page">{t.mentions.title}</span>
         </nav>
         <h1 className="display h-xl">Mentions légales</h1>
       </header>

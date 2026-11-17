@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
 import SEOHead from '../components/SEOHead'
+import { useTranslation } from '../i18n/useTranslation'
 
 export default function ConfidentialitePage() {
+  const { t } = useTranslation()
   return (
     <div className="container">
       <SEOHead
@@ -12,7 +14,7 @@ export default function ConfidentialitePage() {
       />
       <header className="page-head">
         <nav className="crumbs" aria-label="Fil d'Ariane">
-          <Link to="/">Accueil</Link><span>/</span><span aria-current="page">Politique de confidentialité</span>
+          <Link to="/">{t.nav.home}</Link><span>/</span><span aria-current="page">{t.footer.privacy}</span>
         </nav>
         <h1 className="display h-xl">Politique de confidentialité</h1>
         <p style={{ color: 'var(--ink-soft)', marginTop: '0.5rem' }}>Conformément au RGPD (Règlement UE 2016/679) — en vigueur au 1er janvier 2026</p>
