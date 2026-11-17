@@ -1,14 +1,16 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createClient } from '@supabase/supabase-js'
 
-const SITE = 'https://bks-store.com'
+const SITE = 'https://www.bks-store.com'
 
 const STATIC_URLS = [
   { loc: '/', priority: '1.0', changefreq: 'weekly' },
   { loc: '/catalogue', priority: '0.9', changefreq: 'daily' },
+  { loc: '/marques', priority: '0.8', changefreq: 'weekly' },
   { loc: '/a-propos', priority: '0.6', changefreq: 'monthly' },
   { loc: '/contact', priority: '0.5', changefreq: 'monthly' },
-  { loc: '/livraison', priority: '0.4', changefreq: 'monthly' },
+  { loc: '/livraison', priority: '0.5', changefreq: 'monthly' },
+  { loc: '/cgv', priority: '0.3', changefreq: 'monthly' },
 ]
 
 export default async function handler(_req: VercelRequest, res: VercelResponse) {
@@ -34,17 +36,18 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
     <lastmod>${now}</lastmod>
   </url>`).join('')
 
-  const productEntries = (products ?? []).map((p: any) => {
-    const slug = p.slug ?? p.id
-    const lastmod = p.updated_at ? p.updated_at.split('T')[0] : now
-    return `
+  const productEntries = (products ?? [])
+    .filter((p: any) => p.slug) // exclure les produits sans slug (URL UUID rejetée)
+    .map((p: any) => {
+      const lastmod = p.updated_at ? p.updated_at.split('T')[0] : now
+      return `
   <url>
-    <loc>${SITE}/produit/${slug}</loc>
+    <loc>${SITE}/produit/${p.slug}</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <lastmod>${lastmod}</lastmod>
   </url>`
-  }).join('')
+    }).join('')
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
