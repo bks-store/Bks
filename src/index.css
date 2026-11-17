@@ -336,6 +336,26 @@ a:hover .media--zoom > img { transform: scale(1.03); }
 .lang-toggle__sep { opacity: 0.3; font-weight: 400; }
 .lang-toggle--desktop { display: none; }
 .lang-toggle--mobile { display: flex; }
+
+/* Sélecteur de devise */
+.currency-select {
+  appearance: none;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--ff-body);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--ink-soft);
+  padding: 0.35rem 0.4rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.currency-select:hover { color: var(--ink); }
+.currency-select option { background: var(--surface); color: var(--ink); }
+.currency-select--mobile { display: inline-block; }
+
 .icon-btn {
   position: relative;
   width: 44px; height: 44px;
@@ -361,6 +381,7 @@ a:hover .media--zoom > img { transform: scale(1.03); }
   .site-header__nav { display: flex; gap: 2.75rem; }
   .lang-toggle--mobile { display: none; }
   .lang-toggle--desktop { display: flex; }
+  .currency-select--mobile { display: none; }
 }
 @media (min-width: 1280px) { .site-header__wordmark { display: block; } }
 

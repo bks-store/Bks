@@ -5,6 +5,7 @@ import InstagramIcon from './InstagramIcon'
 import { useCart } from '../context/CartContext'
 import { useTranslation } from '../i18n/useTranslation'
 import { useUserAuth } from '../context/UserAuthContext'
+import { useCurrency, SUPPORTED_CURRENCIES, type SupportedCurrency } from '../context/CurrencyContext'
 
 import { IMAGES } from '../config/images'
 import { useContent } from '../context/ContentContext'
@@ -19,6 +20,7 @@ export default function Header() {
   const { t, locale, setLocale } = useTranslation()
   const { visibleRubriques } = useContent()
   const { user } = useUserAuth()
+  const { currency, setManualCurrency } = useCurrency()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
@@ -82,6 +84,16 @@ export default function Header() {
               <span className="lang-toggle__sep">|</span>
               <span className={locale === 'en' ? 'is-active' : ''}>EN</span>
             </button>
+            <select
+              className="currency-select currency-select--mobile"
+              value={currency}
+              onChange={e => setManualCurrency(e.target.value as SupportedCurrency)}
+              aria-label="Devise"
+            >
+              {SUPPORTED_CURRENCIES.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
             <Link to="/" className="site-header__logo site-header__logo--desktop">
               {logo}
               <span className="site-header__wordmark">Beau Kiosque<br />de Soulier</span>
@@ -108,6 +120,16 @@ export default function Header() {
               <span className="lang-toggle__sep">|</span>
               <span className={locale === 'en' ? 'is-active' : ''}>EN</span>
             </button>
+            <select
+              className="currency-select"
+              value={currency}
+              onChange={e => setManualCurrency(e.target.value as SupportedCurrency)}
+              aria-label="Devise"
+            >
+              {SUPPORTED_CURRENCIES.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
             <button className="icon-btn" onClick={() => setSearchOpen(o => !o)} aria-label="Recherche" aria-expanded={searchOpen}>
               {searchOpen ? <X size={20} strokeWidth={1.4} /> : <Search size={20} strokeWidth={1.4} />}
             </button>

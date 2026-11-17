@@ -1,45 +1,24 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 
-// Pays → devise (tout ce qui n'est pas listé → EUR)
-const COUNTRY_TO_CURRENCY: Record<string, string> = {
-  GB: 'GBP',
-  CH: 'CHF',
-  SE: 'SEK',
-  DK: 'DKK',
-  NO: 'NOK',
-  PL: 'PLN',
-  CZ: 'CZK',
-  HU: 'HUF',
-  RO: 'RON',
-  IS: 'ISK',
-}
+export const SUPPORTED_CURRENCIES = ['EUR', 'GBP', 'CHF', 'USD', 'CAD'] as const
+export type SupportedCurrency = typeof SUPPORTED_CURRENCIES[number]
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
-  EUR: '€',
-  GBP: '£',
-  CHF: 'CHF',
-  SEK: 'kr',
-  DKK: 'kr',
-  NOK: 'kr',
-  PLN: 'zł',
-  CZK: 'Kč',
-  HUF: 'Ft',
-  RON: 'lei',
-  ISK: 'kr',
+  EUR: '€', GBP: '£', CHF: 'CHF', USD: '$', CAD: 'CA$',
 }
 
-function detectCurrency(): string {
-  const lang = navigator.language || 'fr-FR'
-  const country = lang.split('-')[1]?.toUpperCase() ?? ''
-  return COUNTRY_TO_CURRENCY[country] ?? 'EUR'
+const FALLBACK_RATES: Record<string, number> = {
+  GBP: 0.84, CHF: 0.95, USD: 1.08, CAD: 1.47,
 }
 
-function formatAmount(amount: number, currency: string): string {
+const MANUAL_KEY = 'bks-currency-manual'
+
+function formatAmount(amount: number, currency: string, locale: string): string {
   try {
-    return new Intl.NumberFormat(navigator.language || 'fr-FR', {
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
       currency,
-      maximumFractionDigits: currency === 'HUF' || currency === 'ISK' ? 0 : 2,
+      maximumFractionDigits: 2,
     }).format(amount)
   } catch {
     return `${CURRENCY_SYMBOLS[currency] ?? currency} ${amount.toFixed(2)}`
@@ -50,59 +29,98 @@ interface CurrencyContextType {
   currency: string
   rate: number
   isEuro: boolean
+  loading: boolean
   formatPrice: (eurAmount: number) => string
   formatEur: (eurAmount: number) => string
+  setManualCurrency: (currency: SupportedCurrency | null) => void
 }
 
 const CurrencyContext = createContext<CurrencyContextType>({
   currency: 'EUR',
   rate: 1,
   isEuro: true,
+  loading: false,
   formatPrice: (n) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }),
   formatEur:   (n) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }),
+  setManualCurrency: () => {},
 })
 
-const CACHE_KEY = 'bks_fx_rates'
-const CACHE_TTL = 24 * 60 * 60 * 1000 // 24h
-
-// Taux de secours si l'API est indisponible (mis à jour manuellement si besoin)
-const FALLBACK_RATES: Record<string, number> = {
-  GBP: 0.84, CHF: 0.94, SEK: 11.5, DKK: 7.46, NOK: 11.8,
-  PLN: 4.27, CZK: 25.2, HUF: 405, RON: 4.97, ISK: 150,
-}
-
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [currency] = useState<string>(detectCurrency)
-  const [rate, setRate] = useState(() => FALLBACK_RATES[detectCurrency()] ?? 1)
+  const [currency, setCurrency] = useState<string>('EUR')
+  const [rate, setRate] = useState<number>(1)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (currency === 'EUR') return
-
-    // Check localStorage cache
+    // Choix manuel sauvegardé → on l'applique directement sans appel API
     try {
-      const cached = localStorage.getItem(CACHE_KEY)
-      if (cached) {
-        const { ts, rates } = JSON.parse(cached)
-        if (Date.now() - ts < CACHE_TTL && rates[currency]) {
-          setRate(rates[currency])
-          return
-        }
+      const saved = localStorage.getItem(MANUAL_KEY) as SupportedCurrency | null
+      if (saved && SUPPORTED_CURRENCIES.includes(saved)) {
+        setCurrency(saved)
+        setRate(FALLBACK_RATES[saved] ?? 1)
+        // On récupère quand même les taux à jour en arrière-plan
+        fetch('/api/currency')
+          .then(r => r.json())
+          .then((data: { rates: Record<string, number> }) => {
+            if (data?.rates?.[saved]) setRate(data.rates[saved])
+          })
+          .catch(() => {})
+        setLoading(false)
+        return
       }
     } catch { /* ignore */ }
 
-    // Fetch from frankfurter.app (ECB rates, free, no key)
-    fetch(`https://api.frankfurter.app/latest?from=EUR&to=${Object.keys(COUNTRY_TO_CURRENCY).map(c => COUNTRY_TO_CURRENCY[c]).join(',')}`)
+    // Détection par IP via l'API serverless
+    fetch('/api/currency')
       .then(r => r.json())
-      .then(data => {
-        if (data?.rates) {
-          try {
-            localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), rates: data.rates }))
-          } catch { /* ignore */ }
-          if (data.rates[currency]) setRate(data.rates[currency])
+      .then((data: { currency: string; rate: number }) => {
+        if (data?.currency && data?.rate) {
+          setCurrency(data.currency)
+          setRate(data.rate)
         }
       })
-      .catch(() => { /* fallback: taux hardcodés déjà initialisés */ })
-  }, [currency])
+      .catch(() => {
+        // Fallback : EUR sans taux (rate = 1)
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
+  const setManualCurrency = (c: SupportedCurrency | null) => {
+    try {
+      if (c === null) {
+        localStorage.removeItem(MANUAL_KEY)
+      } else {
+        localStorage.setItem(MANUAL_KEY, c)
+      }
+    } catch { /* ignore */ }
+
+    if (c === null) {
+      // Réinitialiser à EUR + relancer détection IP
+      setCurrency('EUR')
+      setRate(1)
+      setLoading(true)
+      fetch('/api/currency')
+        .then(r => r.json())
+        .then((data: { currency: string; rate: number }) => {
+          if (data?.currency && data?.rate) {
+            setCurrency(data.currency)
+            setRate(data.rate)
+          }
+        })
+        .catch(() => {})
+        .finally(() => setLoading(false))
+    } else {
+      setCurrency(c)
+      setRate(FALLBACK_RATES[c] ?? 1)
+      fetch('/api/currency')
+        .then(r => r.json())
+        .then((data: { rates: Record<string, number> }) => {
+          if (data?.rates?.[c]) setRate(data.rates[c])
+        })
+        .catch(() => {})
+    }
+  }
+
+  const locale = typeof navigator !== 'undefined' ? (navigator.language || 'fr-FR') : 'fr-FR'
 
   const formatEur = (eurAmount: number) =>
     eurAmount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
@@ -110,10 +128,10 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   const formatPrice = (eurAmount: number) =>
     currency === 'EUR'
       ? formatEur(eurAmount)
-      : formatAmount(eurAmount * rate, currency)
+      : formatAmount(eurAmount * rate, currency, locale)
 
   return (
-    <CurrencyContext.Provider value={{ currency, rate, isEuro: currency === 'EUR', formatPrice, formatEur }}>
+    <CurrencyContext.Provider value={{ currency, rate, isEuro: currency === 'EUR', loading, formatPrice, formatEur, setManualCurrency }}>
       {children}
     </CurrencyContext.Provider>
   )
