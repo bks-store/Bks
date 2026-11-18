@@ -52,6 +52,15 @@ function optimizeUrl(url: string, width = 600): string {
   return url
 }
 
+// Same proxy, with the black studio background made transparent server-side
+export function cutoutImage(url: string | undefined, width = 600): string | undefined {
+  if (!url) return undefined
+  if (url.includes('supabase.co/storage')) {
+    return `/api/img?url=${encodeURIComponent(url)}&w=${width}&bg=cut`
+  }
+  return url
+}
+
 export function productImage(product: Pick<Product, 'id' | 'images'>, width = 600): string | undefined {
   const raw = product.images[0] ?? IMAGES.products[product.id]
   return raw ? optimizeUrl(raw, width) : undefined

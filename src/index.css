@@ -207,12 +207,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
   object-position: center 20%;
 }
-/* Photos produit : contain + filtre fond blanc (supprime fond studio noir GS) */
+/* Photos produit : le fond noir GS est détouré par /api/img?bg=cut */
 .pcard__media > img,
 .product__media > img {
   object-fit: contain;
   object-position: center;
-  filter: url(#bg-white);
 }
 /* Fond studio : la chaussure est posée sur une lumière douce crème */
 .pcard__media,

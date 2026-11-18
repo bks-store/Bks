@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { Product } from '../data/products'
-import { productImage } from '../config/images'
+import { IMAGES, cutoutImage } from '../config/images'
 import { useTranslation } from '../i18n/useTranslation'
 import SmartImage from './SmartImage'
 import { useCurrency } from '../context/CurrencyContext'
@@ -8,8 +8,8 @@ import { useCurrency } from '../context/CurrencyContext'
 export default function ProductCard({ product, priority }: { product: Product; priority?: boolean }) {
   const { t } = useTranslation()
   const { formatPrice, formatEur, isEuro } = useCurrency()
-  const img1 = productImage(product)
-  const img2 = product.images[1] ?? null
+  const img1 = cutoutImage(product.images[0] ?? IMAGES.products[product.id])
+  const img2 = cutoutImage(product.images[1]) ?? null
   const availableCount = product.sizes.filter(s => s.available).length
   const isLowStock = availableCount > 0 && availableCount <= 2
 

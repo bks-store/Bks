@@ -6,7 +6,7 @@ import { useCart } from '../context/CartContext'
 import { useToast } from '../context/ToastContext'
 import ProductCard from '../components/ProductCard'
 import SmartImage from '../components/SmartImage'
-import { productImage } from '../config/images'
+import { productImage, cutoutImage } from '../config/images'
 import { useCurrency } from '../context/CurrencyContext'
 import { useTranslation } from '../i18n/useTranslation'
 import SEOHead, { buildProductSchema, buildBreadcrumbSchema, SITE_URL } from '../components/SEOHead'
@@ -113,7 +113,7 @@ export default function ProductPage() {
             <div style={{ position: 'relative' }}>
               <div className="product__media media">
                 <SmartImage
-                  src={product.images[activeImg] ?? productImage(product, 1200) ?? undefined}
+                  src={cutoutImage(product.images[activeImg], 1000) ?? productImage(product, 1200) ?? undefined}
                   alt={`${product.brand} ${product.name}`}
                   loading="eager"
                   imgWidth={1000}
@@ -157,7 +157,7 @@ export default function ProductPage() {
                     aria-label={`Vue ${i + 1}`}
                   >
                     <img
-                      src={img}
+                      src={cutoutImage(img, 200)}
                       alt=""
                       style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', mixBlendMode: 'multiply' }}
                     />
