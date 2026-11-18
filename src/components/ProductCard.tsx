@@ -34,8 +34,10 @@ export default function ProductCard({ product, priority }: { product: Product; p
       <div className="pcard__info">
         <div className="pcard__top">
           <span className="pcard__brand">{product.brand}</span>
-          {product.isNew && <span className="pcard__flag">{t.product.new}</span>}
-          {isLowStock && <span className="pcard__flag" style={{ background: 'var(--accent)', color: '#fff' }}>Dernière taille</span>}
+          {isLowStock
+            ? <span className="pcard__flag" style={{ background: 'var(--accent)', color: '#fff' }}>Dernière taille</span>
+            : product.isNew && <span className="pcard__flag">{t.product.new}</span>
+          }
         </div>
         <h3 className="pcard__name">{product.name}</h3>
         <p className="pcard__price">
