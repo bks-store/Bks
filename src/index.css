@@ -1343,6 +1343,17 @@ textarea.a-input { resize: vertical; line-height: 1.55; }
 }
 .pcard:hover .pcard__media-alt { opacity: 1; }
 
+/* ── Faux effet 3D : la chaussure s'incline vers la souris / suit le doigt ─────── */
+.tilt > img,
+a:hover .tilt.media--zoom > img {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  scale: calc(1 + var(--tilt-on, 0) * 0.05);
+  filter: drop-shadow(0 16px 14px rgba(57, 34, 22, calc(var(--tilt-on, 0) * 0.2)));
+  transition: scale .45s var(--ease), filter .45s var(--ease), opacity .35s ease;
+  will-change: transform;
+}
+.tilt--touch { touch-action: pan-y; }
+
 /* ── Page fade transition ────────────────────────────────────────────────────── */
 @keyframes page-fade {
   from { opacity: 0; transform: translateY(6px); }

@@ -3,6 +3,7 @@ import type { Product } from '../data/products'
 import { IMAGES, cutoutImage } from '../config/images'
 import { useTranslation } from '../i18n/useTranslation'
 import SmartImage from './SmartImage'
+import { useTilt } from '../hooks/useTilt'
 import { useCurrency } from '../context/CurrencyContext'
 
 export default function ProductCard({ product, priority }: { product: Product; priority?: boolean }) {
@@ -12,10 +13,11 @@ export default function ProductCard({ product, priority }: { product: Product; p
   const img2 = cutoutImage(product.images[1]) ?? null
   const availableCount = product.sizes.filter(s => s.available).length
   const isLowStock = availableCount > 0 && availableCount <= 2
+  const tiltRef = useTilt<HTMLDivElement>()
 
   return (
     <Link to={`/produit/${product.slug ?? product.id}`} className="pcard">
-      <div className="media media--zoom pcard__media">
+      <div ref={tiltRef} className="media media--zoom pcard__media tilt">
         <SmartImage
           src={img1}
           alt={`${product.brand} ${product.name}`}

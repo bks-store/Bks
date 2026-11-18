@@ -9,6 +9,7 @@ import SmartImage from '../components/SmartImage'
 import { productImage, cutoutImage } from '../config/images'
 import { useCurrency } from '../context/CurrencyContext'
 import { useTranslation } from '../i18n/useTranslation'
+import { useTilt } from '../hooks/useTilt'
 import SEOHead, { buildProductSchema, buildBreadcrumbSchema, SITE_URL } from '../components/SEOHead'
 
 export default function ProductPage() {
@@ -24,6 +25,7 @@ export default function ProductPage() {
   const [added, setAdded] = useState(false)
   const [sizeError, setSizeError] = useState(false)
   const [activeImg, setActiveImg] = useState(0)
+  const tiltRef = useTilt<HTMLDivElement>({ touch: true })
   const { formatPrice: fmtPrice, formatEur, isEuro } = useCurrency()
 
   if (loading) {
@@ -111,7 +113,7 @@ export default function ProductPage() {
           {/* Galerie photos */}
           <div className="product__gallery" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <div style={{ position: 'relative' }}>
-              <div className="product__media media">
+              <div ref={tiltRef} className="product__media media tilt tilt--touch">
                 <SmartImage
                   src={cutoutImage(product.images[activeImg], 1000) ?? productImage(product, 1200) ?? undefined}
                   alt={`${product.brand} ${product.name}`}
