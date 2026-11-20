@@ -270,7 +270,7 @@ export default function ProductPage() {
                 fontSize: '0.8125rem', fontWeight: 600, color: 'var(--accent)',
                 marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem',
               }}>
-                🔥 Plus que {availableSizes.length} taille{availableSizes.length > 1 ? 's' : ''} disponible{availableSizes.length > 1 ? 's' : ''}
+                Plus que {availableSizes.length} taille{availableSizes.length > 1 ? 's' : ''} disponible{availableSizes.length > 1 ? 's' : ''}
               </p>
             )}
 
