@@ -72,6 +72,7 @@ export default function SEOHead({
       {/* ── Base ── */}
       <html lang={isFr ? 'fr' : 'en'} />
       <title>{pageTitle}</title>
+      <meta name="msvalidate.01" content="32583D6785CA20A7C5E246AB0F9217C4" />
       <meta name="description" content={description} />
       <link rel="canonical" href={canonical} />
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
