@@ -60,12 +60,22 @@ interface Props {
   imgWidth?: number
 }
 
+const MAX_RETRIES = 3
+
 export default function SmartImage({ src, alt, className = '', loading = 'lazy', fetchpriority, style, imgWidth = 600 }: Props) {
   const isPriority = loading === 'eager' || fetchpriority === 'high'
   const optimized = src ? optimizeUrl(src, imgWidth) : src
   const [activeSrc, setActiveSrc] = useState<string | undefined>(isPriority ? optimized : undefined)
   const [failed, setFailed] = useState(false)
+  const retryCount = useRef(0)
+  const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const placeholderRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    return () => {
+      if (retryTimer.current) clearTimeout(retryTimer.current)
+    }
+  }, [])
 
   useEffect(() => {
     if (!optimized || isPriority || activeSrc) return
@@ -104,8 +114,20 @@ export default function SmartImage({ src, alt, className = '', loading = 'lazy',
       decoding="async"
       fetchPriority={isPriority ? 'high' : 'auto'}
       style={style}
-      onLoad={releaseSlot}
-      onError={() => { releaseSlot(); setFailed(true) }}
+      onLoad={() => { releaseSlot(); retryCount.current = 0 }}
+      onError={() => {
+        releaseSlot()
+        if (retryCount.current < MAX_RETRIES) {
+          retryCount.current++
+          retryTimer.current = setTimeout(() => {
+            // Force re-fetch en ajoutant un param unique
+            setActiveSrc(undefined)
+            setTimeout(() => setActiveSrc(optimized), 50)
+          }, 1000 * retryCount.current)
+        } else {
+          setFailed(true)
+        }
+      }}
     />
   )
 }

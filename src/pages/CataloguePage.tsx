@@ -87,6 +87,20 @@ export default function CataloguePage() {
   const toggle = <T,>(list: T[], setList: (v: T[]) => void, value: T) =>
     setList(list.includes(value) ? list.filter(x => x !== value) : [...list, value])
 
+  // Lecture des tailles depuis prev (état le plus récent) pour éviter la race condition
+  // quand on clique plusieurs tailles rapidement avant le re-render
+  const toggleSize = (size: string) =>
+    setSearchParams(prev => {
+      const current = prev.getAll('size')
+      prev.delete('size'); prev.delete('p')
+      if (current.includes(size)) {
+        current.filter(s => s !== size).forEach(s => prev.append('size', s))
+      } else {
+        [...current, size].forEach(s => prev.append('size', s))
+      }
+      return prev
+    }, { replace: true })
+
   const clearAll = () => {
     setSearchParams(prev => {
       prev.delete('brand'); prev.delete('size'); prev.delete('price'); prev.delete('p')
@@ -185,7 +199,7 @@ export default function CataloguePage() {
               {SIZES_ALL.map(size => (
                 <button
                   key={size}
-                  onClick={() => toggle(selectedSizes, setSelectedSizes, size)}
+                  onClick={() => toggleSize(size)}
                   aria-pressed={selectedSizes.includes(size)}
                   style={{
                     padding: '0.3rem 0.65rem',
