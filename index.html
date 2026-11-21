@@ -51,6 +51,32 @@
   <body>
     <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap">BKS — Boutique sneakers &amp; streetwear à Dinan, Bretagne</h1>
     <div id="root"></div>
+    <div id="bks-splash" style="
+      position:fixed;inset:0;z-index:9999;
+      background:#F5EFE6;
+      display:flex;align-items:center;justify-content:center;
+      transition:opacity .35s ease, visibility .35s ease;
+    ">
+      <img src="/images/brand/logo-bks-monogram.png" alt="BKS" width="80" height="80"
+        style="opacity:0;transition:opacity .4s ease;animation:bks-pulse 1.4s ease-in-out infinite;"
+        onload="this.style.opacity=1" />
+    </div>
+    <style>
+      @keyframes bks-pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+    </style>
+    <script>
+      (function(){
+        var s=document.getElementById('bks-splash');
+        var done=function(){s.style.opacity='0';s.style.visibility='hidden';};
+        // Se retire dès que React a rendu le contenu
+        var ob=new MutationObserver(function(){
+          if(document.getElementById('root').children.length){ob.disconnect();setTimeout(done,80);}
+        });
+        ob.observe(document.getElementById('root'),{childList:true,subtree:true});
+        // Fallback au bout de 4s
+        setTimeout(done,4000);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
