@@ -3,13 +3,12 @@ import { Link } from 'react-router-dom'
 import {
   ShoppingBag, TrendingUp, ChevronRight, RefreshCw,
   AlertTriangle, Package, ArrowUpRight, Percent, Euro,
-  Loader2, CheckCircle2, AlertCircle, Eye,
+  Loader2, CheckCircle2, AlertCircle, Eye, ChevronLeft,
 } from 'lucide-react'
 import { supabase, isConfigured } from '../../lib/supabase'
 import { useTranslation } from '../../i18n/useTranslation'
 import type { DbOrder } from '../../types/database'
 
-// Coefficient: PV TTC = PA × 1.65 → marge = 0.65/1.65
 const MARKUP = 1.65
 const MARGIN_RATE = 0.65 / 1.65
 
@@ -52,7 +51,7 @@ const DEMO: FullStats = {
   caMonth: 2847.50, caPrevMonth: 2210.00, caToday: 189.99,
   margeMonth: 2847.50 * MARGIN_RATE,
   panierMoyen: 189.99,
-  ordersMonth: 15, ordersToday: 1, ordersPending: 3,
+  ordersMonth: 15, ordersToday: 1, ordersPending: 0,
   productsPublished: 1, productsTotal: 396,
   lastSync: new Date(Date.now() - 3600000).toISOString(),
   visitsToday: 24, visitsMonth: 312, visitsPrevMonth: 198,
@@ -79,9 +78,14 @@ function formatDate(iso: string) {
 
 function trend(current: number, prev: number) {
   if (prev === 0) return null
-  const pct = ((current - prev) / prev) * 100
-  return pct
+  return ((current - prev) / prev) * 100
 }
+
+function monthLabel(d: Date) {
+  return d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+}
+
+const NOW = new Date()
 
 export default function AdminDashboard() {
   const { t } = useTranslation()
@@ -91,38 +95,51 @@ export default function AdminDashboard() {
   const [syncing, setSyncing] = useState(false)
   const [syncResult, setSyncResult] = useState<{ ok: boolean; msg: string } | null>(null)
 
+  // Mois sélectionné (1er jour du mois)
+  const [selMonth, setSelMonth] = useState(() => new Date(NOW.getFullYear(), NOW.getMonth(), 1))
+  const isCurrentMonth = selMonth.getFullYear() === NOW.getFullYear() && selMonth.getMonth() === NOW.getMonth()
+
+  const prevMonth = () => setSelMonth(d => new Date(d.getFullYear(), d.getMonth() - 1, 1))
+  const nextMonth = () => {
+    const next = new Date(selMonth.getFullYear(), selMonth.getMonth() + 1, 1)
+    if (next <= new Date(NOW.getFullYear(), NOW.getMonth(), 1)) setSelMonth(next)
+  }
+
   useEffect(() => {
     if (!isConfigured) { setLoading(false); return }
 
     const load = async () => {
-      const now = new Date()
-      const startMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-      const startPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString()
-      const endPrevMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59).toISOString()
-      const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString()
+      setLoading(true)
+
+      const startMonth    = new Date(selMonth.getFullYear(), selMonth.getMonth(), 1).toISOString()
+      const endMonth      = new Date(selMonth.getFullYear(), selMonth.getMonth() + 1, 0, 23, 59, 59).toISOString()
+      const startPrevMonth = new Date(selMonth.getFullYear(), selMonth.getMonth() - 1, 1).toISOString()
+      const endPrevMonth   = new Date(selMonth.getFullYear(), selMonth.getMonth(), 0, 23, 59, 59).toISOString()
+      const startToday    = new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate()).toISOString()
 
       const [ordersRes, productsRes, visitsRes] = await Promise.all([
-        supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(100),
+        supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(500),
         supabase.from('products').select('id, is_published, last_sync_at').order('last_sync_at', { ascending: false }).limit(500),
-        supabase.from('page_views').select('visited_at').gte('visited_at', startPrevMonth),
+        supabase.from('page_views').select('visited_at').gte('visited_at', startPrevMonth).lte('visited_at', endMonth),
       ])
 
       const allOrders: DbOrder[] = ordersRes.data ?? []
       const allProducts = (productsRes.data ?? []) as { id: string; is_published: boolean; last_sync_at: string | null }[]
 
-      const paidOrders = allOrders.filter(o => o.payment_status === 'paid')
-      const monthOrders = paidOrders.filter(o => o.created_at >= startMonth)
+      const paidOrders     = allOrders.filter(o => o.payment_status === 'paid')
+      const monthOrders    = paidOrders.filter(o => o.created_at >= startMonth && o.created_at <= endMonth)
       const prevMonthOrders = paidOrders.filter(o => o.created_at >= startPrevMonth && o.created_at <= endPrevMonth)
-      const todayOrders = paidOrders.filter(o => o.created_at >= startToday)
-      const pending = allOrders.filter(o => o.status === 'pending' || o.status === 'confirmed')
+      const todayOrders    = isCurrentMonth ? paidOrders.filter(o => o.created_at >= startToday) : []
 
-      const caMonth = monthOrders.reduce((s, o) => s + (o.payment_amount ?? 0), 0)
+      // Commandes à traiter = payées mais pas encore envoyées à GS (status pending)
+      const pending = allOrders.filter(o => o.status === 'pending' && o.payment_status === 'paid')
+
+      const caMonth     = monthOrders.reduce((s, o) => s + (o.payment_amount ?? 0), 0)
       const caPrevMonth = prevMonthOrders.reduce((s, o) => s + (o.payment_amount ?? 0), 0)
-      const caToday = todayOrders.reduce((s, o) => s + (o.payment_amount ?? 0), 0)
+      const caToday     = todayOrders.reduce((s, o) => s + (o.payment_amount ?? 0), 0)
 
-      // Marge réelle depuis order_items.unit_price_buy (si disponible)
       const orderIds = monthOrders.map(o => o.id)
-      let margeMonth = caMonth * MARGIN_RATE // fallback coefficient
+      let margeMonth = caMonth * MARGIN_RATE
       if (orderIds.length > 0) {
         const { data: itemsData } = await supabase
           .from('order_items')
@@ -139,8 +156,8 @@ export default function AdminDashboard() {
       const lastSync = allProducts.find(p => p.last_sync_at)?.last_sync_at ?? null
 
       const allViews = (visitsRes.data ?? []) as { visited_at: string }[]
-      const visitsToday = allViews.filter(v => v.visited_at >= startToday).length
-      const visitsMonth = allViews.filter(v => v.visited_at >= startMonth).length
+      const visitsToday    = isCurrentMonth ? allViews.filter(v => v.visited_at >= startToday).length : 0
+      const visitsMonth    = allViews.filter(v => v.visited_at >= startMonth && v.visited_at <= endMonth).length
       const visitsPrevMonth = allViews.filter(v => v.visited_at >= startPrevMonth && v.visited_at < startMonth).length
 
       setStats({
@@ -159,7 +176,7 @@ export default function AdminDashboard() {
       setLoading(false)
     }
     load()
-  }, [])
+  }, [selMonth])
 
   const syncCatalog = async () => {
     if (!isConfigured) return
@@ -175,8 +192,6 @@ export default function AdminDashboard() {
       setSyncing(false)
     }
   }
-
-  if (loading) return <div style={{padding:'5rem 0', textAlign:'center', color:'var(--ink-faint)'}}><Loader2 size={24} className="animate-spin" color="var(--accent)" /></div>
 
   const caT = trend(stats.caMonth, stats.caPrevMonth)
   const trendColor = caT !== null ? (caT >= 0 ? '#3D7A43' : '#A6412C') : undefined
@@ -199,7 +214,7 @@ export default function AdminDashboard() {
         {!isConfigured && <span className="admin-tag">Mode démo</span>}
       </div>
 
-      {/* Alert: commandes en attente */}
+      {/* Alert: commandes à traiter (toujours temps réel) */}
       {stats.ordersPending > 0 && (
         <Link to="/admin/commandes" style={{
           display:'flex', alignItems:'center', gap:'1rem',
@@ -216,29 +231,53 @@ export default function AdminDashboard() {
               {stats.ordersPending} commande{stats.ordersPending > 1 ? 's' : ''} à traiter
             </p>
             <p style={{fontSize:'0.75rem', color:'rgba(92,61,20,0.65)', margin:'0.1rem 0 0'}}>
-              Cliquez pour voir les commandes en attente
+              Paiement reçu — à envoyer chez GoldenSneakers
             </p>
           </div>
           <ChevronRight size={16} color="#92714a" strokeWidth={2} />
         </Link>
       )}
 
-      {/* KPIs financiers */}
+      {/* KPIs financiers avec sélecteur de mois */}
       <div>
-        <p style={{fontSize:'0.5625rem', fontWeight:700, letterSpacing:'0.22em', textTransform:'uppercase', color:'var(--ink-faint)', marginBottom:'0.75rem'}}>
-          Performance financière · 30 derniers jours
-          <span style={{fontWeight:400, letterSpacing:'0.05em', textTransform:'none', marginLeft:'0.5rem', opacity:0.7}}>
-            {(() => {
-              const now = new Date()
-              const from = new Date(now); from.setDate(now.getDate() - 29)
-              const fmt = (d: Date) => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
-              return `${fmt(from)} – ${fmt(now)}`
-            })()}
-          </span>
-        </p>
+        <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'0.75rem'}}>
+          <p style={{fontSize:'0.5625rem', fontWeight:700, letterSpacing:'0.22em', textTransform:'uppercase', color:'var(--ink-faint)', margin:0}}>
+            Performance financière
+          </p>
+          {/* Sélecteur de mois */}
+          <div style={{display:'flex', alignItems:'center', gap:'0.5rem'}}>
+            <button onClick={prevMonth} style={{
+              display:'flex', alignItems:'center', justifyContent:'center',
+              width:28, height:28, borderRadius:6, border:'1px solid var(--line)',
+              background:'transparent', cursor:'pointer', color:'var(--ink)',
+            }}>
+              <ChevronLeft size={14} strokeWidth={2} />
+            </button>
+            <span style={{
+              fontSize:'0.75rem', fontWeight:600, color:'var(--ink)',
+              minWidth:'8rem', textAlign:'center', textTransform:'capitalize',
+            }}>
+              {loading ? '…' : monthLabel(selMonth)}
+            </span>
+            <button onClick={nextMonth} disabled={isCurrentMonth} style={{
+              display:'flex', alignItems:'center', justifyContent:'center',
+              width:28, height:28, borderRadius:6, border:'1px solid var(--line)',
+              background:'transparent', cursor: isCurrentMonth ? 'not-allowed' : 'pointer',
+              color:'var(--ink)', opacity: isCurrentMonth ? 0.3 : 1,
+            }}>
+              <ChevronRight size={14} strokeWidth={2} />
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div style={{display:'flex', alignItems:'center', justifyContent:'center', height:160}}>
+            <Loader2 size={24} className="animate-spin" color="var(--accent)" />
+          </div>
+        ) : (
         <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:'0.75rem'}}>
 
-          {/* CA mensuel */}
+          {/* CA */}
           <div className="admin-card" style={{padding:'1.5rem'}}>
             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1rem'}}>
               <div style={{width:34, height:34, borderRadius:8, background:'rgba(200,149,90,0.12)', display:'flex', alignItems:'center', justifyContent:'center'}}>
@@ -257,22 +296,24 @@ export default function AdminDashboard() {
             <p style={{fontFamily:'var(--ff-display)', fontSize:'clamp(1.75rem, 2.5vw, 2.25rem)', fontWeight:500, lineHeight:1, color:'var(--ink)', margin:0}}>
               {money(stats.caMonth)}
             </p>
-            {stats.caToday > 0 && (
+            {isCurrentMonth && stats.caToday > 0 && (
               <p style={{fontSize:'0.6875rem', color:'var(--ink-faint)', marginTop:'0.4rem'}}>
                 +{money(stats.caToday)} aujourd'hui
               </p>
             )}
           </div>
 
-          {/* Marge brute */}
+          {/* Marge */}
           <div className="admin-card" style={{padding:'1.5rem'}}>
             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1rem'}}>
               <div style={{width:34, height:34, borderRadius:8, background:'rgba(61,122,67,0.1)', display:'flex', alignItems:'center', justifyContent:'center'}}>
                 <Percent size={16} color="#3D7A43" strokeWidth={1.8} />
               </div>
-              <span style={{fontSize:'0.6875rem', fontWeight:700, color:'#3D7A43'}}>
-                39,4%
-              </span>
+              {stats.caMonth > 0 && (
+                <span style={{fontSize:'0.6875rem', fontWeight:700, color:'#3D7A43'}}>
+                  {((stats.margeMonth / stats.caMonth) * 100).toFixed(1)}%
+                </span>
+              )}
             </div>
             <p style={{fontSize:'0.6875rem', fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--ink-soft)', marginBottom:'0.4rem'}}>
               Marge brute
@@ -299,7 +340,7 @@ export default function AdminDashboard() {
               {stats.panierMoyen > 0 ? money(stats.panierMoyen) : '—'}
             </p>
             <p style={{fontSize:'0.6875rem', color:'var(--ink-faint)', marginTop:'0.4rem'}}>
-              {stats.ordersMonth} commande{stats.ordersMonth !== 1 ? 's' : ''} ce mois
+              {stats.ordersMonth} commande{stats.ordersMonth !== 1 ? 's' : ''}
             </p>
           </div>
 
@@ -317,7 +358,7 @@ export default function AdminDashboard() {
               {stats.ordersMonth}
             </p>
             <p style={{fontSize:'0.6875rem', color:'var(--ink-faint)', marginTop:'0.4rem'}}>
-              {stats.ordersToday > 0 ? `+${stats.ordersToday} aujourd'hui` : 'Ce mois-ci'}
+              {isCurrentMonth && stats.ordersToday > 0 ? `+${stats.ordersToday} aujourd'hui` : monthLabel(selMonth)}
             </p>
           </div>
 
@@ -344,19 +385,19 @@ export default function AdminDashboard() {
                   {stats.visitsMonth.toLocaleString('fr-FR')}
                 </p>
                 <p style={{fontSize:'0.6875rem', color:'var(--ink-faint)', marginTop:'0.4rem'}}>
-                  {stats.visitsToday > 0 ? `${stats.visitsToday} aujourd'hui` : 'Ce mois-ci'}
+                  {isCurrentMonth && stats.visitsToday > 0 ? `${stats.visitsToday} aujourd'hui` : monthLabel(selMonth)}
                 </p>
               </div>
             )
           })()}
 
         </div>
+        )}
       </div>
 
       {/* Catalogue + Sync */}
       <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(260px, 1fr))', gap:'0.75rem'}}>
 
-        {/* Catalogue */}
         <div className="admin-card" style={{padding:'1.25rem 1.5rem'}}>
           <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1rem'}}>
             <p style={{fontSize:'0.6875rem', fontWeight:700, letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--ink-soft)', margin:0}}>
@@ -374,7 +415,6 @@ export default function AdminDashboard() {
               / {stats.productsTotal} produits en ligne
             </span>
           </div>
-          {/* Barre de publication */}
           <div style={{height:4, background:'var(--surface-2)', borderRadius:2, overflow:'hidden'}}>
             <div style={{
               height:'100%', borderRadius:2,
@@ -388,7 +428,6 @@ export default function AdminDashboard() {
           </p>
         </div>
 
-        {/* Sync GS */}
         <div className="admin-card" style={{padding:'1.25rem 1.5rem', display:'flex', flexDirection:'column', gap:'0.75rem'}}>
           <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
             <p style={{fontSize:'0.6875rem', fontWeight:700, letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--ink-soft)', margin:0}}>
