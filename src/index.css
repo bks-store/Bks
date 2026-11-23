@@ -254,7 +254,7 @@ a:hover .media--zoom > img { transform: scale(1.03); }
 @media (min-width: 768px) { .announce__extra { display: inline; } }
 
 .site-header {
-  position: sticky; top: 0; z-index: 50;
+  position: relative; z-index: 1;
   background: var(--surface);
   border-bottom: 1px solid var(--line);
   transition: box-shadow 0.4s var(--ease);

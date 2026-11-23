@@ -83,9 +83,11 @@ function StoreFront() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <BlackFridayBar />
+      <div style={{ position: 'sticky', top: 0, zIndex: 50 }}>
+        <BlackFridayBar />
+        <Header />
+      </div>
       <ChristmasBar />
-      <Header />
       <CookieBanner />
       <CartDrawer />
       <SnowOverlay />
