@@ -277,6 +277,7 @@ export default function CartPage() {
     if (!isFormValid) return
     setLoading(true)
     setError(null)
+    setStep('payment')
 
     try {
       if (!isConfigured) {
@@ -308,9 +309,9 @@ export default function CartPage() {
         } as any, { onConflict: 'id' })
       }
 
-      setStep('payment')
     } catch (e) {
       setError((e as Error).message)
+      setStep('details')
     } finally {
       setLoading(false)
     }
@@ -374,7 +375,7 @@ export default function CartPage() {
           <div>
             {items.map(item => (
               <div key={`${item.productId}-${item.size}`} className="cart-line">
-                <Link to={`/produit/${item.productId}`} className="media">
+                <Link to={`/produit/${item.productId}`} className="pcard__media">
                   <SmartImage src={item.imageUrl ?? IMAGES.products[item.productId]} alt={`${item.brand} ${item.name}`} />
                 </Link>
                 <div style={{ minWidth: 0 }}>
@@ -514,6 +515,16 @@ export default function CartPage() {
         )}
 
         {/* ── Étape 3 : Paiement Stripe ── */}
+        {step === 'payment' && !clientSecret && (
+          <div className="stripe-skeleton">
+            <div className="stripe-skeleton__field" />
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <div className="stripe-skeleton__field" style={{ flex: 1 }} />
+              <div className="stripe-skeleton__field" style={{ width: 90 }} />
+            </div>
+            <div className="stripe-skeleton__field" />
+          </div>
+        )}
         {step === 'payment' && clientSecret && (
           <StripeErrorBoundary>
             <Elements
@@ -592,7 +603,7 @@ export default function CartPage() {
                     disabled={promoChecking || !promoInput.trim()}
                     style={{
                       padding: '0.5rem 0.875rem', borderRadius: 4,
-                      background: 'var(--ink)', color: 'var(--bg)',
+                      background: 'var(--ink)', color: 'var(--surface)',
                       border: 'none', cursor: promoChecking ? 'wait' : 'pointer',
                       fontSize: '0.8125rem', fontWeight: 600, whiteSpace: 'nowrap',
                       opacity: !promoInput.trim() ? 0.5 : 1,
