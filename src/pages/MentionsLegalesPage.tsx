@@ -26,8 +26,11 @@ export default function MentionsLegalesPage() {
           BKS — Beau Kiosque de Soulier<br />
           Boutique indépendante de sneakers et chaussures<br />
           3 rue de la Chaux, 22100 Dinan, France<br />
-          Propriétaire et responsable de la publication : Damien Holemy<br />
-          Contact : <a href="https://www.instagram.com/b.k.s_dinan/" target="_blank" rel="noopener noreferrer">@b.k.s_dinan</a> sur Instagram
+          Responsable de la publication : Damien Holemy<br />
+          Contact : <a href="mailto:bks@bks-store.com">bks@bks-store.com</a>
+        </p>
+        <p style={{ fontSize: '0.78rem', color: 'var(--ink-muted, #9E8E84)', lineHeight: 1.7 }}>
+          SARL au capital de 3 000 € — SIRET 109 084 244 00010 — TVA FR61 109 084 244
         </p>
 
         <h2>Hébergement</h2>
