@@ -240,11 +240,13 @@ export default function CartPage() {
     if (!code) return
     setPromoChecking(true)
     setPromoError(null)
-    const { data, error } = await supabase!
+    const result = await (supabase! as any)
       .from('promo_codes')
       .select('discount_percent')
       .eq('code', code)
       .maybeSingle()
+    const data = result.data as { discount_percent: number } | null
+    const error = result.error
     setPromoChecking(false)
     if (error || !data) {
       setPromoError('Code invalide ou expiré')
