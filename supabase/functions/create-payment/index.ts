@@ -24,6 +24,7 @@ interface CheckoutPayload {
   items: CartItem[]
   total: number
   locale?: string
+  promoCode?: string
   customer: {
     name: string
     email: string
@@ -43,7 +44,7 @@ serve(async (req) => {
 
   try {
     const payload: CheckoutPayload = await req.json()
-    const { items, total, locale, customer } = payload
+    const { items, total, locale, promoCode, customer } = payload
 
     if (!items?.length || !customer?.name || !customer?.email) {
       return json({ error: 'Données manquantes' }, 400)
@@ -53,7 +54,7 @@ serve(async (req) => {
     }
 
     const ALLOWED_COUNTRIES = new Set([
-      'FR','BE','CH','LU','DE','ES','IT','NL','PT','AT','GB','IE',
+      'FR','BE','CH','LU','DE','ES','IT','NL','PT','AT','IE',
       'SE','DK','NO','FI','PL','CZ','SK','HU','RO','BG','HR','SI',
       'EE','LV','LT','GR','CY','MT','MC','AD',
     ])
@@ -86,7 +87,25 @@ serve(async (req) => {
       return sum + dbPrice * item.quantity
     }, 0)
     const shipping = subtotal >= 150 ? 0 : 5.9
-    const verifiedTotal = Math.round((subtotal + shipping) * 100) / 100
+
+    // Validation code promo
+    let discountPercent = 0
+    if (promoCode) {
+      const { data: promoRow } = await supabase
+        .from('promo_codes')
+        .select('id, discount_percent, max_uses, used_count')
+        .eq('code', promoCode.toUpperCase())
+        .eq('active', true)
+        .maybeSingle()
+      if (!promoRow) return json({ error: 'Code promo invalide ou expiré' }, 400)
+      if (promoRow.max_uses !== null && promoRow.used_count >= promoRow.max_uses) {
+        return json({ error: 'Ce code promo a atteint sa limite d\'utilisation' }, 400)
+      }
+      discountPercent = promoRow.discount_percent
+    }
+
+    const discountAmount = discountPercent > 0 ? Math.round(subtotal * discountPercent) / 100 : 0
+    const verifiedTotal = Math.round((subtotal - discountAmount + shipping) * 100) / 100
 
     // Rejet si le client envoie un montant différent (tolérance 1 centime)
     if (total !== undefined && Math.abs(total - verifiedTotal) > 0.01) {
@@ -175,6 +194,11 @@ serve(async (req) => {
       .from('orders')
       .update({ stripe_session_id: paymentIntent.id })
       .eq('id', order.id)
+
+    // Incrémenter le compteur d'utilisations du code promo
+    if (promoCode && discountPercent > 0) {
+      await supabase.rpc('increment_promo_used', { code_input: promoCode.toUpperCase() })
+    }
 
     return json({ clientSecret: paymentIntent.client_secret, orderId: order.id })
 

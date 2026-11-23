@@ -187,10 +187,16 @@ export default function CartPage() {
   const totalQty = items.reduce((s, i) => s + i.quantity, 0)
   const SHIPPING = 5.90
   const shippingCost = total >= 150 ? 0 : SHIPPING
-  const totalWithShipping = total + shippingCost
+  const discountAmount = promoDiscount > 0 ? Math.round(total * promoDiscount) / 100 : 0
+  const totalWithShipping = total - discountAmount + shippingCost
 
   const [step, setStep] = useState<Step>('cart')
   const [form, setForm] = useState<CustomerForm>(EMPTY_FORM)
+  const [promoInput, setPromoInput] = useState('')
+  const [promoCode, setPromoCode] = useState<string | null>(null)
+  const [promoDiscount, setPromoDiscount] = useState(0)
+  const [promoError, setPromoError] = useState<string | null>(null)
+  const [promoChecking, setPromoChecking] = useState(false)
 
   useEffect(() => {
     if (!user || !isConfigured || !supabase) return
@@ -228,6 +234,35 @@ export default function CartPage() {
   const setAddr = (field: keyof Address, val: string) =>
     setForm(f => ({ ...f, address: { ...f.address, [field]: val } }))
 
+  const applyPromo = useCallback(async () => {
+    const code = promoInput.trim().toUpperCase()
+    if (!code) return
+    setPromoChecking(true)
+    setPromoError(null)
+    const { data, error } = await supabase!
+      .from('promo_codes')
+      .select('discount_percent')
+      .eq('code', code)
+      .maybeSingle()
+    setPromoChecking(false)
+    if (error || !data) {
+      setPromoError('Code invalide ou expiré')
+      setPromoCode(null)
+      setPromoDiscount(0)
+    } else {
+      setPromoCode(code)
+      setPromoDiscount(data.discount_percent)
+      setPromoError(null)
+    }
+  }, [promoInput])
+
+  const removePromo = () => {
+    setPromoCode(null)
+    setPromoDiscount(0)
+    setPromoInput('')
+    setPromoError(null)
+  }
+
   const isFormValid =
     form.name.trim() &&
     form.email.trim() &&
@@ -246,7 +281,7 @@ export default function CartPage() {
       }
 
       const { data, error: fnErr } = await supabase.functions.invoke('create-payment', {
-        body: { items, total: totalWithShipping, locale, customer: form },
+        body: { items, total: totalWithShipping, locale, customer: form, promoCode: promoCode ?? undefined },
       })
 
       if (fnErr) throw new Error(fnErr.message)
@@ -427,7 +462,6 @@ export default function CartPage() {
                   <option value="NL">Pays-Bas</option>
                   <option value="PT">Portugal</option>
                   <option value="AT">Autriche</option>
-                  <option value="GB">Royaume-Uni</option>
                   <option value="IE">Irlande</option>
                   <option value="SE">Suède</option>
                   <option value="DK">Danemark</option>
@@ -516,6 +550,68 @@ export default function CartPage() {
               Livraison offerte en France · Colissimo suivi
             </p>
           )}
+
+          {/* Code promo */}
+          {step !== 'payment' && (
+            <div style={{ marginBottom: '1rem' }}>
+              {promoCode ? (
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '0.5rem 0.75rem', borderRadius: 6,
+                  background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.3)',
+                  fontSize: '0.8125rem',
+                }}>
+                  <span style={{ color: '#16a34a', fontWeight: 600 }}>
+                    {promoCode} — −{promoDiscount}%
+                  </span>
+                  <button onClick={removePromo} style={{
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: 'var(--ink-soft)', padding: 0, lineHeight: 1,
+                  }}>
+                    <X size={14} strokeWidth={1.5} />
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input
+                    value={promoInput}
+                    onChange={e => { setPromoInput(e.target.value.toUpperCase()); setPromoError(null) }}
+                    onKeyDown={e => e.key === 'Enter' && applyPromo()}
+                    placeholder="Code promo"
+                    style={{
+                      flex: 1, padding: '0.5rem 0.75rem', borderRadius: 4,
+                      border: promoError ? '1px solid #dc2626' : '1px solid var(--line)',
+                      fontSize: '0.8125rem', background: 'var(--bg)', color: 'var(--ink)',
+                    }}
+                  />
+                  <button
+                    onClick={applyPromo}
+                    disabled={promoChecking || !promoInput.trim()}
+                    style={{
+                      padding: '0.5rem 0.875rem', borderRadius: 4,
+                      background: 'var(--ink)', color: 'var(--bg)',
+                      border: 'none', cursor: promoChecking ? 'wait' : 'pointer',
+                      fontSize: '0.8125rem', fontWeight: 600, whiteSpace: 'nowrap',
+                      opacity: !promoInput.trim() ? 0.5 : 1,
+                    }}
+                  >
+                    {promoChecking ? '…' : 'Appliquer'}
+                  </button>
+                </div>
+              )}
+              {promoError && (
+                <p style={{ fontSize: '0.75rem', color: '#dc2626', marginTop: '0.35rem' }}>{promoError}</p>
+              )}
+            </div>
+          )}
+
+          {discountAmount > 0 && (
+            <div className="summary__row" style={{ color: '#16a34a' }}>
+              <span>Réduction ({promoDiscount}%)</span>
+              <span>−{fmtPrice(discountAmount)}</span>
+            </div>
+          )}
+
           <div className="summary__total">
             <span>{t.cart.total}</span>
             <div style={{ textAlign: 'right' }}>
