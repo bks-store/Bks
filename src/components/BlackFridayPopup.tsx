@@ -3,7 +3,7 @@ import { X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 const COOKIE_KEY = 'bks_bf_popup_v1'
-const DELAY_MS   = 8000
+const DELAY_MS   = 3000
 
 export default function BlackFridayPopup() {
   const [visible, setVisible]   = useState(false)
@@ -152,10 +152,6 @@ export default function BlackFridayPopup() {
                     <p style={{ fontSize: 12, color: '#dc2626', margin: '0 0 0.5rem', fontFamily: 'var(--ff-body, sans-serif)' }}>{error}</p>
                   )}
 
-                  <p style={{ fontSize: 10, color: '#9E8E84', margin: 0, lineHeight: 1.5, fontFamily: 'var(--ff-body, sans-serif)' }}>
-                    En continuant, vous acceptez de recevoir des communications de BKS Store.
-                    Pas de spam — désabonnement en un clic.
-                  </p>
                 </form>
               </>
             ) : (

@@ -111,10 +111,6 @@ serve(async (req) => {
         <tr><td style="background:#28170E;padding:32px 48px;text-align:center;border-radius:0 0 4px 4px;">
           <p style="color:#C8955A;font-size:10px;margin:0 0 8px;letter-spacing:0.18em;text-transform:uppercase;font-family:Georgia,serif;">BKS &#x2014; Beau Kiosque de Soulier</p>
           <p style="color:rgba(244,239,230,0.35);font-size:10px;margin:0 0 12px;font-family:-apple-system,sans-serif;letter-spacing:0.04em;">bks-store.com</p>
-          <p style="color:rgba(244,239,230,0.2);font-size:10px;margin:0;font-family:-apple-system,sans-serif;line-height:1.6;">
-            Vous recevez cet email car vous avez souscrit &#xe0; notre offre Black Friday.<br>
-            Pour vous d&#xe9;sinscrire, r&#xe9;pondez avec "D&#xe9;sabonnement".
-          </p>
         </td></tr>
 
       </table>
