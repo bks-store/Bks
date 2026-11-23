@@ -16,7 +16,7 @@ import { useCart } from '../context/CartContext'
 import { useTranslation } from '../i18n/useTranslation'
 import { useUserAuth } from '../context/UserAuthContext'
 import SmartImage from '../components/SmartImage'
-import { IMAGES } from '../config/images'
+import { IMAGES, cutoutImage } from '../config/images'
 import { formatPrice } from '../lib/format'
 import { useCurrency } from '../context/CurrencyContext'
 import { supabase, isConfigured } from '../lib/supabase'
@@ -376,7 +376,7 @@ export default function CartPage() {
             {items.map(item => (
               <div key={`${item.productId}-${item.size}`} className="cart-line">
                 <Link to={`/produit/${item.productId}`} className="pcard__media">
-                  <SmartImage src={item.imageUrl ?? IMAGES.products[item.productId]} alt={`${item.brand} ${item.name}`} />
+                  <SmartImage src={cutoutImage(item.imageUrl) ?? IMAGES.products[item.productId]} alt={`${item.brand} ${item.name}`} />
                 </Link>
                 <div style={{ minWidth: 0 }}>
                   <p className="pcard__brand">{item.brand}</p>
