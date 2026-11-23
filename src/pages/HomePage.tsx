@@ -17,14 +17,11 @@ const MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=3+rue+de+la+Ch
 function Hero() {
   const { t } = useTranslation()
   const h = t.home.hero
-  const { media } = useContent()
+  const { media, content } = useContent()
 
-  const slides = [
-    media('hero'),
-    media('hero-2'),
-    media('hero-3'),
-    media('hero-4'),
-  ].filter(Boolean)
+  const slides = (['hero', 'hero-2', 'hero-3', 'hero-4'] as const)
+    .map(key => content.media[key] || (key === 'hero' ? media(key) : ''))
+    .filter(Boolean)
 
   const [current, setCurrent] = useState(0)
 

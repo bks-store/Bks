@@ -161,7 +161,7 @@ export default function BlackFridayPopup() {
                 </p>
                 <p style={{ fontSize: 13, color: '#6D5747', margin: '0 0 16px', lineHeight: 1.6, fontFamily: 'var(--ff-body, sans-serif)' }}>
                   Vérifiez votre boîte mail (et vos spams).<br />
-                  Votre code <strong style={{ color: '#28170E' }}>BFBKS</strong> vous y attend.
+                  Votre code exclusif vous y attend.
                 </p>
                 <button
                   onClick={dismiss}
