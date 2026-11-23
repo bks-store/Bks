@@ -186,9 +186,6 @@ export default function CartPage() {
   const { formatPrice: fmtPrice, formatEur, isEuro } = useCurrency()
   const totalQty = items.reduce((s, i) => s + i.quantity, 0)
   const SHIPPING = 5.90
-  const shippingCost = total >= 150 ? 0 : SHIPPING
-  const discountAmount = promoDiscount > 0 ? Math.round(total * promoDiscount) / 100 : 0
-  const totalWithShipping = total - discountAmount + shippingCost
 
   const [step, setStep] = useState<Step>('cart')
   const [form, setForm] = useState<CustomerForm>(EMPTY_FORM)
@@ -197,6 +194,10 @@ export default function CartPage() {
   const [promoDiscount, setPromoDiscount] = useState(0)
   const [promoError, setPromoError] = useState<string | null>(null)
   const [promoChecking, setPromoChecking] = useState(false)
+
+  const shippingCost = total >= 150 ? 0 : SHIPPING
+  const discountAmount = promoDiscount > 0 ? Math.round(total * promoDiscount) / 100 : 0
+  const totalWithShipping = total - discountAmount + shippingCost
 
   useEffect(() => {
     if (!user || !isConfigured || !supabase) return
