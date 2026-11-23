@@ -168,7 +168,7 @@ export default function SmartImage({ src, alt, className = '', loading = 'lazy',
     )
   }
 
-  // Chargée : img seule, fondu
+  // Chargée : img seule — pas d'opacity inline pour ne pas écraser le CSS (.pcard__media-alt etc.)
   return (
     <img
       src={activeSrc}
@@ -176,7 +176,7 @@ export default function SmartImage({ src, alt, className = '', loading = 'lazy',
       className={className}
       decoding="async"
       fetchPriority={isPriority ? 'high' : 'auto'}
-      style={{ ...style, opacity: 1, transition: 'opacity .2s ease' }}
+      style={style}
     />
   )
 }
