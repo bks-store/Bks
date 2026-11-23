@@ -10,6 +10,7 @@ const STATIC_URLS = [
   { loc: '/a-propos', priority: '0.6', changefreq: 'monthly' },
   { loc: '/contact', priority: '0.5', changefreq: 'monthly' },
   { loc: '/livraison', priority: '0.5', changefreq: 'monthly' },
+  { loc: '/cgv', priority: '0.4', changefreq: 'yearly' },
 ]
 
 export default async function handler(_req: VercelRequest, res: VercelResponse) {

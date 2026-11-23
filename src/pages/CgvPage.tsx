@@ -8,9 +8,10 @@ export default function CgvPage() {
     <div className="container">
       <SEOHead
         path="/cgv"
-        titleFr="Conditions Générales de Vente"
-        titleEn="Terms & Conditions"
-        noIndex
+        titleFr="Conditions Générales de Vente — BKS Dinan"
+        titleEn="Terms & Conditions — BKS Dinan"
+        descFr="Conditions générales de vente BKS — politique de retour 30 jours, livraison DHL, remboursement. Boutique sneakers à Dinan, Bretagne."
+        descEn="BKS terms & conditions — 30-day return policy, DHL shipping, refunds. Sneaker boutique in Dinan, Brittany."
       />
       <header className="page-head">
         <nav className="crumbs" aria-label="Fil d'Ariane">
