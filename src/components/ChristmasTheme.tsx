@@ -1,5 +1,37 @@
 import { useEffect, useRef } from 'react'
 
+const BF_END = new Date('2026-11-30T00:00:00')
+
+// Barre Black Friday — visible jusqu'au 29 nov., ouvre le popup au clic
+export function BlackFridayBar() {
+  if (new Date() >= BF_END) return null
+  const open = () => window.dispatchEvent(new CustomEvent('bks:open-bf-popup'))
+  return (
+    <button
+      onClick={open}
+      style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        gap: '0.75rem', flexWrap: 'wrap',
+        width: '100%', background: '#0E0906', color: '#F4EFE6',
+        border: 'none', cursor: 'pointer',
+        padding: '0.6rem 1rem',
+        fontSize: '0.72rem', fontFamily: 'var(--ff-body)',
+        letterSpacing: '0.07em', lineHeight: 1,
+      }}
+    >
+      <span style={{ color: '#C8955A', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', fontSize: '0.7rem' }}>
+        Black Friday
+      </span>
+      <span style={{ opacity: 0.3 }}>·</span>
+      <span style={{ opacity: 0.8 }}>−20% sur toute la boutique jusqu'au 29&nbsp;nov.</span>
+      <span style={{ opacity: 0.3 }}>·</span>
+      <span style={{ color: '#C8955A', fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: '3px' }}>
+        Obtenir mon code →
+      </span>
+    </button>
+  )
+}
+
 // Barre de Noël — slim, dans les couleurs de la marque
 export function ChristmasBar() {
   return (

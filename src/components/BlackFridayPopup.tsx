@@ -21,6 +21,17 @@ export default function BlackFridayPopup() {
     return () => clearTimeout(t)
   }, [])
 
+  useEffect(() => {
+    const handler = () => {
+      setSent(false)
+      setError(null)
+      setEmail('')
+      setVisible(true)
+    }
+    window.addEventListener('bks:open-bf-popup', handler)
+    return () => window.removeEventListener('bks:open-bf-popup', handler)
+  }, [])
+
   const dismiss = () => {
     setVisible(false)
     try { localStorage.setItem(COOKIE_KEY, '1') } catch {}
