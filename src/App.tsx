@@ -18,7 +18,7 @@ import { ToastProvider } from './context/ToastContext'
 import CookieBanner from './components/CookieBanner'
 import CartDrawer from './components/CartDrawer'
 import BlackFridayPopup from './components/BlackFridayPopup'
-import { ChristmasBar, SnowOverlay } from './components/ChristmasTheme'
+import { BlackFridayBar, ChristmasBar, SnowOverlay } from './components/ChristmasTheme'
 
 // Pages secondaires — chargées en différé
 const BrandsPage = lazy(() => import('./pages/BrandsPage'))
@@ -83,6 +83,7 @@ function StoreFront() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <BlackFridayBar />
       <ChristmasBar />
       <Header />
       <CookieBanner />
