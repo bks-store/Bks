@@ -10,6 +10,7 @@ import { IMAGES } from '../config/images'
 import { useTranslation } from '../i18n/useTranslation'
 import { useContent } from '../context/ContentContext'
 import { MEDIA_SLOTS } from '../lib/content'
+import { HOME_TAGS } from '../config/home'
 
 const INSTAGRAM_URL = 'https://www.instagram.com/b.k.s_dinan/'
 const MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=3+rue+de+la+Chaux+22100+Dinan'
@@ -275,8 +276,12 @@ export default function HomePage() {
   const sizeCount = (p: Product) => p.sizes.filter(s => s.available).length
   const buyable = products.filter(p => p.images.length > 0 && sizeCount(p) > 0)
 
+  // Sélection cochée dans l'admin si elle existe, sinon remplissage automatique
+  const tagged = (tag: string) => buyable.filter(p => p.tags?.includes(tag)).slice(0, 12)
+
   const perBrand = new Map<string, number>()
-  const classics = buyable
+  const manualClassics = tagged(HOME_TAGS.classic)
+  const classics = manualClassics.length ? manualClassics : buyable
     .filter(p => sizeCount(p) >= 5 && p.price <= 200)
     .sort((a, b) => sizeCount(b) - sizeCount(a))
     .filter(p => {
@@ -286,7 +291,8 @@ export default function HomePage() {
     })
     .slice(0, 8)
   const inClassics = new Set(classics.map(p => p.id))
-  const premium = buyable
+  const manualPremium = tagged(HOME_TAGS.premium).filter(p => !inClassics.has(p.id))
+  const premium = manualPremium.length ? manualPremium : buyable
     .filter(p => !inClassics.has(p.id) && p.price >= 180 && sizeCount(p) >= 2)
     .sort((a, b) => sizeCount(b) - sizeCount(a) || Number(b.isFeatured) - Number(a.isFeatured))
     .slice(0, 8)

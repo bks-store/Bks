@@ -5,6 +5,7 @@ import { supabase, isConfigured } from '../../lib/supabase'
 import { useTranslation } from '../../i18n/useTranslation'
 import type { DbProduct, DbProductSize, StockType, ProductCategory } from '../../types/database'
 import { PRODUCTS } from '../../data/products'
+import { HOME_TAGS } from '../../config/home'
 
 const COMMON_SIZES = ['35','36','37','38','39','40','41','42','43','44','45','46','47']
 const CATEGORIES: ProductCategory[] = ['sneakers', 'streetwear', 'accessoires']
@@ -68,6 +69,7 @@ export default function AdminProductEdit() {
   const [isPublished, setIsPublished] = useState(false)
   const [isNew2, setIsNew2] = useState(false)
   const [isFeatured, setIsFeatured] = useState(false)
+  const [tags, setTags] = useState<string[]>([])
   const [sizes, setSizes] = useState<SizeEntry[]>([])
   const [images, setImages] = useState<string[]>([])
   const [newImageUrl, setNewImageUrl] = useState('')
@@ -105,6 +107,7 @@ export default function AdminProductEdit() {
         setPriceOriginal(p.price_original?.toString() ?? '')
         setStockType(p.stock_type); setIsPublished(p.is_published)
         setIsNew2(p.is_new); setIsFeatured(p.is_featured)
+        setTags(p.tags ?? [])
         setImages(p.images)
       }
       const s: DbProductSize[] = sizesRes.data ?? []
@@ -121,6 +124,9 @@ export default function AdminProductEdit() {
       ))
     }
   }
+
+  const toggleTag = (tag: string, on: boolean) =>
+    setTags(prev => on ? [...new Set([...prev, tag])] : prev.filter(x => x !== tag))
 
   const removeSize = (size: string) => setSizes(prev => prev.filter(s => s.size !== size))
   const updateSizeQty = (size: string, qty: number) =>
@@ -177,6 +183,7 @@ export default function AdminProductEdit() {
       is_published: isPublished,
       is_new: isNew2,
       is_featured: isFeatured,
+      tags,
       images,
     }
 
@@ -197,15 +204,18 @@ export default function AdminProductEdit() {
     } else {
       const { error: e } = await (supabase.from('products') as any).update(productData).eq('id', id)
       if (e) { setError(t.admin.productEdit.error); setSaving(false); return }
-      // Supprimer anciennes tailles
-      await (supabase.from('product_sizes') as any).delete().eq('product_id', id)
+      // Ne supprimer que les tailles retirées : un delete global effacerait gs_size_id (requis pour transmettre la commande à GS)
+      const { data: existing } = await (supabase.from('product_sizes') as any).select('size').eq('product_id', id)
+      const removed = ((existing ?? []) as { size: string }[]).map(s => s.size).filter(s => !sizes.some(x => x.size === s))
+      if (removed.length) await (supabase.from('product_sizes') as any).delete().eq('product_id', id).in('size', removed)
     }
 
-    // Insérer les tailles
     if (sizes.length > 0) {
-      await (supabase.from('product_sizes') as any).insert(
-        sizes.map(s => ({ product_id: productId, size: s.size, stock_qty: s.stock_qty }))
+      const { error: sizeErr } = await (supabase.from('product_sizes') as any).upsert(
+        sizes.map(s => ({ product_id: productId, size: s.size, stock_qty: s.stock_qty })),
+        { onConflict: 'product_id,size' }
       )
+      if (sizeErr) { setError(t.admin.productEdit.error); setSaving(false); return }
     }
 
     setSuccess(true)
@@ -243,6 +253,11 @@ export default function AdminProductEdit() {
           <Toggle checked={isPublished} onChange={setIsPublished} label={t.admin.productEdit.publish} />
           <Toggle checked={isNew2} onChange={setIsNew2} label={t.admin.productEdit.markNew} />
           <Toggle checked={isFeatured} onChange={setIsFeatured} label={t.admin.productEdit.markFeatured} />
+          <Toggle checked={tags.includes(HOME_TAGS.classic)} onChange={v => toggleTag(HOME_TAGS.classic, v)} label="Accueil — ligne « Les classiques »" />
+          <Toggle checked={tags.includes(HOME_TAGS.premium)} onChange={v => toggleTag(HOME_TAGS.premium, v)} label="Accueil — ligne « Sneakers premium »" />
+          <p style={{ fontSize: '0.75rem', color: 'var(--ink-soft)', margin: 0 }}>
+            Si aucun produit n'est coché pour une ligne, elle se remplit automatiquement (modèles avec le plus de pointures).
+          </p>
         </div>
 
         {/* Identité */}
