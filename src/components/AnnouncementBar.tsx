@@ -1,7 +1,7 @@
 import { Truck, ShieldCheck, Clock } from 'lucide-react'
 
 const ITEMS = [
-  { icon: <Truck size={13} strokeWidth={1.8} />, text: 'Livraison DHL dès 5,90 €' },
+  { icon: <Truck size={13} strokeWidth={1.8} />, text: 'Livraison Colissimo dès 5,90 €' },
   { icon: <ShieldCheck size={13} strokeWidth={1.8} />, text: 'Paiement 100% sécurisé' },
   { icon: <Clock size={13} strokeWidth={1.8} />, text: 'Expédition sous 24–48h' },
 ]

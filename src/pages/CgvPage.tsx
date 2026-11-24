@@ -10,8 +10,8 @@ export default function CgvPage() {
         path="/cgv"
         titleFr="Conditions Générales de Vente — BKS Dinan"
         titleEn="Terms & Conditions — BKS Dinan"
-        descFr="Conditions générales de vente BKS — politique de retour 30 jours, livraison DHL, remboursement. Boutique sneakers à Dinan, Bretagne."
-        descEn="BKS terms & conditions — 30-day return policy, DHL shipping, refunds. Sneaker boutique in Dinan, Brittany."
+        descFr="Conditions générales de vente BKS — rétractation 14 jours, livraison Colissimo, remboursement. Boutique sneakers à Dinan, Bretagne."
+        descEn="BKS terms & conditions — 14-day returns, Colissimo shipping, refunds. Sneaker boutique in Dinan, Brittany."
       />
       <header className="page-head">
         <nav className="crumbs" aria-label="Fil d'Ariane">
@@ -69,13 +69,13 @@ export default function CgvPage() {
 
         <h2>Article 7 — Livraison</h2>
         <p>
-          Les commandes sont expédiées par DHL. Les délais indicatifs :
+          Les commandes sont expédiées par Colissimo. Les délais indicatifs :
         </p>
         <ul>
           <li>France &amp; Europe : 5 à 8 jours ouvrés (expédition depuis la Pologne)</li>
         </ul>
         <p>
-          Les frais de livraison sont calculés à la commande selon le poids et la destination. BKS ne peut être tenu responsable
+          Les frais de livraison sont de 5,90 € par commande, offerts dès 150 € d'achat, et affichés avant le paiement. BKS ne peut être tenu responsable
           des retards imputables au transporteur.
         </p>
 

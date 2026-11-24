@@ -568,7 +568,7 @@ export default function CartPage() {
           )}
           {total >= 150 && (
             <p style={{ fontSize: '0.6875rem', color: 'var(--ink-soft)', marginBottom: '1rem', lineHeight: 1.5 }}>
-              Livraison offerte · DHL suivi, 5 à 8 jours ouvrés
+              Livraison offerte · Colissimo suivi, 5 à 8 jours ouvrés
             </p>
           )}
 

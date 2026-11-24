@@ -13,8 +13,8 @@ export default function LivraisonPage() {
         path="/livraison"
         titleFr="Livraison & retours"
         titleEn="Delivery & returns"
-        descFr="Livraison DHL en France et en Europe. Retours sous 14 jours. Livraison offerte dès 150 €."
-        descEn="DHL delivery in France and Europe. 14-day returns. Free delivery from €150."
+        descFr="Livraison Colissimo en France et en Europe. Retours sous 14 jours. Livraison offerte dès 150 €."
+        descEn="Colissimo delivery in France and Europe. 14-day returns. Free delivery from €150."
       />
       <div className="container">
         <header className="page-head">

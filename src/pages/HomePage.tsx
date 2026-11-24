@@ -299,8 +299,8 @@ export default function HomePage() {
         path="/"
         titleFr="Sneakers &amp; Streetwear à Dinan"
         titleEn="Sneakers &amp; Streetwear in Dinan, France"
-        descFr="Boutique sneakers à Dinan, Bretagne — Jordan, Nike, Adidas, New Balance. À 30 min de Saint-Malo et Saint-Brieuc. Sélection à la main. Livraison DHL France & Europe dès 5,90 €."
-        descEn="Sneaker boutique in Dinan, Brittany — Jordan, Nike, Adidas, New Balance. 30 min from Saint-Malo. Hand-picked selection. DHL delivery France & Europe from €5.90."
+        descFr="Boutique sneakers à Dinan, Bretagne — Jordan, Nike, Adidas, New Balance. À 30 min de Saint-Malo et Saint-Brieuc. Sélection à la main. Livraison Colissimo France & Europe dès 5,90 €."
+        descEn="Sneaker boutique in Dinan, Brittany — Jordan, Nike, Adidas, New Balance. 30 min from Saint-Malo. Hand-picked selection. Colissimo delivery France & Europe from €5.90."
         schema={[LOCAL_BUSINESS_SCHEMA, FAQ_SCHEMA]}
       />
       <Hero />

@@ -10,8 +10,8 @@ const DEFAULT_OG_IMAGE = `${SITE_URL}/images/brand/logo-bks-3d-clean.png`
 
 // ── Descriptions par défaut (FR / EN) ─────────────────────────────────────────
 const DEFAULT_DESC: Record<string, string> = {
-  fr: 'Boutique sneakers à Dinan, Bretagne — Jordan, Nike, Adidas, New Balance. À 30 min de Saint-Malo. Sélection à la main par Damien. Livraison DHL France & Europe.',
-  en: 'Sneaker boutique in Dinan, Brittany — Jordan, Nike, Adidas, New Balance. 30 min from Saint-Malo. Hand-picked by Damien. DHL shipping France & Europe.',
+  fr: 'Boutique sneakers à Dinan, Bretagne — Jordan, Nike, Adidas, New Balance. À 30 min de Saint-Malo. Sélection à la main par Damien. Livraison Colissimo France & Europe.',
+  en: 'Sneaker boutique in Dinan, Brittany — Jordan, Nike, Adidas, New Balance. 30 min from Saint-Malo. Hand-picked by Damien. Colissimo shipping France & Europe.',
 }
 
 interface SEOProps {
@@ -180,7 +180,7 @@ export const FAQ_SCHEMA = {
       name: 'Où acheter des sneakers près de Saint-Malo ?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'BKS Dinan est la boutique de sneakers la plus proche de Saint-Malo (30 minutes). Au 3 rue de la Chaux, 22100 Dinan, vous trouverez Jordan, Nike, Adidas et New Balance sélectionnés à la main. Commande en ligne avec livraison DHL partout en France.',
+        text: 'BKS Dinan est la boutique de sneakers la plus proche de Saint-Malo (30 minutes). Au 3 rue de la Chaux, 22100 Dinan, vous trouverez Jordan, Nike, Adidas et New Balance sélectionnés à la main. Commande en ligne avec livraison Colissimo partout en France.',
       },
     },
     {
@@ -196,7 +196,7 @@ export const FAQ_SCHEMA = {
       name: "BKS fait-il des livraisons en France et en Europe ?",
       acceptedAnswer: {
         '@type': 'Answer',
-        text: "Oui, BKS livre en France et en Europe par DHL en 5 à 8 jours ouvrés. La livraison est offerte dès 150 €. Commandez en ligne sur bks-store.com.",
+        text: "Oui, BKS livre en France et en Europe par Colissimo en 5 à 8 jours ouvrés. La livraison est offerte dès 150 €. Commandez en ligne sur bks-store.com.",
       },
     },
     {

@@ -112,11 +112,11 @@ export default function ProductPage() {
   const availSizeList = availableSizes.map(s => s.size).join(', ')
   const priceStr = product.price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
   const descFr = availSizeList
-    ? `${productTitle} — ${priceStr}. Tailles disponibles : ${availSizeList}. Boutique BKS à Dinan, Bretagne. Livraison DHL France & Europe.`
-    : `${productTitle} — ${priceStr}. ${product.description || 'Boutique BKS à Dinan, Bretagne. Livraison DHL France & Europe.'}`
+    ? `${productTitle} — ${priceStr}. Tailles disponibles : ${availSizeList}. Boutique BKS à Dinan, Bretagne. Livraison Colissimo France & Europe.`
+    : `${productTitle} — ${priceStr}. ${product.description || 'Boutique BKS à Dinan, Bretagne. Livraison Colissimo France & Europe.'}`
   const descEn = availSizeList
-    ? `${productTitle} — ${priceStr}. Available sizes: ${availSizeList}. BKS store in Dinan, Brittany. DHL shipping France & Europe.`
-    : `${productTitle} — ${priceStr}. ${product.description || 'BKS store in Dinan, Brittany. DHL shipping France & Europe.'}`
+    ? `${productTitle} — ${priceStr}. Available sizes: ${availSizeList}. BKS store in Dinan, Brittany. Colissimo shipping France & Europe.`
+    : `${productTitle} — ${priceStr}. ${product.description || 'BKS store in Dinan, Brittany. Colissimo shipping France & Europe.'}`
 
   const categoryLabel = product.category === 'sneakers' ? 'Sneakers'
     : product.category === 'streetwear' ? 'Streetwear' : 'Accessoires'
@@ -352,7 +352,7 @@ export default function ProductPage() {
               marginBottom: '1.5rem',
             }}>
               {[
-                { icon: <Truck size={15} strokeWidth={1.5} />, label: 'Livraison DHL' },
+                { icon: <Truck size={15} strokeWidth={1.5} />, label: 'Livraison Colissimo' },
                 { icon: <ShieldCheck size={15} strokeWidth={1.5} />, label: '100% Authentique' },
                 { icon: <RotateCcw size={15} strokeWidth={1.5} />, label: 'Retours 14j' },
               ].map(b => (

@@ -163,8 +163,8 @@ export default function CataloguePage() {
         path="/catalogue"
         titleFr="Catalogue sneakers — Jordan, Nike, Adidas, New Balance"
         titleEn="Sneakers catalogue — Jordan, Nike, Adidas, New Balance"
-        descFr="Catalogue sneakers BKS — Jordan, Nike, Adidas, New Balance. Boutique à Dinan, Bretagne (30 min Saint-Malo). Livraison DHL France & Europe."
-        descEn="BKS sneaker catalogue — Jordan, Nike, Adidas, New Balance. Shop in Dinan, Brittany (30 min from Saint-Malo). DHL delivery France & Europe."
+        descFr="Catalogue sneakers BKS — Jordan, Nike, Adidas, New Balance. Boutique à Dinan, Bretagne (30 min Saint-Malo). Livraison Colissimo France & Europe."
+        descEn="BKS sneaker catalogue — Jordan, Nike, Adidas, New Balance. Shop in Dinan, Brittany (30 min from Saint-Malo). Colissimo delivery France & Europe."
       />
       <header className={`page-head ${rubrique?.coverUrl ? 'rubrique-head' : ''}`}>
         <div className={rubrique?.coverUrl ? 'rubrique-head__text' : ''}>

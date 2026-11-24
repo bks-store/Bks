@@ -66,7 +66,7 @@ export default function ConfidentialitePage() {
         <ul>
           <li><strong>Stripe</strong> (paiement) — <a href="https://stripe.com/fr/privacy" target="_blank" rel="noopener noreferrer">politique de confidentialité Stripe</a></li>
           <li><strong>Supabase</strong> (hébergement base de données, serveurs en Europe) — <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">politique Supabase</a></li>
-          <li><strong>Golden Sneakers et DHL</strong> (préparation et livraison de la commande) — nom, adresse, téléphone uniquement</li>
+          <li><strong>Golden Sneakers et Colissimo</strong> (préparation et livraison de la commande) — nom, adresse, téléphone uniquement</li>
           <li><strong>Resend</strong> (envoi des emails de commande)</li>
           <li><strong>Google Analytics et Meta</strong> (mesure d'audience et de nos publicités) — uniquement si vous acceptez les cookies</li>
         </ul>

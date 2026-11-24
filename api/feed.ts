@@ -51,7 +51,7 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
       ? Number(p.price_original).toFixed(2) : null
 
     const desc = p.description
-      || `${title} — Boutique BKS à Dinan. Sneakers & streetwear, livraison DHL en France et en Europe sous 5 à 8 jours ouvrés.`
+      || `${title} — Boutique BKS à Dinan. Sneakers & streetwear, livraison Colissimo en France et en Europe sous 5 à 8 jours ouvrés.`
 
     const catId = CATEGORY_MAP[p.category] ?? '187'
     const productType = p.category === 'sneakers' ? 'Sneakers' : p.category === 'streetwear' ? 'Streetwear' : 'Accessoires'
@@ -176,7 +176,7 @@ function buildItem(p: ItemParams): string {
     `      <g:age_group>adult</g:age_group>`,
     `      <g:shipping>`,
     `        <g:country>FR</g:country>`,
-    `        <g:service>DHL Standard</g:service>`,
+    `        <g:service>Colissimo Standard</g:service>`,
     `        <g:price>5.90 EUR</g:price>`,
     `      </g:shipping>`,
     `    </item>`,
