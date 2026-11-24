@@ -22,6 +22,30 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
 
+    // Lecture seule : statuts bruts GS pour diagnostic (aucune écriture, aucun email)
+    const body = await req.json().catch(() => ({}))
+    if (Array.isArray(body?.inspect)) {
+      const headers = { Authorization: `Bearer ${gsToken}` }
+      const out: Record<string, unknown> = {}
+      for (const gsId of (body.inspect as unknown[]).slice(0, 10).map(String)) {
+        if (!/^\d+$/.test(gsId)) continue
+        const o = await fetch(`${GS_API_BASE}/orders-dropship/order-details/${gsId}/`, { headers })
+        const p = await fetch(`${GS_API_BASE}/orders-dropship/package-details/${gsId}/`, { headers })
+        const oj = o.ok ? await o.json() : null
+        const pj = p.ok ? await p.json() : null
+        out[gsId] = {
+          order_http: o.status,
+          order_status: oj?.status ?? null,
+          order_fields: oj ? Object.keys(oj) : null,
+          package_http: p.status,
+          package: pj,
+        }
+      }
+      return new Response(JSON.stringify({ ok: true, inspect: out }), {
+        headers: { ...CORS, 'Content-Type': 'application/json' },
+      })
+    }
+
     // 1. Trouver toutes les commandes envoyées à GS mais pas encore expédiées
     const { data: pendingOrders, error } = await supabase
       .from('orders')
