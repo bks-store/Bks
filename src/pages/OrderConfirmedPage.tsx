@@ -4,6 +4,7 @@ import { CheckCircle, XCircle, Loader2, ArrowRight, UserPlus } from 'lucide-reac
 import { useCart } from '../context/CartContext'
 import { useUserAuth } from '../context/UserAuthContext'
 import { useTranslation } from '../i18n/useTranslation'
+import { trackEcom, type TrackItem } from '../lib/marketing'
 
 export default function OrderConfirmedPage() {
   const [params] = useSearchParams()
@@ -16,6 +17,20 @@ export default function OrderConfirmedPage() {
   const [cleared, setCleared] = useState(false)
 
   const success = !redirectStatus || redirectStatus === 'succeeded'
+
+  useEffect(() => {
+    if (!redirectStatus || !success || !orderId) return
+    try {
+      const raw = sessionStorage.getItem('bks_checkout')
+      const firedKey = `bks_purchase_${orderId}`
+      if (!raw || localStorage.getItem(firedKey)) return
+      const checkout = JSON.parse(raw) as { orderId: string; value: number; items: TrackItem[] }
+      if (checkout.orderId !== orderId) return
+      trackEcom('Purchase', checkout.items, checkout.value, orderId)
+      localStorage.setItem(firedKey, '1')
+      sessionStorage.removeItem('bks_checkout')
+    } catch {}
+  }, [redirectStatus, success, orderId])
 
   useEffect(() => {
     if (success && !cleared) {

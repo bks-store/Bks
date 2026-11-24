@@ -11,7 +11,7 @@ export function BlackFridayBar() {
       onClick={open}
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        gap: '0.75rem', flexWrap: 'wrap',
+        gap: '0.6rem', flexWrap: 'nowrap', whiteSpace: 'nowrap',
         width: '100%', background: '#0E0906', color: '#F4EFE6',
         border: 'none', cursor: 'pointer',
         padding: '0.6rem 1rem',
@@ -23,7 +23,7 @@ export function BlackFridayBar() {
         Black Friday
       </span>
       <span style={{ opacity: 0.3 }}>·</span>
-      <span style={{ opacity: 0.8 }}>−20% sur toute la boutique jusqu'au 29&nbsp;nov.</span>
+      <span style={{ opacity: 0.8 }}>−20%<span className="bf-bar__long"> sur toute la boutique jusqu'au 29&nbsp;nov.</span></span>
       <span style={{ opacity: 0.3 }}>·</span>
       <span style={{ color: '#C8955A', fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: '3px' }}>
         Obtenir mon code →

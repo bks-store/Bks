@@ -20,6 +20,7 @@ import { IMAGES, cutoutImage } from '../config/images'
 import { formatPrice } from '../lib/format'
 import { useCurrency } from '../context/CurrencyContext'
 import { supabase, isConfigured } from '../lib/supabase'
+import { trackEcom } from '../lib/marketing'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY ?? '')
 
@@ -195,6 +196,7 @@ export default function CartPage() {
   const [promoError, setPromoError] = useState<string | null>(null)
   const [promoChecking, setPromoChecking] = useState(false)
 
+  const trackItems = items.map(i => ({ id: i.productId, name: i.name, brand: i.brand, price: i.price, quantity: i.quantity, size: i.size }))
   const shippingCost = total >= 150 ? 0 : SHIPPING
   const discountAmount = promoDiscount > 0 ? Math.round(total * promoDiscount) / 100 : 0
   const totalWithShipping = total - discountAmount + shippingCost
@@ -242,13 +244,14 @@ export default function CartPage() {
     setPromoError(null)
     const result = await (supabase! as any)
       .from('promo_codes')
-      .select('discount_percent')
+      .select('discount_percent, expires_at')
       .eq('code', code)
+      .eq('active', true)
       .maybeSingle()
-    const data = result.data as { discount_percent: number } | null
+    const data = result.data as { discount_percent: number; expires_at: string | null } | null
     const error = result.error
     setPromoChecking(false)
-    if (error || !data) {
+    if (error || !data || (data.expires_at && new Date(data.expires_at) < new Date())) {
       setPromoError('Code invalide ou expiré')
       setPromoCode(null)
       setPromoDiscount(0)
@@ -294,6 +297,10 @@ export default function CartPage() {
 
       setClientSecret(data.clientSecret)
       setOrderId(data.orderId)
+      trackEcom('AddPaymentInfo', trackItems, totalWithShipping)
+      try {
+        sessionStorage.setItem('bks_checkout', JSON.stringify({ orderId: data.orderId, value: totalWithShipping, items: trackItems }))
+      } catch {}
 
       if (saveAddress && user && isConfigured && supabase) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -315,7 +322,7 @@ export default function CartPage() {
     } finally {
       setLoading(false)
     }
-  }, [isFormValid, items, total, form])
+  }, [isFormValid, items, totalWithShipping, form, locale, promoCode, saveAddress, user])
 
   if (items.length === 0 && step !== 'payment') {
     return (
@@ -561,7 +568,7 @@ export default function CartPage() {
           )}
           {total >= 150 && (
             <p style={{ fontSize: '0.6875rem', color: 'var(--ink-soft)', marginBottom: '1rem', lineHeight: 1.5 }}>
-              Livraison offerte en France · Colissimo suivi
+              Livraison offerte · DHL suivi, 5 à 8 jours ouvrés
             </p>
           )}
 
@@ -636,7 +643,7 @@ export default function CartPage() {
 
           {step === 'cart' && (
             <button
-              onClick={() => setStep('details')}
+              onClick={() => { trackEcom('InitiateCheckout', trackItems, totalWithShipping); setStep('details') }}
               className="btn btn--solid btn--block"
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
             >

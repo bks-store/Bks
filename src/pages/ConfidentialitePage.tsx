@@ -66,9 +66,11 @@ export default function ConfidentialitePage() {
         <ul>
           <li><strong>Stripe</strong> (paiement) — <a href="https://stripe.com/fr/privacy" target="_blank" rel="noopener noreferrer">politique de confidentialité Stripe</a></li>
           <li><strong>Supabase</strong> (hébergement base de données, serveurs en Europe) — <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">politique Supabase</a></li>
-          <li><strong>Colissimo / transporteur</strong> (livraison) — nom, prénom, adresse uniquement</li>
+          <li><strong>Golden Sneakers et DHL</strong> (préparation et livraison de la commande) — nom, adresse, téléphone uniquement</li>
+          <li><strong>Resend</strong> (envoi des emails de commande)</li>
+          <li><strong>Google Analytics et Meta</strong> (mesure d'audience et de nos publicités) — uniquement si vous acceptez les cookies</li>
         </ul>
-        <p>Aucune donnée n'est vendue ni transmise à des tiers à des fins publicitaires.</p>
+        <p>Aucune donnée n'est vendue. Sans votre accord aux cookies, aucune donnée n'est transmise à Google ou Meta.</p>
 
         <h2>7. Vos droits (RGPD)</h2>
         <p>Conformément au RGPD, vous disposez des droits suivants :</p>

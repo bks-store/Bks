@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { trackEcom } from '../lib/marketing'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { ArrowRight, ArrowLeft, Check, Truck, ShieldCheck, RotateCcw } from 'lucide-react'
 import { useProducts } from '../context/ProductsContext'
@@ -27,6 +28,42 @@ export default function ProductPage() {
   const [activeImg, setActiveImg] = useState(0)
   const tiltRef = useTilt<HTMLDivElement>({ touch: true })
   const { formatPrice: fmtPrice, formatEur, isEuro } = useCurrency()
+
+  const addBtnRef = useRef<HTMLButtonElement>(null)
+  const sizeBoxRef = useRef<HTMLDivElement>(null)
+  const [showSticky, setShowSticky] = useState(false)
+
+  useEffect(() => {
+    if (!product) return
+    trackEcom('ViewContent', [{ id: product.id, name: product.name, brand: product.brand, price: product.price, quantity: 1 }], product.price)
+    try {
+      const remembered = localStorage.getItem('bks_size')
+      if (remembered && product.sizes.some(s => s.size === remembered && s.available)) setSelectedSize(remembered)
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id])
+
+  useEffect(() => {
+    const update = () => {
+      const btn = addBtnRef.current
+      if (!btn) return
+      const r = btn.getBoundingClientRect()
+      setShowSticky(r.top > window.innerHeight || r.bottom < 0)
+    }
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [product?.id, loading])
+
+  const chooseSize = (size: string) => {
+    setSelectedSize(size)
+    setSizeError(false)
+    try { localStorage.setItem('bks_size', size) } catch {}
+  }
 
   if (loading) {
     return <div className="container" style={{minHeight:'60vh'}} />
@@ -57,7 +94,16 @@ export default function ProductPage() {
     setTimeout(() => setAdded(false), 2500)
   }
 
-  const similar = products.filter(p => p.id !== product.id && (p.brand === product.brand || p.category === product.category)).slice(0, 4)
+  const similar = products
+    .filter(p => p.id !== product.id && (p.brand === product.brand || p.category === product.category) && p.sizes.some(s => s.available))
+    .sort((a, b) => Number(b.brand === product.brand) - Number(a.brand === product.brand))
+    .slice(0, 4)
+
+  const handleStickyClick = () => {
+    if (selectedSize) { handleAdd(); return }
+    sizeBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    setSizeError(true)
+  }
   const availableSizes = product.sizes.filter(s => s.available)
   const isLowStock = availableSizes.length > 0 && availableSizes.length <= 2
 
@@ -196,7 +242,7 @@ export default function ProductPage() {
             </div>
 
             {/* Sélection taille */}
-            <div style={{
+            <div ref={sizeBoxRef} style={{
               background: sizeError ? 'rgba(var(--accent-hover-rgb, 220,80,60), 0.04)' : 'var(--surface-2)',
               border: sizeError ? '1px solid var(--accent-hover)' : '1px solid var(--line)',
               borderRadius: '6px',
@@ -227,7 +273,7 @@ export default function ProductPage() {
                       key={s.size}
                       disabled={!s.available}
                       aria-pressed={selectedSize === s.size}
-                      onClick={() => { setSelectedSize(s.size); setSizeError(false) }}
+                      onClick={() => chooseSize(s.size)}
                       style={{
                         height: '48px',
                         fontSize: '0.875rem',
@@ -276,6 +322,7 @@ export default function ProductPage() {
 
             {/* Bouton ajouter */}
             <button
+              ref={addBtnRef}
               className="btn btn--solid btn--block"
               onClick={handleAdd}
               disabled={availableSizes.length === 0}
@@ -292,6 +339,10 @@ export default function ProductPage() {
                   ? <>{t.product.addToCart} — EU {selectedSize}</>
                   : t.product.addToCart}
             </button>
+
+            <p className="product__stock" style={{ marginTop: 0, marginBottom: '1rem' }}>
+              {product.stockType === 'boutique' ? t.product.stockBoutique : t.product.stockDropship}
+            </p>
 
             {/* Trust badges */}
             <div style={{
@@ -320,10 +371,6 @@ export default function ProductPage() {
               ))}
             </div>
 
-            <p className="product__stock">
-              {product.stockType === 'boutique' ? t.product.stockBoutique : t.product.stockDropship}
-            </p>
-
             <div className="product__details">
               <details>
                 <summary>{t.product.delivery} &amp; {t.product.returns.toLowerCase()}</summary>
@@ -333,6 +380,18 @@ export default function ProductPage() {
           </div>
         </div>
       </div>
+
+      {showSticky && availableSizes.length > 0 && (
+        <div className="product-sticky">
+          <div style={{ minWidth: 0 }}>
+            <p className="product-sticky__name">{product.name}</p>
+            <p className="product-sticky__price">{fmtPrice(product.price)}</p>
+          </div>
+          <button className="btn btn--solid" onClick={handleStickyClick}>
+            {added ? t.product.added : selectedSize ? `${t.product.addToCart} — EU ${selectedSize}` : t.product.chooseSize}
+          </button>
+        </div>
+      )}
 
       {similar.length > 0 && (
         <section className="section bg-surface-2">

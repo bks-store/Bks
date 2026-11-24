@@ -36,9 +36,22 @@ const Ctx = createContext<ProductsCtx>({
   reload: async () => {},
 })
 
+const CACHE_KEY = 'bks_products_v2'
+const CACHE_MAX_AGE = 6 * 60 * 60 * 1000
+
+function readCache(): Product[] | null {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    if (!raw) return null
+    const { at, products } = JSON.parse(raw) as { at: number; products: Product[] }
+    return Date.now() - at < CACHE_MAX_AGE && products.length ? products : null
+  } catch { return null }
+}
+
 export function ProductsProvider({ children }: { children: ReactNode }) {
-  const [products, setProducts] = useState<Product[]>(isConfigured ? [] : PRODUCTS)
-  const [loading, setLoading] = useState(isConfigured)
+  const [cached] = useState(() => (isConfigured ? readCache() : null))
+  const [products, setProducts] = useState<Product[]>(isConfigured ? cached ?? [] : PRODUCTS)
+  const [loading, setLoading] = useState(isConfigured && !cached)
 
   const load = async () => {
     if (!isConfigured) {
@@ -46,7 +59,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
       setLoading(false)
       return
     }
-    setLoading(true)
+    if (!readCache()) setLoading(true)
     const { data: rows } = await supabase
       .from('products')
       .select('id,slug,name,brand,price_sale,price_original,category,subcategory,images,description,is_new,is_featured,stock_type,tags,product_sizes(size,available)')
@@ -69,8 +82,10 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
       if (b.is_featured !== a.is_featured) return (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0)
       return 0
     })
-    setProducts(sorted.map(r => toProduct(r)))
+    const fresh = sorted.map(r => toProduct(r))
+    setProducts(fresh)
     setLoading(false)
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), products: fresh })) } catch {}
   }
 
   useEffect(() => { load() }, [])

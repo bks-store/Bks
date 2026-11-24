@@ -11,6 +11,14 @@ const MARKUP = 1.65
 // Max images à télécharger par sync (séquentiel pour éviter les crashes mémoire)
 const MAX_IMG_DOWNLOAD = 20
 
+// Prix en X9,99, sauf 149,99 → 150,00 pour atteindre le seuil de livraison offerte (150 €)
+const FREE_SHIPPING_PRICE = 150
+const roundTo999 = (p: number) => Math.ceil((p + 0.01) / 10) * 10 - 0.01
+const toShopPrice = (p: number) => {
+  const r = Math.round(roundTo999(p) * 100) / 100
+  return r === FREE_SHIPPING_PRICE - 0.01 ? FREE_SHIPPING_PRICE : r
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
@@ -56,7 +64,7 @@ serve(async (req) => {
         brand: item.brand_name,
         category: 'sneakers',
         stock_type: 'dropshipping',
-        price_sale: Math.ceil((minBuy * MARKUP + 0.01) / 10) * 10 - 0.01,
+        price_sale: toShopPrice(minBuy * MARKUP),
         price_buy: minBuy,
         last_sync_at: now,
         sync_status: 'synced',
@@ -220,13 +228,12 @@ serve(async (req) => {
 
     // Normaliser les prix de tous les produits vers le format X9.99
     const { data: allProducts } = await supabase.from('products').select('id, price_sale')
-    const roundTo999 = (p: number) => Math.ceil((p + 0.01) / 10) * 10 - 0.01
     const toRound = (allProducts ?? []).filter((p: { price_sale: number }) =>
-      Math.abs(roundTo999(p.price_sale) - p.price_sale) > 0.001
+      p.price_sale !== FREE_SHIPPING_PRICE && Math.abs(toShopPrice(p.price_sale) - p.price_sale) > 0.001
     )
     if (toRound.length > 0) {
       await Promise.all(toRound.map((p: { id: string; price_sale: number }) =>
-        supabase.from('products').update({ price_sale: roundTo999(p.price_sale) }).eq('id', p.id)
+        supabase.from('products').update({ price_sale: toShopPrice(p.price_sale) }).eq('id', p.id)
       ))
     }
 

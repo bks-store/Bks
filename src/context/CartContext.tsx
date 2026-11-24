@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { trackEcom } from '../lib/marketing'
+import { useProducts } from './ProductsContext'
 
 export interface CartItem {
   productId: string
@@ -40,7 +42,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try { localStorage.setItem(CART_KEY, JSON.stringify(items)) } catch {}
   }, [items])
 
+  // Le serveur facture le prix actuel : on aligne l'affichage des paniers enregistrés
+  const { products } = useProducts()
+  useEffect(() => {
+    if (!products.length) return
+    const priceOf = new Map(products.map(p => [p.id, p.price]))
+    setItems(prev => {
+      const changed = prev.some(i => priceOf.has(i.productId) && priceOf.get(i.productId) !== i.price)
+      return changed
+        ? prev.map(i => (priceOf.has(i.productId) ? { ...i, price: priceOf.get(i.productId)! } : i))
+        : prev
+    })
+  }, [products])
+
   const addItem = (item: CartItem) => {
+    trackEcom('AddToCart', [{ id: item.productId, name: item.name, brand: item.brand, price: item.price, quantity: item.quantity, size: item.size }], item.price * item.quantity)
     setItems(prev => {
       const existing = prev.find(i => i.productId === item.productId && i.size === item.size)
       if (existing) {

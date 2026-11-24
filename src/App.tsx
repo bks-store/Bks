@@ -1,6 +1,7 @@
 import { useEffect, lazy, Suspense } from 'react'
 import { Routes, Route, useLocation, Link } from 'react-router-dom'
 import { supabase } from './lib/supabase'
+import { trackPageView } from './lib/marketing'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
@@ -63,12 +64,9 @@ function StoreFront() {
   const { pathname, search } = useLocation()
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
   useEffect(() => {
-    if (typeof (window as any).gtag === 'function') {
-      ;(window as any).gtag('event', 'page_view', {
-        page_path: pathname + search,
-        page_title: document.title,
-      })
-    }
+    // laisse react-helmet poser le <title> de la page avant l'envoi
+    const t = setTimeout(() => trackPageView(pathname + search), 0)
+    return () => clearTimeout(t)
   }, [pathname, search])
   useEffect(() => {
     if (pathname.startsWith('/admin')) return

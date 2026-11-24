@@ -272,8 +272,26 @@ function Instagram() {
 export default function HomePage() {
   const { t } = useTranslation()
   const { products } = useProducts()
-  const nouveautes = products.filter(p => p.isNew && p.images.length > 0)
-  const featured = products.filter(p => p.isFeatured && p.images.length > 0)
+  const sizeCount = (p: Product) => p.sizes.filter(s => s.available).length
+  const buyable = products.filter(p => p.images.length > 0 && sizeCount(p) > 0)
+
+  const perBrand = new Map<string, number>()
+  const classics = buyable
+    .filter(p => sizeCount(p) >= 5 && p.price <= 200)
+    .sort((a, b) => sizeCount(b) - sizeCount(a))
+    .filter(p => {
+      const n = perBrand.get(p.brand) ?? 0
+      perBrand.set(p.brand, n + 1)
+      return n < 2
+    })
+    .slice(0, 8)
+  const inClassics = new Set(classics.map(p => p.id))
+  const premium = buyable
+    .filter(p => !inClassics.has(p.id) && p.price >= 180 && sizeCount(p) >= 2)
+    .sort((a, b) => sizeCount(b) - sizeCount(a) || Number(b.isFeatured) - Number(a.isFeatured))
+    .slice(0, 8)
+  const shown = new Set([...inClassics, ...premium.map(p => p.id)])
+  const nouveautes = buyable.filter(p => p.isNew && !shown.has(p.id))
 
   return (
     <>
@@ -286,7 +304,29 @@ export default function HomePage() {
         schema={[LOCAL_BUSINESS_SCHEMA, FAQ_SCHEMA]}
       />
       <Hero />
-      <BrandsStrip />
+      {classics.length > 0 && (
+        <ProductRow
+          eyebrow={t.home.classicsEyebrow}
+          title={t.home.classicsTitle}
+          products={classics}
+          link="/catalogue"
+          linkLabel={t.sections.seeAllCatalogue}
+          tone="surface-2"
+          cols={4}
+          priority
+        />
+      )}
+      {premium.length > 0 && (
+        <ProductRow
+          eyebrow={t.home.premiumEyebrow}
+          title={t.home.premiumTitle}
+          products={premium}
+          link="/catalogue?tri=prix-desc"
+          linkLabel={t.sections.seeAllCatalogue}
+          tone="surface"
+          cols={4}
+        />
+      )}
       {nouveautes.length > 0 && (
         <ProductRow
           eyebrow={t.home.newEyebrow}
@@ -295,23 +335,11 @@ export default function HomePage() {
           link="/catalogue?nouveau=true"
           linkLabel={t.sections.seeAllNew}
           tone="surface-2"
-          cols={3}
-          priority
-        />
-      )}
-      <Brand />
-      {featured.length > 0 && (
-        <ProductRow
-          eyebrow={t.home.featuredEyebrow}
-          title={t.sections.featured}
-          products={featured}
-          link="/catalogue"
-          linkLabel={t.sections.seeAllCatalogue}
-          tone="surface"
           cols={4}
-          priority
         />
       )}
+      <BrandsStrip />
+      <Brand />
       <Store />
       <Instagram />
     </>

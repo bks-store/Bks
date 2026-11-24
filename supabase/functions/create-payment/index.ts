@@ -93,11 +93,13 @@ serve(async (req) => {
     if (promoCode) {
       const { data: promoRow } = await supabase
         .from('promo_codes')
-        .select('id, discount_percent, max_uses, used_count')
+        .select('id, discount_percent, max_uses, used_count, expires_at')
         .eq('code', promoCode.toUpperCase())
         .eq('active', true)
         .maybeSingle()
-      if (!promoRow) return json({ error: 'Code promo invalide ou expiré' }, 400)
+      if (!promoRow || (promoRow.expires_at && new Date(promoRow.expires_at) < new Date())) {
+        return json({ error: 'Code promo invalide ou expiré' }, 400)
+      }
       if (promoRow.max_uses !== null && promoRow.used_count >= promoRow.max_uses) {
         return json({ error: 'Ce code promo a atteint sa limite d\'utilisation' }, 400)
       }

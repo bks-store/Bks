@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-
-const STORAGE_KEY = 'bks-cookie-consent'
+import { CONSENT_KEY as STORAGE_KEY, startTracking, trackPageView } from '../lib/marketing'
 
 type ConsentState = 'accepted' | 'declined' | null
 
@@ -26,6 +25,7 @@ export default function CookieBanner() {
 
   const accept = () => {
     try { localStorage.setItem(STORAGE_KEY, 'accepted') } catch {}
+    if (startTracking()) trackPageView(location.pathname + location.search)
     setConsent('accepted')
     setVisible(false)
   }
@@ -44,7 +44,7 @@ export default function CookieBanner() {
         <div className="cookie-banner__text">
           <p>
             <strong>Cookies</strong> — Ce site utilise des cookies techniques indispensables à son fonctionnement.
-            Avec votre accord, nous utilisons également Google Analytics pour mesurer l'audience (données anonymisées).{' '}
+            Avec votre accord, nous utilisons aussi Google Analytics (mesure d'audience) et le pixel Meta (mesure de nos publicités Facebook et Instagram).{' '}
             <Link to="/confidentialite">En savoir plus</Link>
           </p>
         </div>

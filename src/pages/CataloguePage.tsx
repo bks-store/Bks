@@ -97,6 +97,7 @@ export default function CataloguePage() {
         current.filter(s => s !== size).forEach(s => prev.append('size', s))
       } else {
         [...current, size].forEach(s => prev.append('size', s))
+        try { localStorage.setItem('bks_size', size) } catch {}
       }
       return prev
     }, { replace: true })
@@ -123,7 +124,10 @@ export default function CataloguePage() {
     switch (sortBy) {
       case 'prix-asc': products.sort((a, b) => a.price - b.price); break
       case 'prix-desc': products.sort((a, b) => b.price - a.price); break
-      default: if (rubrique?.ruleType !== 'manual') products.sort((a, b) => Number(b.isNew) - Number(a.isNew))
+      default: if (rubrique?.ruleType !== 'manual') {
+        const sizes = (p: typeof products[number]) => p.sizes.filter(s => s.available).length
+        products.sort((a, b) => Number(b.isNew) - Number(a.isNew) || sizes(b) - sizes(a))
+      }
     }
     return products
   }, [rubrique, category, isNew, query, selectedBrands, selectedSizes, selectedPrice, sortBy, allProducts])
