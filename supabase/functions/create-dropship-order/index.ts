@@ -7,17 +7,36 @@ const CORS = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+async function alertShop(orderId: string, customer: string, message: string) {
+  const resendKey = Deno.env.get('RESEND_API_KEY')
+  if (!resendKey) return
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: 'BKS Store <commandes@bks-store.com>',
+      to: ['bks@bks-store.com'],
+      subject: `⚠ Commande non transmise à Golden Sneakers — ${customer}`,
+      html: `<p>La commande <strong>${orderId}</strong> (${customer}) est payée mais n'a pas pu être transmise à Golden Sneakers.</p>
+<p>Erreur : <code>${message.replace(/</g, '&lt;')}</code></p>
+<p>Il faut la passer manuellement chez Golden Sneakers, ou contacter le client.</p>`,
+    }),
+  }).catch(() => {})
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
+
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+  )
+  let orderIdForAlert: string | null = null
+  let customerForAlert = ''
 
   try {
     const gsToken = Deno.env.get('GOLDEN_SNEAKERS_TOKEN')
     if (!gsToken) throw new Error('GOLDEN_SNEAKERS_TOKEN manquant dans les secrets Supabase')
-
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-    )
 
     const { order_id } = await req.json()
     if (!order_id) throw new Error('order_id manquant')
@@ -34,8 +53,12 @@ serve(async (req) => {
       throw new Error('Paiement non confirmé — impossible de créer la commande fournisseur')
     }
     if (order.gs_dropship_order_id) {
-      throw new Error('Commande dropship déjà créée pour cette commande')
+      return new Response(JSON.stringify({ ok: true, already: order.gs_dropship_order_id }), {
+        headers: { ...CORS, 'Content-Type': 'application/json' },
+      })
     }
+    orderIdForAlert = order.id
+    customerForAlert = order.customer_name ?? ''
 
     const addr = order.shipping_address
     if (!addr) throw new Error('Adresse de livraison manquante')
@@ -57,7 +80,7 @@ serve(async (req) => {
         name: order.customer_name,
         city: addr.city,
         zip_code: addr.zip,
-        street: addr.line1,
+        street: [addr.line1, addr.line2].filter((s: string | null) => s && s.trim()).join(', '),
         country_code: addr.country ?? 'FR',
         phone: order.customer_phone ?? '',
         email: order.customer_email,
@@ -96,7 +119,15 @@ serve(async (req) => {
       { headers: { ...CORS, 'Content-Type': 'application/json' } },
     )
   } catch (e) {
-    return new Response(JSON.stringify({ ok: false, error: (e as Error).message }), {
+    const message = (e as Error).message
+    if (orderIdForAlert) {
+      // 'error' empêche les relances automatiques et les alertes en boucle
+      await supabase.from('orders')
+        .update({ gs_dropship_status: 'error', notes: `Transmission GS échouée : ${message}`.slice(0, 500), updated_at: new Date().toISOString() })
+        .eq('id', orderIdForAlert)
+      await alertShop(orderIdForAlert, customerForAlert, message)
+    }
+    return new Response(JSON.stringify({ ok: false, error: message }), {
       status: 500,
       headers: { ...CORS, 'Content-Type': 'application/json' },
     })

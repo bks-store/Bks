@@ -46,23 +46,41 @@ serve(async (req) => {
       })
     }
 
+    // 0. Relancer les commandes payées jamais transmises à GS (échec réseau au moment du paiement)
+    const retried: string[] = []
+    const { data: untransmitted } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('payment_status', 'paid')
+      .is('gs_dropship_order_id', null)
+      .is('gs_dropship_status', null)
+      .lt('created_at', new Date(Date.now() - 10 * 60 * 1000).toISOString())
+    for (const o of untransmitted ?? []) {
+      await fetch(`${supabaseUrl}/functions/v1/create-dropship-order`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_id: o.id }),
+      }).catch(() => {})
+      retried.push(o.id)
+    }
+
     // 1. Trouver toutes les commandes envoyées à GS mais pas encore expédiées
     const { data: pendingOrders, error } = await supabase
       .from('orders')
       .select('id, gs_dropship_order_id, status, tracking_number')
       .not('gs_dropship_order_id', 'is', null)
-      .is('tracking_number', null)
-      .not('status', 'in', '("cancelled","delivered")')
+      .in('status', ['confirmed', 'preparing'])
 
     if (error) throw new Error(`Lecture commandes: ${error.message}`)
     if (!pendingOrders?.length) {
-      return new Response(JSON.stringify({ ok: true, checked: 0, shipped: 0 }), {
+      return new Response(JSON.stringify({ ok: true, checked: 0, shipped: 0, retried }), {
         headers: { ...CORS, 'Content-Type': 'application/json' },
       })
     }
 
     let shippedCount = 0
     const errors: string[] = []
+    const statuses: Record<string, string> = {}
 
     for (const order of pendingOrders) {
       try {
@@ -76,61 +94,52 @@ serve(async (req) => {
           continue
         }
         const gsOrder = await orderRes.json()
+        const gsStatus = String(gsOrder.status ?? '').toUpperCase()
+        statuses[gsId] = gsStatus
 
-        // 3. Mettre à jour le statut "En préparation" si GS confirme (TO_SHIP)
-        if (
-          order.status === 'confirmed' &&
-          String(gsOrder.status ?? '').toUpperCase() === 'TO_SHIP'
-        ) {
-          await supabase
-            .from('orders')
-            .update({ status: 'preparing', updated_at: new Date().toISOString() })
-            .eq('id', order.id)
+        // GS attribue le numéro de suivi dès la commande (TO_SHIP) : seul ENDED signifie colis parti
+        if (gsStatus === 'TO_SHIP') {
+          if (order.status === 'confirmed') {
+            await supabase
+              .from('orders')
+              .update({ status: 'preparing', updated_at: new Date().toISOString() })
+              .eq('id', order.id)
+          }
+          continue
         }
+        if (gsStatus !== 'ENDED') continue
 
-        // 2b. Détails du colis (tracking)
-        let gsPackage: Record<string, unknown> = {}
-        const pkgRes = await fetch(`${GS_API_BASE}/orders-dropship/package-details/${gsId}/`, { headers })
-        if (pkgRes.ok) gsPackage = await pkgRes.json()
-
-        // 4. Si GS a un numéro de suivi → mettre à jour + envoyer email client
-        const tracking =
-          (gsPackage as Record<string, unknown>).tracking_numbers
-            ?? gsPackage.tracking_number
-            ?? gsOrder.tracking_numbers
-            ?? gsOrder.tracking_number
-            ?? gsOrder.waybill
-            ?? null
-
-        // tracking_numbers peut être un tableau → prendre le premier
+        const tracking = gsOrder.tracking_numbers ?? gsOrder.tracking_number ?? gsOrder.waybill ?? null
         const trackingStr: string | null = Array.isArray(tracking)
           ? (tracking[0] ? String(tracking[0]) : null)
           : (tracking ? String(tracking) : null)
 
-        if (trackingStr) {
-          await supabase
-            .from('orders')
-            .update({
-              tracking_number: trackingStr,
-              status: 'shipped',
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', order.id)
+        if (!trackingStr && !order.tracking_number) {
+          errors.push(`GS ${gsId} ENDED sans numéro de suivi`)
+          continue
+        }
 
-          // Déclencher l'email d'expédition (ne jamais appeler si RESEND non configuré)
-          const resendKey = Deno.env.get('RESEND_API_KEY')
-          if (resendKey) {
-            await fetch(`${supabaseUrl}/functions/v1/send-shipping-email`, {
-              method: 'POST',
-              headers: {
-                Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ order_id: order.id }),
-            })
-          }
+        await supabase
+          .from('orders')
+          .update({
+            tracking_number: order.tracking_number ?? trackingStr,
+            status: 'shipped',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', order.id)
+        shippedCount++
 
-          shippedCount++
+        // Email d'expédition une seule fois : si un suivi était déjà enregistré, le client l'a déjà reçu
+        if (!order.tracking_number && Deno.env.get('RESEND_API_KEY')) {
+          const mailRes = await fetch(`${supabaseUrl}/functions/v1/send-shipping-email`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ order_id: order.id }),
+          })
+          if (!mailRes.ok) errors.push(`Email expédition ${order.id}: HTTP ${mailRes.status} ${(await mailRes.text()).slice(0, 200)}`)
         }
       } catch (e) {
         errors.push(`Exception commande ${order.id}: ${(e as Error).message}`)
@@ -142,6 +151,8 @@ serve(async (req) => {
         ok: true,
         checked: pendingOrders.length,
         shipped: shippedCount,
+        gs_statuses: statuses,
+        retried,
         errors,
       }),
       { headers: { ...CORS, 'Content-Type': 'application/json' } },
